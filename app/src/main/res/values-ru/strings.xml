@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Таймер сна</string>
+    <string name="tab_timer">Таймер</string>
+    <string name="tab_settings">Настройки</string>
+</resources>

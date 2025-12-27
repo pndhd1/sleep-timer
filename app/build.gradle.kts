@@ -2,6 +2,7 @@ plugins {
     id(libs.plugins.android.application)
     id(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -18,6 +19,8 @@ android {
         versionName = BuildConfig.VersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        androidResources.localeFilters += listOf("en", "ru")
     }
 
     buildTypes {
@@ -57,4 +60,7 @@ dependencies {
 
     implementation(libs.decompose)
     implementation(libs.decompose.extensions.compose)
+
+    implementation(libs.kotlin.serialization.core)
+    implementation(libs.kotlin.serialization.json)
 }
