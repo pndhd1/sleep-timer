@@ -2,6 +2,7 @@ package io.github.pndhd1.sleeptimer.ui.root
 
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
+import io.github.pndhd1.sleeptimer.ui.timer.TimerComponent
 
 interface RootComponent {
 
@@ -12,9 +13,9 @@ interface RootComponent {
 
     sealed interface Child {
 
-        class TimerChild : Child
+        data class TimerChild(val component: TimerComponent) : Child
 
-        class SettingsChild : Child
+        data object SettingsChild : Child
     }
 }
 

@@ -1,6 +1,8 @@
 package io.github.pndhd1.sleeptimer.ui.root
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +14,7 @@ import androidx.compose.ui.res.vectorResource
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.timer.TimerContent
 
 @Composable
 fun RootContent(
@@ -56,8 +59,11 @@ fun RootContent(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            when (activeChild) {
-                is Child.TimerChild -> Text("Timer Screen")
+            when (val child = activeChild) {
+                is Child.TimerChild -> TimerContent(
+                    component = child.component,
+                    modifier = Modifier.fillMaxSize(),
+                )
                 is Child.SettingsChild -> Text("Settings Screen")
             }
         }

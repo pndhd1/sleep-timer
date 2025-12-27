@@ -2,4 +2,15 @@
     <string name="app_name">Sleep Timer</string>
     <string name="tab_timer">Timer</string>
     <string name="tab_settings">Settings</string>
+
+    <string name="label_hours">Hours</string>
+    <string name="label_minutes">Minutes</string>
+    <string name="label_seconds">Seconds</string>
+
+    <string name="preset_minutes">%d min</string>
+    <string name="preset_hours">%d h</string>
+
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="button_reset">Reset</string>
 </resources>

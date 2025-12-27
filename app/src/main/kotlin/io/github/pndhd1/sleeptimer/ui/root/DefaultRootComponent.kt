@@ -1,9 +1,13 @@
 package io.github.pndhd1.sleeptimer.ui.root
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.stack.*
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.bringToFront
+import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import io.github.pndhd1.sleeptimer.ui.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.timer.DefaultTimerComponent
 import kotlinx.serialization.Serializable
 
 class DefaultRootComponent(
@@ -30,10 +34,11 @@ class DefaultRootComponent(
 
     private fun createChild(config: Config, componentContext: ComponentContext): Child =
         when (config) {
-            Config.TimerConfig -> Child.TimerChild()
-            Config.SettingsConfig -> Child.SettingsChild()
+            Config.TimerConfig -> Child.TimerChild(
+                component = DefaultTimerComponent(componentContext),
+            )
+            Config.SettingsConfig -> Child.SettingsChild
         }
-
 
     @Serializable
     private sealed interface Config {

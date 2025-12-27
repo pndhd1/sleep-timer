@@ -2,4 +2,15 @@
     <string name="app_name">Таймер сна</string>
     <string name="tab_timer">Таймер</string>
     <string name="tab_settings">Настройки</string>
+
+    <string name="label_hours">Часы</string>
+    <string name="label_minutes">Минуты</string>
+    <string name="label_seconds">Секунды</string>
+
+    <string name="preset_minutes">%d мин</string>
+    <string name="preset_hours">%d ч</string>
+
+    <string name="button_start">Старт</string>
+    <string name="button_stop">Стоп</string>
+    <string name="button_reset">Сброс</string>
 </resources>
