@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.timer.active
+package io.github.pndhd1.sleeptimer.ui.screens.timer.active
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FilledTonalButton

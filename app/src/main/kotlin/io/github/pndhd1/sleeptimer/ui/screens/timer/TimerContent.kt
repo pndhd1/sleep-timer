@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.timer
+package io.github.pndhd1.sleeptimer.ui.screens.timer
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import io.github.pndhd1.sleeptimer.ui.timer.active.ActiveTimerContent
-import io.github.pndhd1.sleeptimer.ui.timer.config.TimerConfigContent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerContent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigContent
 
 @Composable
 fun TimerContent(

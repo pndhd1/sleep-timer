@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.root
+package io.github.pndhd1.sleeptimer.ui.screens.root
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
@@ -6,8 +6,8 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
-import io.github.pndhd1.sleeptimer.ui.root.RootComponent.Child
-import io.github.pndhd1.sleeptimer.ui.timer.DefaultTimerComponent
+import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.timer.DefaultTimerComponent
 import kotlinx.serialization.Serializable
 
 class DefaultRootComponent(

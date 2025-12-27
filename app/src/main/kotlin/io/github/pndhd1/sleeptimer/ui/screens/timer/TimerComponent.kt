@@ -1,9 +1,9 @@
-package io.github.pndhd1.sleeptimer.ui.timer
+package io.github.pndhd1.sleeptimer.ui.screens.timer
 
 import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.value.Value
-import io.github.pndhd1.sleeptimer.ui.timer.active.ActiveTimerComponent
-import io.github.pndhd1.sleeptimer.ui.timer.config.TimerConfigComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigComponent
 
 interface TimerComponent {
 

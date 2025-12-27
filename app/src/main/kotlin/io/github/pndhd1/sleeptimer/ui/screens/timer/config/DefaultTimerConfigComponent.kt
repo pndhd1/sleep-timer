@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.timer.config
+package io.github.pndhd1.sleeptimer.ui.screens.timer.config
 
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.flow.MutableStateFlow

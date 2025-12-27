@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.timer
+package io.github.pndhd1.sleeptimer.ui.screens.timer
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
@@ -8,9 +8,9 @@ import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import io.github.pndhd1.sleeptimer.ui.timer.active.DefaultActiveTimerComponent
-import io.github.pndhd1.sleeptimer.ui.timer.config.DefaultTimerConfigComponent
-import io.github.pndhd1.sleeptimer.ui.timer.config.TimerConfigParams
+import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay

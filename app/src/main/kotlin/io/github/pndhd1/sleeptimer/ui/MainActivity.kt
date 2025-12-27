@@ -8,8 +8,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
-import io.github.pndhd1.sleeptimer.ui.root.DefaultRootComponent
-import io.github.pndhd1.sleeptimer.ui.root.RootContent
+import io.github.pndhd1.sleeptimer.ui.screens.root.DefaultRootComponent
+import io.github.pndhd1.sleeptimer.ui.screens.root.RootContent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 
 class MainActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.ui.root
+package io.github.pndhd1.sleeptimer.ui.screens.root
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import io.github.pndhd1.sleeptimer.R
-import io.github.pndhd1.sleeptimer.ui.root.RootComponent.Child
-import io.github.pndhd1.sleeptimer.ui.timer.TimerContent
+import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerContent
 
 @Composable
 fun RootContent(
