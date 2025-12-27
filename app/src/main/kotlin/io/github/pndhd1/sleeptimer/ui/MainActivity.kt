@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.defaultComponentContext
 import io.github.pndhd1.sleeptimer.ui.root.DefaultRootComponent
+import io.github.pndhd1.sleeptimer.ui.root.RootContent
+import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,10 +19,12 @@ class MainActivity : ComponentActivity() {
         val root = DefaultRootComponent(defaultComponentContext())
 
         setContent {
-            SleepTimerApplication(
-                component = root,
-                modifier = Modifier.fillMaxSize(),
-            )
+            SleepTimerTheme {
+                RootContent(
+                    component = root,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 }
