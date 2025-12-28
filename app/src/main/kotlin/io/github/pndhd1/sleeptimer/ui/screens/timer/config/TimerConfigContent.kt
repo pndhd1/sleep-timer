@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -19,7 +18,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.pndhd1.sleeptimer.R
-import java.util.Locale
+import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlin.time.Duration
 
 private const val TimeFormat = "%d:%02d:%02d"
@@ -34,13 +33,11 @@ fun TimerConfigContent(
 ) {
     val state by component.state.collectAsState()
     val configuration = LocalConfiguration.current
-    val locale = configuration.locales[0]
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
         LandscapeLayout(
             state = state,
-            locale = locale,
             onHoursChanged = component::onHoursChanged,
             onMinutesChanged = component::onMinutesChanged,
             onSecondsChanged = component::onSecondsChanged,
@@ -51,7 +48,6 @@ fun TimerConfigContent(
     } else {
         PortraitLayout(
             state = state,
-            locale = locale,
             onHoursChanged = component::onHoursChanged,
             onMinutesChanged = component::onMinutesChanged,
             onSecondsChanged = component::onSecondsChanged,
@@ -65,7 +61,6 @@ fun TimerConfigContent(
 @Composable
 private fun PortraitLayout(
     state: TimerConfigState,
-    locale: Locale,
     onHoursChanged: (Long) -> Unit,
     onMinutesChanged: (Long) -> Unit,
     onSecondsChanged: (Long) -> Unit,
@@ -84,10 +79,7 @@ private fun PortraitLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            TimeDisplay(
-                state = state,
-                locale = locale,
-            )
+            TimeDisplay(state = state)
 
             Spacer(Modifier.height(24.dp))
 
@@ -119,7 +111,6 @@ private fun PortraitLayout(
 @Composable
 private fun LandscapeLayout(
     state: TimerConfigState,
-    locale: Locale,
     onHoursChanged: (Long) -> Unit,
     onMinutesChanged: (Long) -> Unit,
     onSecondsChanged: (Long) -> Unit,
@@ -138,10 +129,7 @@ private fun LandscapeLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            TimeDisplay(
-                state = state,
-                locale = locale,
-            )
+            TimeDisplay(state = state)
 
             StartButton(
                 enabled = state.hasTime,
@@ -174,15 +162,10 @@ private fun LandscapeLayout(
 @Composable
 private fun TimeDisplay(
     state: TimerConfigState,
-    locale: Locale,
     modifier: Modifier = Modifier,
 ) {
-    val displayTime = remember(state.duration, locale) {
-        String.format(locale, TimeFormat, state.hours, state.minutes, state.seconds)
-    }
-
     Text(
-        text = displayTime,
+        text = Formatter.formatTime(state.duration),
         style = MaterialTheme.typography.displayLarge,
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier,

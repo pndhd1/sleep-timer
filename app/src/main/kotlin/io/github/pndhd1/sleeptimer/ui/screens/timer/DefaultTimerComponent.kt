@@ -13,6 +13,7 @@ import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child.Active
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child.Config
+import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerParams
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigParams
@@ -77,6 +78,7 @@ class DefaultTimerComponent(
         is SlotConfig.Active -> Active(
             component = DefaultActiveTimerComponent(
                 componentContext = componentContext,
+                params = ActiveTimerParams(targetTime = config.targetTime),
                 onStop = ::onStopTimer,
             ),
         )
