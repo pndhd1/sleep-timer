@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerContent
@@ -21,7 +21,7 @@ fun RootContent(
     component: RootComponent,
     modifier: Modifier = Modifier,
 ) {
-    val stack by component.stack.subscribeAsState()
+    val stack by component.stack.collectAsState()
     val activeChild = stack.active.instance
 
     Scaffold(
@@ -64,6 +64,7 @@ fun RootContent(
                     component = child.component,
                     modifier = Modifier.fillMaxSize(),
                 )
+
                 is Child.SettingsChild -> Text("Settings Screen")
             }
         }

@@ -1,38 +1,54 @@
 package io.github.pndhd1.sleeptimer.data.repository
 
 import androidx.datastore.core.DataStore
-import io.github.pndhd1.sleeptimer.data.proto.ProtoSettings
-import io.github.pndhd1.sleeptimer.data.proto.copy
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.utils.Defaults
+import io.github.pndhd1.sleeptimer.utils.toByteArray
+import io.github.pndhd1.sleeptimer.utils.toIntArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private val DefaultDurationSecondsKey = intPreferencesKey("default_duration_seconds")
+private val PresetSecondsKey = byteArrayPreferencesKey("preset_seconds")
+
+@Inject
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class SettingsRepositoryImpl(
-    private val settingsStore: DataStore<ProtoSettings>,
+    private val preferences: DataStore<Preferences>,
 ) : SettingsRepository {
 
-    override val timerSettings: Flow<TimerSettings> = settingsStore.data.map { it.toDomain() }
+    override val timerSettings: Flow<TimerSettings> = preferences.data.map { it.toDomain() }
 
     override suspend fun updateTimerDefaultDuration(duration: Duration) {
-        settingsStore.updateData { current ->
-            current.copy { defaultDurationSeconds = duration.inWholeSeconds }
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[DefaultDurationSecondsKey] = duration.inWholeSeconds.toInt()
+            }
         }
     }
 
     override suspend fun updateTimerPresets(presets: List<Duration>) {
-        settingsStore.updateData { current ->
-            current.copy {
-                presetSeconds.clear()
-                presetSeconds.addAll(presets.map { it.inWholeSeconds })
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[PresetSecondsKey] = presets.map { it.inWholeSeconds.toInt() }.toByteArray()
             }
         }
     }
 }
 
-private fun ProtoSettings.toDomain() = TimerSettings(
-    defaultDuration = defaultDurationSeconds.seconds,
-    presets = presetSecondsList.map { it.seconds },
+private fun Preferences.toDomain() = TimerSettings(
+    defaultDuration = get(DefaultDurationSecondsKey)?.seconds ?: Defaults.DefaultDuration,
+    presets = get(PresetSecondsKey)?.let { it.toIntArray().map { it.seconds } }
+        ?: Defaults.DefaultPresets,
 )

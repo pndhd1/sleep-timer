@@ -10,8 +10,7 @@ essenty = "2.5.0"
 serialization = "1.9.0"
 splashscreen = "1.2.0"
 datastore = "1.2.0"
-protobuf = "4.33.2"
-protobufPlugin = "0.9.6"
+metro = "0.9.2"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -31,13 +30,12 @@ essenty-lifecycle-coroutines = { group = "com.arkivanov.essenty", name = "lifecy
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
-androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
-protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 

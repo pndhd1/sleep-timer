@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-option java_package = "io.github.pndhd1.sleeptimer.data.proto";
-option java_multiple_files = true;
-
-message ProtoSettings {
-  int64 default_duration_seconds = 1;
-  repeated int64 preset_seconds = 2;
-}

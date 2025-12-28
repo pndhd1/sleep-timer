@@ -74,24 +74,33 @@ private fun PortraitLayout(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
-        TimeDisplay(
-            state = state,
-            locale = locale,
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            TimeDisplay(
+                state = state,
+                locale = locale,
+            )
 
-        TimeInputSection(
-            hours = state.hours,
-            minutes = state.minutes,
-            seconds = state.seconds,
-            onHoursChanged = onHoursChanged,
-            onMinutesChanged = onMinutesChanged,
-            onSecondsChanged = onSecondsChanged,
-        )
+            Spacer(Modifier.height(24.dp))
 
-        PresetButtons(
-            presets = state.presets,
-            onPresetSelected = onPresetSelected,
-        )
+            TimeInputSection(
+                hours = state.hours,
+                minutes = state.minutes,
+                seconds = state.seconds,
+                onHoursChanged = onHoursChanged,
+                onMinutesChanged = onMinutesChanged,
+                onSecondsChanged = onSecondsChanged,
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            PresetButtons(
+                presets = state.presets,
+                onPresetSelected = onPresetSelected,
+            )
+        }
 
         StartButton(
             enabled = state.hasTime,
@@ -135,7 +144,7 @@ private fun LandscapeLayout(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             TimeInputSection(
                 hours = state.hours,

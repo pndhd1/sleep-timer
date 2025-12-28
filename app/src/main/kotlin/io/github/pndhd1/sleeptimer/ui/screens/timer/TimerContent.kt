@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigContent
 
@@ -16,30 +16,21 @@ fun TimerContent(
     component: TimerComponent,
     modifier: Modifier = Modifier,
 ) {
-    val state by component.state.subscribeAsState()
-
-    when (val currentState = state) {
-        is TimerComponent.TimerState.Loading -> {
-            LoadingContent(modifier = modifier)
+    val slot by component.slot.collectAsState()
+    when (val child = slot?.child?.instance) {
+        null -> LoadingContent(modifier = modifier)
+        is TimerComponent.Child.Config -> {
+            TimerConfigContent(
+                component = child.component,
+                modifier = modifier,
+            )
         }
-        is TimerComponent.TimerState.Content -> {
-            when (val child = currentState.childSlot.child?.instance) {
-                is TimerComponent.Child.Config -> {
-                    TimerConfigContent(
-                        component = child.component,
-                        modifier = modifier,
-                    )
-                }
-                is TimerComponent.Child.Active -> {
-                    ActiveTimerContent(
-                        component = child.component,
-                        modifier = modifier,
-                    )
-                }
-                null -> {
-                    LoadingContent(modifier = modifier)
-                }
-            }
+
+        is TimerComponent.Child.Active -> {
+            ActiveTimerContent(
+                component = child.component,
+                modifier = modifier,
+            )
         }
     }
 }

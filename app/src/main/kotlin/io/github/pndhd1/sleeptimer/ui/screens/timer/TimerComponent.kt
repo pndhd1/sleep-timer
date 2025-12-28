@@ -1,21 +1,17 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer
 
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
-import com.arkivanov.decompose.value.Value
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigComponent
+import kotlinx.coroutines.flow.StateFlow
 
 interface TimerComponent {
 
-    val state: Value<TimerState>
+    val slot: StateFlow<ChildSlot<*, Child>?>
 
-    sealed interface TimerState {
-
-        data object Loading : TimerState
-
-        data class Content(
-            val childSlot: ChildSlot<*, Child>,
-        ) : TimerState
+    fun interface Factory {
+        fun create(componentContext: ComponentContext): TimerComponent
     }
 
     sealed interface Child {

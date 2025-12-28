@@ -3,7 +3,7 @@ plugins {
     id(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.protobuf)
+    alias(libs.plugins.metro)
 }
 
 android {
@@ -40,6 +40,7 @@ android {
     kotlin {
         compilerOptions {
             jvmTarget.set(BuildConfig.Jvm)
+            freeCompilerArgs.add("-XXLanguage:+ContextParameters")
         }
     }
     buildFeatures {
@@ -51,6 +52,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -67,24 +69,4 @@ dependencies {
     implementation(libs.kotlin.serialization.core)
     implementation(libs.kotlin.serialization.json)
 
-    implementation(libs.androidx.datastore)
-    implementation(libs.protobuf.kotlin.lite)
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
-    }
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin") {
-                    option("lite")
-                }
-            }
-        }
-    }
 }

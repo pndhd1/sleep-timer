@@ -5,15 +5,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 class DefaultTimerConfigComponent(
     componentContext: ComponentContext,
     params: TimerConfigParams,
-    private val onStartTimer: (duration: Duration) -> Unit,
+    private val onStartTimer: (targetTime: Instant) -> Unit,
 ) : TimerConfigComponent, ComponentContext by componentContext {
 
     private val _state = MutableStateFlow(
@@ -54,8 +56,9 @@ class DefaultTimerConfigComponent(
 
     override fun onStartClick() {
         val currentState = _state.value
+        val targetTime = Clock.System.now() + currentState.duration
         if (currentState.hasTime) {
-            onStartTimer(currentState.duration)
+            onStartTimer(targetTime)
         }
     }
 }
