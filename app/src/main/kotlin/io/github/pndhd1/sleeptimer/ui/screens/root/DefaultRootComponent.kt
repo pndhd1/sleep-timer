@@ -56,7 +56,9 @@ class DefaultRootComponent(
 @Serializable
 private sealed interface StackConfig {
 
+    @Serializable
     data object TimerConfig : StackConfig
 
+    @Serializable
     data object SettingsConfig : StackConfig
 }
