@@ -24,37 +24,39 @@ class DefaultRootComponent(
         override fun create(componentContext: ComponentContext): DefaultRootComponent
     }
 
-    private val nav = StackNavigation<Config>()
-    private val _stack: StateFlow<ChildStack<Config, Child>> = childStack(
+    private val nav = StackNavigation<StackConfig>()
+    private val _stack: StateFlow<ChildStack<StackConfig, Child>> = childStack(
         source = nav,
-        serializer = Config.serializer(),
-        initialConfiguration = Config.TimerConfig,
+        serializer = StackConfig.serializer(),
+        initialConfiguration = StackConfig.TimerConfig,
         childFactory = ::createChild,
     ).toStateFlow()
     override val stack: StateFlow<ChildStack<*, Child>> get() = _stack
 
     override fun onTimerTabClick() {
-        nav.bringToFront(Config.TimerConfig)
+        nav.bringToFront(StackConfig.TimerConfig)
     }
 
     override fun onSettingsTabClick() {
-        nav.bringToFront(Config.SettingsConfig)
+        nav.bringToFront(StackConfig.SettingsConfig)
     }
 
-    private fun createChild(config: Config, componentContext: ComponentContext): Child =
-        when (config) {
-            Config.TimerConfig -> Child.TimerChild(
-                component = timerComponentFactory.create(componentContext),
-            )
+    private fun createChild(
+        config: StackConfig,
+        componentContext: ComponentContext,
+    ): Child = when (config) {
+        StackConfig.TimerConfig -> Child.TimerChild(
+            component = timerComponentFactory.create(componentContext),
+        )
 
-            Config.SettingsConfig -> Child.SettingsChild
-        }
-
-    @Serializable
-    private sealed interface Config {
-
-        data object TimerConfig : Config
-
-        data object SettingsConfig : Config
+        StackConfig.SettingsConfig -> Child.SettingsChild
     }
+}
+
+@Serializable
+private sealed interface StackConfig {
+
+    data object TimerConfig : StackConfig
+
+    data object SettingsConfig : StackConfig
 }
