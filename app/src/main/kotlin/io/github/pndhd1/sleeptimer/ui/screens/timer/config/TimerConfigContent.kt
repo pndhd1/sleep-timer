@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
@@ -77,34 +78,31 @@ private fun PortraitLayout(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            TimeDisplay(state = state)
+        TimeDisplay(state = state)
 
-            Spacer(Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-            TimeInputSection(
-                hours = state.hours,
-                minutes = state.minutes,
-                seconds = state.seconds,
-                onHoursChanged = onHoursChanged,
-                onMinutesChanged = onMinutesChanged,
-                onSecondsChanged = onSecondsChanged,
-            )
+        TimeInputSection(
+            hours = state.hours,
+            minutes = state.minutes,
+            seconds = state.seconds,
+            onHoursChanged = onHoursChanged,
+            onMinutesChanged = onMinutesChanged,
+            onSecondsChanged = onSecondsChanged,
+        )
 
-            Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
-            PresetButtons(
-                presets = state.presets,
-                onPresetSelected = onPresetSelected,
-            )
-        }
+        PresetButtons(
+            presets = state.presets,
+            onPresetSelected = onPresetSelected,
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
 
         StartButton(
             enabled = state.hasTime,
@@ -124,43 +122,47 @@ private fun LandscapeLayout(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            TimeDisplay(state = state)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+            ) {
+                TimeDisplay(state = state)
 
-            StartButton(
-                enabled = state.hasTime,
-                loading = state.loading,
-                onClick = onStartClick,
-            )
-        }
+                StartButton(
+                    enabled = state.hasTime,
+                    loading = state.loading,
+                    onClick = onStartClick,
+                )
+            }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            TimeInputSection(
-                hours = state.hours,
-                minutes = state.minutes,
-                seconds = state.seconds,
-                onHoursChanged = onHoursChanged,
-                onMinutesChanged = onMinutesChanged,
-                onSecondsChanged = onSecondsChanged,
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                TimeInputSection(
+                    hours = state.hours,
+                    minutes = state.minutes,
+                    seconds = state.seconds,
+                    onHoursChanged = onHoursChanged,
+                    onMinutesChanged = onMinutesChanged,
+                    onSecondsChanged = onSecondsChanged,
+                )
 
-            PresetButtons(
-                presets = state.presets,
-                onPresetSelected = onPresetSelected,
-            )
+                PresetButtons(
+                    presets = state.presets,
+                    onPresetSelected = onPresetSelected,
+                )
+            }
         }
     }
 }
@@ -339,12 +341,17 @@ private val defaultPresets = listOf(5.minutes, 15.minutes, 30.minutes, 1.hours)
 private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigState> {
     override val values = sequenceOf(
         TimerConfigState(loading = false, duration = Duration.ZERO, presets = defaultPresets),
-        TimerConfigState(loading = false, duration = 1.hours + 30.minutes, presets = defaultPresets),
+        TimerConfigState(
+            loading = false,
+            duration = 1.hours + 30.minutes,
+            presets = defaultPresets
+        ),
         TimerConfigState(loading = true, duration = 15.minutes, presets = defaultPresets),
     )
 }
 
 @Preview(showBackground = true)
+@PreviewScreenSizes
 @Composable
 private fun TimerConfigContentPreview(
     @PreviewParameter(TimerConfigStateProvider::class) state: TimerConfigState,

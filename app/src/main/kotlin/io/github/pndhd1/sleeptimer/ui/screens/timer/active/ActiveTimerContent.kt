@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
@@ -41,7 +42,9 @@ fun ActiveTimerContent(
     }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -75,6 +78,7 @@ private class RemainingDurationProvider : PreviewParameterProvider<Duration> {
 }
 
 @Preview(showBackground = true)
+@PreviewScreenSizes
 @Composable
 private fun ActiveTimerContentPreview(
     @PreviewParameter(RemainingDurationProvider::class) remainingDuration: Duration,
