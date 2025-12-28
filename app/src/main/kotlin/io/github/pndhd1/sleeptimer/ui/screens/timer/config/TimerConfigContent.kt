@@ -1,6 +1,9 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer.config
 
 import android.content.res.Configuration
+import androidx.compose.animation.*
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -20,6 +23,9 @@ import java.util.Locale
 import kotlin.time.Duration
 
 private const val TimeFormat = "%d:%02d:%02d"
+
+// Add little delay to make to avoid jumpy transition
+private const val StartButtonTransitionDelayMillis = 400
 
 @Composable
 fun TimerConfigContent(
@@ -104,6 +110,7 @@ private fun PortraitLayout(
 
         StartButton(
             enabled = state.hasTime,
+            loading = state.loading,
             onClick = onStartClick,
         )
     }
@@ -138,6 +145,7 @@ private fun LandscapeLayout(
 
             StartButton(
                 enabled = state.hasTime,
+                loading = state.loading,
                 onClick = onStartClick,
             )
         }
@@ -297,17 +305,40 @@ private fun PresetChip(
 @Composable
 private fun StartButton(
     enabled: Boolean,
+    loading: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.height(56.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.button_start),
-            style = MaterialTheme.typography.titleMedium,
-        )
+    AnimatedContent(
+        loading,
+        transitionSpec = {
+            val spec = tween<Float>(delayMillis = StartButtonTransitionDelayMillis)
+            fadeIn(spec)
+                .togetherWith(fadeOut(spec))
+                .using(SizeTransform(clip = false) { _, _ -> snap() })
+        },
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) { curLoading ->
+        Box(
+            modifier = Modifier.height(56.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (curLoading) {
+                CircularProgressIndicator()
+                return@AnimatedContent
+            }
+
+            Button(
+                onClick = { if (!loading) onClick() },
+                enabled = enabled,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Text(
+                    text = stringResource(R.string.button_start),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
     }
 }

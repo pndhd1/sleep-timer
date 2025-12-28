@@ -1,10 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer.config
 
 import com.arkivanov.decompose.ComponentContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -20,6 +17,7 @@ class DefaultTimerConfigComponent(
 
     private val _state = MutableStateFlow(
         TimerConfigState(
+            loading = false,
             duration = params.duration,
             presets = params.presets,
         )
@@ -55,10 +53,8 @@ class DefaultTimerConfigComponent(
     }
 
     override fun onStartClick() {
-        val currentState = _state.value
+        val currentState = _state.updateAndGet { it.copy(loading = true) }
         val targetTime = Clock.System.now() + currentState.duration
-        if (currentState.hasTime) {
-            onStartTimer(targetTime)
-        }
+        if (currentState.hasTime) onStartTimer(targetTime)
     }
 }

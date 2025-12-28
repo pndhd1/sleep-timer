@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,20 +18,22 @@ fun TimerContent(
     modifier: Modifier = Modifier,
 ) {
     val slot by component.slot.collectAsState()
-    when (val child = slot?.child?.instance) {
-        null -> LoadingContent(modifier = modifier)
-        is TimerComponent.Child.Config -> {
-            TimerConfigContent(
-                component = child.component,
-                modifier = modifier,
-            )
-        }
+    Crossfade(slot?.child?.instance) { child ->
+        when (child) {
+            null -> LoadingContent(modifier = modifier)
+            is TimerComponent.Child.Config -> {
+                TimerConfigContent(
+                    component = child.component,
+                    modifier = modifier,
+                )
+            }
 
-        is TimerComponent.Child.Active -> {
-            ActiveTimerContent(
-                component = child.component,
-                modifier = modifier,
-            )
+            is TimerComponent.Child.Active -> {
+                ActiveTimerContent(
+                    component = child.component,
+                    modifier = modifier,
+                )
+            }
         }
     }
 }

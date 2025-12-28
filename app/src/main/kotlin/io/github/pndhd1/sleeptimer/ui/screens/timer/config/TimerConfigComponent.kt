@@ -20,6 +20,7 @@ data class TimerConfigParams(
 )
 
 data class TimerConfigState(
+    val loading: Boolean,
     val duration: Duration,
     val presets: List<Duration>,
 ) {
