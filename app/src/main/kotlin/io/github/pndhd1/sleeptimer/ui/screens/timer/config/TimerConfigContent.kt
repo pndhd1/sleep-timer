@@ -15,11 +15,17 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 private const val TimeFormat = "%d:%02d:%02d"
 
@@ -325,3 +331,29 @@ private fun StartButton(
         }
     }
 }
+
+// region Preview
+
+private val defaultPresets = listOf(5.minutes, 15.minutes, 30.minutes, 1.hours)
+
+private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigState> {
+    override val values = sequenceOf(
+        TimerConfigState(loading = false, duration = Duration.ZERO, presets = defaultPresets),
+        TimerConfigState(loading = false, duration = 1.hours + 30.minutes, presets = defaultPresets),
+        TimerConfigState(loading = true, duration = 15.minutes, presets = defaultPresets),
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TimerConfigContentPreview(
+    @PreviewParameter(TimerConfigStateProvider::class) state: TimerConfigState,
+) {
+    SleepTimerTheme {
+        TimerConfigContent(
+            component = PreviewTimerConfigComponent(state),
+        )
+    }
+}
+
+// endregion

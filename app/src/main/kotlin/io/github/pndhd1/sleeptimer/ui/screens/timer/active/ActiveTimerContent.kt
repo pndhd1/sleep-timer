@@ -10,14 +10,20 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -57,3 +63,27 @@ fun ActiveTimerContent(
         }
     }
 }
+
+// region Preview
+
+private class RemainingDurationProvider : PreviewParameterProvider<Duration> {
+    override val values = sequenceOf(
+        1.hours + 30.minutes,
+        45.minutes + 23.seconds,
+        15.seconds,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActiveTimerContentPreview(
+    @PreviewParameter(RemainingDurationProvider::class) remainingDuration: Duration,
+) {
+    SleepTimerTheme {
+        ActiveTimerContent(
+            component = PreviewActiveTimerComponent(remainingDuration),
+        )
+    }
+}
+
+// endregion

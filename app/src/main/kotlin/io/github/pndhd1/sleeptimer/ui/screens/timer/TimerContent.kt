@@ -10,11 +10,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerContent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.active.PreviewActiveTimerComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.PreviewTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigContent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
+import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun TimerContent(
@@ -77,3 +86,40 @@ private fun ErrorContent(
         )
     }
 }
+
+// region Preview
+
+private val defaultPresets = listOf(5.minutes, 15.minutes, 30.minutes, 1.hours)
+
+private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child?> {
+    override val values = sequenceOf(
+        null, // Loading
+        TimerComponent.Child.Error,
+        TimerComponent.Child.Config(
+            PreviewTimerConfigComponent(
+                TimerConfigState(
+                    loading = false,
+                    duration = 30.minutes,
+                    presets = defaultPresets,
+                )
+            )
+        ),
+        TimerComponent.Child.Active(
+            PreviewActiveTimerComponent(remainingDuration = 1.hours + 15.minutes)
+        ),
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TimerContentPreview(
+    @PreviewParameter(TimerChildProvider::class) child: TimerComponent.Child?,
+) {
+    SleepTimerTheme {
+        TimerContent(
+            component = PreviewTimerComponent(child),
+        )
+    }
+}
+
+// endregion
