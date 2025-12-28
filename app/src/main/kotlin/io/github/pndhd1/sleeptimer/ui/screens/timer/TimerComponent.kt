@@ -15,6 +15,7 @@ interface TimerComponent {
     }
 
     sealed interface Child {
+        data object Error : Child
 
         data class Config(val component: TimerConfigComponent) : Child
 

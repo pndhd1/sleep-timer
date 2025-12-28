@@ -5,13 +5,13 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlinx.coroutines.delay
@@ -25,7 +25,7 @@ fun ActiveTimerContent(
     component: ActiveTimerComponent,
     modifier: Modifier = Modifier,
 ) {
-    val state by component.state.collectAsState()
+    val state by component.state.collectAsStateWithLifecycle()
     val remainingTime by produceState(Duration.ZERO, state.targetTime) {
         while (isActive) {
             value = (state.targetTime - Clock.System.now()).coerceAtLeast(Duration.ZERO)

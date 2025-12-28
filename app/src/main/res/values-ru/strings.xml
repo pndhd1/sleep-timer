@@ -13,4 +13,7 @@
     <string name="button_start">Старт</string>
     <string name="button_stop">Стоп</string>
     <string name="button_reset">Сброс</string>
+
+    <string name="error_title">Что-то пошло не так</string>
+    <string name="error_message">Не удалось загрузить таймер. Попробуйте перезапустить приложение.</string>
 </resources>

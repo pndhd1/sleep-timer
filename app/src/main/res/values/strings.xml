@@ -13,4 +13,7 @@
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="button_reset">Reset</string>
+
+    <string name="error_title">Something went wrong</string>
+    <string name="error_message">Failed to load timer. Please try restart.</string>
 </resources>
