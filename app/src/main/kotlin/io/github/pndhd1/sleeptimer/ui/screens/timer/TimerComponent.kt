@@ -1,21 +1,19 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer
 
-import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionComponent
 import kotlinx.coroutines.flow.StateFlow
 
 interface TimerComponent {
 
     val slot: StateFlow<ChildSlot<*, Child>?>
 
-    fun interface Factory {
-        fun create(componentContext: ComponentContext): TimerComponent
-    }
-
     sealed interface Child {
         data object Error : Child
+
+        data class Permission(val component: PermissionComponent) : Child
 
         data class Config(val component: TimerConfigComponent) : Child
 

@@ -28,8 +28,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-private const val TimeFormat = "%d:%02d:%02d"
-
 // Add little delay to make to avoid jumpy transition
 private const val StartButtonTransitionDelayMillis = 400
 

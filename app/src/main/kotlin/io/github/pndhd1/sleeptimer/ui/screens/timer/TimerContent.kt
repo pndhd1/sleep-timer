@@ -21,6 +21,8 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.active.PreviewActiveTimerCom
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.PreviewTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
+import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionContent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -33,6 +35,13 @@ fun TimerContent(
     val slot by component.slot.collectAsStateWithLifecycle()
     Crossfade(slot?.child?.instance, modifier = modifier) { child ->
         when (child) {
+            is TimerComponent.Child.Permission -> {
+                PermissionContent(
+                    component = child.component,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+
             is TimerComponent.Child.Config -> {
                 TimerConfigContent(
                     component = child.component,
@@ -95,6 +104,7 @@ private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child
     override val values = sequenceOf(
         null, // Loading
         TimerComponent.Child.Error,
+        TimerComponent.Child.Permission(PreviewPermissionComponent()),
         TimerComponent.Child.Config(
             PreviewTimerConfigComponent(
                 TimerConfigState(

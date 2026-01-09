@@ -6,25 +6,26 @@ import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import dev.zacsweers.metro.*
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
+import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerParams
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigParams
+import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermissionComponent
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -35,13 +36,14 @@ import kotlin.time.Instant
 class DefaultTimerComponent(
     @Assisted componentContext: ComponentContext,
     settingsRepository: SettingsRepository,
+    deviceAdminRepository: DeviceAdminRepository,
     private val activeTimerRepository: ActiveTimerRepository,
+    private val permissionComponentFactory: DefaultPermissionComponent.Factory,
 ) : TimerComponent, ComponentContext by componentContext {
 
     @AssistedFactory
-    @ContributesBinding(AppScope::class)
-    fun interface Factory : TimerComponent.Factory {
-        override fun create(componentContext: ComponentContext): DefaultTimerComponent
+    fun interface Factory {
+        fun create(componentContext: ComponentContext): DefaultTimerComponent
     }
 
     private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -58,9 +60,11 @@ class DefaultTimerComponent(
         combine(
             settingsRepository.timerSettings,
             activeTimerRepository.activeTimer,
-            transform = ::handleTimerChange,
+            deviceAdminRepository.isAdminActive,
+            transform = ::createSlotConfig,
         )
             .catch { handleError() }
+            .onEach { nav.activate(it) }
             .flowWithLifecycle(lifecycle)
             .launchIn(scope)
     }
@@ -69,6 +73,12 @@ class DefaultTimerComponent(
         config: SlotConfig,
         componentContext: ComponentContext,
     ): Child = when (config) {
+        is SlotConfig.Permission -> Child.Permission(
+            component = permissionComponentFactory.create(
+                componentContext = componentContext,
+            ),
+        )
+
         is SlotConfig.Config -> Child.Config(
             component = DefaultTimerConfigComponent(
                 componentContext = componentContext,
@@ -91,6 +101,19 @@ class DefaultTimerComponent(
         is SlotConfig.Error -> Child.Error
     }
 
+    private fun createSlotConfig(
+        settings: TimerSettings,
+        activeTimer: ActiveTimerData?,
+        isAdminActive: Boolean,
+    ): SlotConfig = when {
+        !isAdminActive -> SlotConfig.Permission
+
+        activeTimer != null && activeTimer.targetTime >= Clock.System.now() ->
+            activeTimer.toActiveTimerSlot()
+
+        else -> settings.toTimerConfigSlot()
+    }
+
     private fun onStartTimer(targetTime: Instant) {
         scope.launch {
             runCatchingSuspend { activeTimerRepository.startTimer(targetTime) }
@@ -105,21 +128,6 @@ class DefaultTimerComponent(
         }
     }
 
-    private fun handleTimerChange(
-        settings: TimerSettings,
-        activeTimer: ActiveTimerData?,
-    ) {
-        val targetConfig = if (
-            activeTimer != null &&
-            activeTimer.targetTime >= Clock.System.now()
-        ) {
-            activeTimer.toActiveTimerSlot()
-        } else {
-            settings.toTimerConfigSlot()
-        }
-        nav.activate(targetConfig)
-    }
-
     private fun handleError() {
         nav.activate(SlotConfig.Error)
     }
@@ -130,6 +138,9 @@ private sealed interface SlotConfig {
 
     @Serializable
     data object Error : SlotConfig
+
+    @Serializable
+    data object Permission : SlotConfig
 
     @Serializable
     data class Config(

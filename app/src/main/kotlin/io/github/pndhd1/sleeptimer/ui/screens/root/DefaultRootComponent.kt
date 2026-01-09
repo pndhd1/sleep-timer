@@ -5,9 +5,11 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
-import dev.zacsweers.metro.*
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
-import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.DefaultTimerComponent
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -15,13 +17,12 @@ import kotlinx.serialization.Serializable
 @AssistedInject
 class DefaultRootComponent(
     @Assisted componentContext: ComponentContext,
-    private val timerComponentFactory: TimerComponent.Factory,
+    private val timerComponentFactory: DefaultTimerComponent.Factory,
 ) : RootComponent, ComponentContext by componentContext {
 
     @AssistedFactory
-    @ContributesBinding(AppScope::class)
-    fun interface Factory : RootComponent.Factory {
-        override fun create(componentContext: ComponentContext): DefaultRootComponent
+    fun interface Factory {
+        fun create(componentContext: ComponentContext): DefaultRootComponent
     }
 
     private val nav = StackNavigation<StackConfig>()

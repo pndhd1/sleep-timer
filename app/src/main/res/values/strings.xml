@@ -16,4 +16,9 @@
 
     <string name="error_title">Something went wrong</string>
     <string name="error_message">Failed to load timer. Please try restart.</string>
+
+    <string name="permission_title">Device Admin Permission</string>
+    <string name="permission_description">Sleep Timer needs device administrator permission to lock your screen when the timer expires.</string>
+    <string name="permission_grant_button">Grant Permission</string>
+    <string name="permission_system_explanation">Sleep Timer needs device admin permission to lock the screen when timer expires.</string>
 </resources>
