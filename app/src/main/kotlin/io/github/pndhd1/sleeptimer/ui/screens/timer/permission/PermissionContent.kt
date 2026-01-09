@@ -1,6 +1,5 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer.permission
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -10,10 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
@@ -23,11 +23,15 @@ fun PermissionContent(
     component: PermissionComponent,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { component.onPermissionResult() },
     )
+
+    val (titleRes, descriptionRes) = when (component.permissionType) {
+        PermissionType.DeviceAdmin -> R.string.permission_device_admin_title to R.string.permission_device_admin_description
+        PermissionType.ExactAlarm -> R.string.permission_exact_alarm_title to R.string.permission_exact_alarm_description
+    }
 
     Column(
         modifier = modifier
@@ -37,7 +41,7 @@ fun PermissionContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(R.string.permission_title),
+            text = stringResource(titleRes),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
@@ -45,7 +49,7 @@ fun PermissionContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(R.string.permission_description),
+            text = stringResource(descriptionRes),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -53,13 +57,7 @@ fun PermissionContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
-            onClick = {
-                @SuppressLint("LocalContextGetResourceValueCall") // we do not need this string in composition
-                val explanation = context.getString(R.string.permission_system_explanation)
-                launcher.launch(component.getActivationIntent(explanation))
-            }
-        ) {
+        Button(onClick = { launcher.launch(component.getActivationIntent()) }) {
             Text(text = stringResource(R.string.permission_grant_button))
         }
     }
@@ -67,12 +65,18 @@ fun PermissionContent(
 
 // region Preview
 
+private class PermissionTypePreviewProvider : PreviewParameterProvider<PermissionType> {
+    override val values = sequenceOf(PermissionType.DeviceAdmin, PermissionType.ExactAlarm)
+}
+
 @Preview(showBackground = true)
 @Composable
-private fun PermissionContentPreview() {
+private fun PermissionContentPreview(
+    @PreviewParameter(PermissionTypePreviewProvider::class) permissionType: PermissionType,
+) {
     SleepTimerTheme {
         PermissionContent(
-            component = PreviewPermissionComponent(),
+            component = PreviewPermissionComponent(permissionType),
         )
     }
 }

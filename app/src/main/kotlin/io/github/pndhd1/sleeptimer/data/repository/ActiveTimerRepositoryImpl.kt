@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.content.getSystemService
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -30,8 +31,7 @@ class ActiveTimerRepositoryImpl(
     private val preferences: DataStore<Preferences>,
 ) : ActiveTimerRepository {
 
-    private val alarmManager: AlarmManager =
-        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val alarmManager: AlarmManager? = context.getSystemService()
 
     override val activeTimer: Flow<ActiveTimerData?> =
         preferences.data.map(Preferences::toDomain)
@@ -68,7 +68,7 @@ class ActiveTimerRepositoryImpl(
         val triggerAtMillis = targetTime.toEpochMilliseconds()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
+            if (alarmManager?.canScheduleExactAlarms() == true) {
                 alarmManager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     triggerAtMillis,
@@ -76,7 +76,7 @@ class ActiveTimerRepositoryImpl(
                 )
             }
         } else {
-            alarmManager.setExactAndAllowWhileIdle(
+            alarmManager?.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 triggerAtMillis,
                 pendingIntent
@@ -94,7 +94,7 @@ class ActiveTimerRepositoryImpl(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        alarmManager.cancel(pendingIntent)
+        alarmManager?.cancel(pendingIntent)
     }
 }
 

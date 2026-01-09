@@ -20,6 +20,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerCom
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigParams
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermissionComponent
+import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionType
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
@@ -36,7 +37,7 @@ import kotlin.time.Instant
 class DefaultTimerComponent(
     @Assisted componentContext: ComponentContext,
     settingsRepository: SettingsRepository,
-    deviceAdminRepository: DeviceAdminRepository,
+    private val deviceAdminRepository: DeviceAdminRepository,
     private val activeTimerRepository: ActiveTimerRepository,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
 ) : TimerComponent, ComponentContext by componentContext {
@@ -61,6 +62,7 @@ class DefaultTimerComponent(
             settingsRepository.timerSettings,
             activeTimerRepository.activeTimer,
             deviceAdminRepository.isAdminActive,
+            deviceAdminRepository.canScheduleExactAlarms,
             transform = ::createSlotConfig,
         )
             .catch { handleError() }
@@ -76,6 +78,7 @@ class DefaultTimerComponent(
         is SlotConfig.Permission -> Child.Permission(
             component = permissionComponentFactory.create(
                 componentContext = componentContext,
+                permissionType = config.type,
             ),
         )
 
@@ -105,8 +108,10 @@ class DefaultTimerComponent(
         settings: TimerSettings,
         activeTimer: ActiveTimerData?,
         isAdminActive: Boolean,
+        canScheduleExactAlarms: Boolean,
     ): SlotConfig = when {
-        !isAdminActive -> SlotConfig.Permission
+        !isAdminActive -> SlotConfig.Permission(PermissionType.DeviceAdmin)
+        !canScheduleExactAlarms -> SlotConfig.Permission(PermissionType.ExactAlarm)
 
         activeTimer != null && activeTimer.targetTime >= Clock.System.now() ->
             activeTimer.toActiveTimerSlot()
@@ -140,7 +145,7 @@ private sealed interface SlotConfig {
     data object Error : SlotConfig
 
     @Serializable
-    data object Permission : SlotConfig
+    data class Permission(val type: PermissionType) : SlotConfig
 
     @Serializable
     data class Config(

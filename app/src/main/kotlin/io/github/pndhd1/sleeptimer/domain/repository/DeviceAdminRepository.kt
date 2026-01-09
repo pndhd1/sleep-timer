@@ -5,7 +5,12 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface DeviceAdminRepository {
     val isAdminActive: StateFlow<Boolean>
-    fun getActivationIntent(explanation: String): Intent
+    val canScheduleExactAlarms: StateFlow<Boolean>
+
+    fun getAdminActivationIntent(): Intent
+    fun getAlarmPermissionIntent(): Intent
+
     fun lockScreen()
     fun refreshAdminState()
+    fun refreshAlarmPermissionState()
 }

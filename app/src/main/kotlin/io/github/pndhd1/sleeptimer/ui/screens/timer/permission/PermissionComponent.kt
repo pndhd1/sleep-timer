@@ -4,7 +4,14 @@ import android.content.Intent
 
 interface PermissionComponent {
 
-    fun getActivationIntent(explanation: String): Intent
+    val permissionType: PermissionType
+
+    fun getActivationIntent(): Intent
 
     fun onPermissionResult()
+}
+
+enum class PermissionType {
+    DeviceAdmin,
+    ExactAlarm,
 }

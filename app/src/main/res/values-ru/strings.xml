@@ -17,8 +17,12 @@
     <string name="error_title">Что-то пошло не так</string>
     <string name="error_message">Не удалось загрузить таймер. Попробуйте перезапустить приложение.</string>
 
-    <string name="permission_title">Разрешение администратора</string>
-    <string name="permission_description">Таймеру сна необходимо разрешение администратора устройства для блокировки экрана по истечении таймера.</string>
     <string name="permission_grant_button">Предоставить разрешение</string>
-    <string name="permission_system_explanation">Таймеру сна необходимо разрешение администратора для блокировки экрана.</string>
+
+    <string name="permission_device_admin_title">Разрешение администратора</string>
+    <string name="permission_device_admin_description">Таймеру сна необходимо разрешение администратора устройства для блокировки экрана по истечении таймера.</string>
+    <string name="permission_device_admin_system_explanation">Таймеру сна необходимо разрешение администратора для блокировки экрана.</string>
+
+    <string name="permission_exact_alarm_title">Разрешение будильника</string>
+    <string name="permission_exact_alarm_description">Таймеру сна необходимо разрешение на точные будильники для корректной работы таймера.</string>
 </resources>
