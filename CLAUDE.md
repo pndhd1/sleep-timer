@@ -52,7 +52,7 @@ class MyRepositoryImpl(
 ```kotlin
 class MyReceiver : BroadcastReceiver() {
     @Inject
-    lateinit var repository: MyRepository
+    private lateinit var repository: MyRepository
 
     override fun onReceive(context: Context, intent: Intent?) {
         context.requireAppGraph().inject(this)

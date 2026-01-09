@@ -31,10 +31,10 @@ import kotlin.time.ExperimentalTime
 class TimerService : Service() {
 
     @Inject
-    lateinit var activeTimerRepository: ActiveTimerRepository
+    private lateinit var activeTimerRepository: ActiveTimerRepository
 
     @Inject
-    lateinit var settingsRepository: SettingsRepository
+    private lateinit var settingsRepository: SettingsRepository
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var updateJob: Job? = null
