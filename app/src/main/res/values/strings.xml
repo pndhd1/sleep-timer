@@ -25,4 +25,10 @@
 
     <string name="permission_exact_alarm_title">Alarm Permission</string>
     <string name="permission_exact_alarm_description">Sleep Timer needs permission to schedule exact alarms so the timer works precisely.</string>
+
+    <string name="notification_channel_name">Timer</string>
+    <string name="notification_channel_description">Shows timer progress and controls</string>
+    <string name="notification_title">Sleep Timer</string>
+    <string name="notification_action_stop">Stop</string>
+    <string name="notification_action_extend">+%d min</string>
 </resources>

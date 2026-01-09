@@ -14,4 +14,6 @@ object Defaults {
             45.minutes,
             60.minutes
         )
+
+    inline val DefaultExtendDuration: Duration get() = 5.minutes
 }

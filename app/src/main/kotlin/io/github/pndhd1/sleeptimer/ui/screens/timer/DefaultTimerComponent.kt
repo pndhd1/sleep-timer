@@ -119,9 +119,9 @@ class DefaultTimerComponent(
         else -> settings.toTimerConfigSlot()
     }
 
-    private fun onStartTimer(targetTime: Instant) {
+    private fun onStartTimer(targetTime: Instant, duration: Duration) {
         scope.launch {
-            runCatchingSuspend { activeTimerRepository.startTimer(targetTime) }
+            runCatchingSuspend { activeTimerRepository.startTimer(targetTime, duration) }
                 .onFailure { handleError() }
         }
     }

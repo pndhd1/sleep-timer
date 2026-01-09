@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private val DefaultDurationSecondsKey = intPreferencesKey("default_duration_seconds")
 private val PresetSecondsKey = byteArrayPreferencesKey("preset_seconds")
+private val ExtendDurationSecondsKey = intPreferencesKey("extend_duration_seconds")
 
 @Inject
 @SingleIn(AppScope::class)
@@ -45,10 +46,19 @@ class SettingsRepositoryImpl(
             }
         }
     }
+
+    override suspend fun updateExtendDuration(duration: Duration) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[ExtendDurationSecondsKey] = duration.inWholeSeconds.toInt()
+            }
+        }
+    }
 }
 
 private fun Preferences.toDomain() = TimerSettings(
     defaultDuration = get(DefaultDurationSecondsKey)?.seconds ?: Defaults.DefaultDuration,
     presets = get(PresetSecondsKey)?.let { it.toIntArray().map { it.seconds } }
         ?: Defaults.DefaultPresets,
+    extendDuration = get(ExtendDurationSecondsKey)?.seconds ?: Defaults.DefaultExtendDuration,
 )

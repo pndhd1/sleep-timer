@@ -25,4 +25,10 @@
 
     <string name="permission_exact_alarm_title">Разрешение будильника</string>
     <string name="permission_exact_alarm_description">Таймеру сна необходимо разрешение на точные будильники для корректной работы таймера.</string>
+
+    <string name="notification_channel_name">Таймер</string>
+    <string name="notification_channel_description">Показывает прогресс таймера и элементы управления</string>
+    <string name="notification_title">Таймер сна</string>
+    <string name="notification_action_stop">Стоп</string>
+    <string name="notification_action_extend">+%d мин</string>
 </resources>

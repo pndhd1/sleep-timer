@@ -19,7 +19,8 @@ app/src/main/kotlin/io/github/pndhd1/sleeptimer/
 │   └── repository/   # Repository interfaces
 ├── data/             # Implementation layer
 │   ├── repository/   # Repository implementations (DataStore + AlarmManager)
-│   └── receiver/     # Broadcast receivers
+│   ├── receiver/     # Broadcast receivers
+│   └── service/      # Foreground services
 ├── di/               # Dependency injection (Metro framework)
 ├── ui/
 │   ├── screens/      # Screen components using Decompose
@@ -34,6 +35,36 @@ app/src/main/kotlin/io/github/pndhd1/sleeptimer/
 - **DI**: Metro framework - `@SingleIn(AppScope::class)`, `@ContributesBinding`
 - **UI**: Jetpack Compose with Material 3
 - **Persistence**: DataStore (preferences-based)
+
+### Metro DI Patterns
+
+**Constructor Injection** (preferred for classes you control):
+```kotlin
+@Inject
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class MyRepositoryImpl(
+    private val dependency: SomeDependency,
+) : MyRepository
+```
+
+**Field Injection** (for Android components without constructor control - BroadcastReceiver, Service, Activity):
+```kotlin
+class MyReceiver : BroadcastReceiver() {
+    @Inject
+    lateinit var repository: MyRepository
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        context.requireAppGraph().inject(this)
+        // Now repository is available
+    }
+}
+```
+
+For field injection to work:
+1. Declare `@Inject lateinit var` fields
+2. Call `requireAppGraph().inject(this)` before using injected fields
+3. Add `fun inject(target: MyClass)` to `AppGraph` interface
 
 ### Component Pattern
 

@@ -14,13 +14,18 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.data.receiver.TimerAlarmReceiver
+import io.github.pndhd1.sleeptimer.data.service.TimerService
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 private val TargetTimeKey = longPreferencesKey("target_time_epoch_seconds")
+private val TotalDurationKey = longPreferencesKey("total_duration_seconds")
 private const val ALARM_REQUEST_CODE = 1001
 
 @Inject
@@ -36,13 +41,29 @@ class ActiveTimerRepositoryImpl(
     override val activeTimer: Flow<ActiveTimerData?> =
         preferences.data.map(Preferences::toDomain)
 
-    override suspend fun startTimer(targetTime: Instant) {
+    override suspend fun startTimer(targetTime: Instant, totalDuration: Duration) {
         preferences.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this[TargetTimeKey] = targetTime.epochSeconds
+                this[TotalDurationKey] = totalDuration.inWholeSeconds
             }
         }
         scheduleAlarm(targetTime)
+        TimerService.start(context)
+    }
+
+    override suspend fun extendTimer(additionalDuration: Duration) {
+        val current = activeTimer.first() ?: return
+        val newTargetTime = current.targetTime + additionalDuration
+        val newTotalDuration = current.totalDuration + additionalDuration
+        cancelAlarm()
+        preferences.updateData { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[TargetTimeKey] = newTargetTime.epochSeconds
+                this[TotalDurationKey] = newTotalDuration.inWholeSeconds
+            }
+        }
+        scheduleAlarm(newTargetTime)
     }
 
     override suspend fun clearTimer() {
@@ -50,8 +71,10 @@ class ActiveTimerRepositoryImpl(
         preferences.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this.remove(TargetTimeKey)
+                this.remove(TotalDurationKey)
             }
         }
+        TimerService.stop(context)
     }
 
     private fun scheduleAlarm(targetTime: Instant) {
@@ -100,7 +123,9 @@ class ActiveTimerRepositoryImpl(
 
 private fun Preferences.toDomain(): ActiveTimerData? {
     val targetTimeSeconds = this[TargetTimeKey] ?: return null
+    val totalDurationSeconds = this[TotalDurationKey] ?: return null
     return ActiveTimerData(
         targetTime = Instant.fromEpochSeconds(targetTimeSeconds),
+        totalDuration = totalDurationSeconds.seconds,
     )
 }

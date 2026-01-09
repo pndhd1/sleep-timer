@@ -10,4 +10,5 @@ interface SettingsRepository {
 
     suspend fun updateTimerDefaultDuration(duration: Duration)
     suspend fun updateTimerPresets(presets: List<Duration>)
+    suspend fun updateExtendDuration(duration: Duration)
 }

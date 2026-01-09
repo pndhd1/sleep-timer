@@ -12,7 +12,7 @@ import kotlin.time.Instant
 class DefaultTimerConfigComponent(
     componentContext: ComponentContext,
     params: TimerConfigParams,
-    private val onStartTimer: (targetTime: Instant) -> Unit,
+    private val onStartTimer: (targetTime: Instant, duration: Duration) -> Unit,
 ) : TimerConfigComponent, ComponentContext by componentContext {
 
     private val _state = MutableStateFlow(
@@ -55,6 +55,6 @@ class DefaultTimerConfigComponent(
     override fun onStartClick() {
         val currentState = _state.updateAndGet { it.copy(loading = true) }
         val targetTime = Clock.System.now() + currentState.duration
-        if (currentState.hasTime) onStartTimer(targetTime)
+        if (currentState.hasTime) onStartTimer(targetTime, currentState.duration)
     }
 }

@@ -5,4 +5,5 @@ import kotlin.time.Duration
 data class TimerSettings(
     val defaultDuration: Duration,
     val presets: List<Duration>,
+    val extendDuration: Duration,
 )
