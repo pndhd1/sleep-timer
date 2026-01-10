@@ -11,7 +11,7 @@ import kotlin.time.Instant
 
 class DefaultTimerConfigComponent(
     componentContext: ComponentContext,
-    params: TimerConfigParams,
+    params: Params,
     private val onStartTimer: (targetTime: Instant, duration: Duration) -> Unit,
 ) : TimerConfigComponent, ComponentContext by componentContext {
 
@@ -57,4 +57,9 @@ class DefaultTimerConfigComponent(
         val targetTime = Clock.System.now() + currentState.duration
         if (currentState.hasTime) onStartTimer(targetTime, currentState.duration)
     }
+
+    data class Params(
+        val duration: Duration,
+        val presets: List<Duration>,
+    )
 }

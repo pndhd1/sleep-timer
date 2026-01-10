@@ -14,11 +14,6 @@ interface TimerConfigComponent {
     fun onStartClick()
 }
 
-data class TimerConfigParams(
-    val duration: Duration,
-    val presets: List<Duration>,
-)
-
 data class TimerConfigState(
     val loading: Boolean,
     val duration: Duration,

@@ -7,9 +7,7 @@ import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
 import io.github.pndhd1.sleeptimer.requireAppGraph
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import io.github.pndhd1.sleeptimer.utils.launchAsync
 
 class TimerAlarmReceiver : BroadcastReceiver() {
 
@@ -23,18 +21,8 @@ class TimerAlarmReceiver : BroadcastReceiver() {
         if (intent?.action != ACTION_TIMER_EXPIRED) return
         context.requireAppGraph().inject(this)
 
-        val pendingResult = goAsync()
         deviceAdminRepository.lockScreen()
-
-        // BroadcastReceiver does not have a lifecycle, so we need to use GlobalScope
-        @OptIn(DelicateCoroutinesApi::class)
-        GlobalScope.launch {
-            try {
-                activeTimerRepository.clearTimer()
-            } finally {
-                pendingResult.finish()
-            }
-        }
+        launchAsync { activeTimerRepository.clearTimer() }
     }
 
     companion object {

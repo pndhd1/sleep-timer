@@ -10,10 +10,6 @@ interface ActiveTimerComponent {
     fun onStopClick()
 }
 
-data class ActiveTimerParams(
-    val targetTime: Instant,
-)
-
 data class ActiveTimerState(
     val targetTime: Instant,
 )

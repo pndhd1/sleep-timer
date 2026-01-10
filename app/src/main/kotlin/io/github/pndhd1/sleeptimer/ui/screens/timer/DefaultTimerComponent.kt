@@ -15,10 +15,8 @@ import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child
-import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerParams
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
-import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigParams
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionType
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
@@ -37,7 +35,7 @@ import kotlin.time.Instant
 class DefaultTimerComponent(
     @Assisted componentContext: ComponentContext,
     settingsRepository: SettingsRepository,
-    private val deviceAdminRepository: DeviceAdminRepository,
+    deviceAdminRepository: DeviceAdminRepository,
     private val activeTimerRepository: ActiveTimerRepository,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
 ) : TimerComponent, ComponentContext by componentContext {
@@ -85,7 +83,7 @@ class DefaultTimerComponent(
         is SlotConfig.Config -> Child.Config(
             component = DefaultTimerConfigComponent(
                 componentContext = componentContext,
-                params = TimerConfigParams(
+                params = DefaultTimerConfigComponent.Params(
                     duration = config.duration,
                     presets = config.presets,
                 ),
@@ -96,7 +94,7 @@ class DefaultTimerComponent(
         is SlotConfig.Active -> Child.Active(
             component = DefaultActiveTimerComponent(
                 componentContext = componentContext,
-                params = ActiveTimerParams(targetTime = config.targetTime),
+                targetTime = config.targetTime,
                 onStop = ::onStopTimer,
             ),
         )
