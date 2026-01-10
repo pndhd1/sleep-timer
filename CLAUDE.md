@@ -70,6 +70,35 @@ For field injection to work:
 
 Each screen follows: Interface (contract) → `Default*Component` (implementation) → `Preview*Component` (previews) → `*Content` (Compose UI)
 
+## Localization
+
+The app supports multiple locales. When adding new string resources:
+
+1. Add strings to `res/values/strings.xml` (English - default)
+2. Add translations to `res/values-ru/strings.xml` (Russian)
+
+**Always add strings to ALL locale files** to avoid missing translations.
+
+## Icons
+
+Use XML vector drawables from `res/drawable/` instead of Material Icons library.
+
+```kotlin
+// Correct - use vectorResource
+Icon(
+    imageVector = ImageVector.vectorResource(R.drawable.ic_add),
+    contentDescription = "...",
+)
+
+// Wrong - don't use Material Icons
+Icon(
+    imageVector = Icons.Default.Add,  // NOT available in this project
+    contentDescription = "...",
+)
+```
+
+When adding new icons, create XML vector drawable in `res/drawable/ic_*.xml`.
+
 ## Key Libraries
 
 - **Decompose** - Architecture and navigation

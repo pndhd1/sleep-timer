@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -13,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screens.root.widgets.RootNavigationBar
+import io.github.pndhd1.sleeptimer.ui.screens.settings.SettingsContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerContent
 
 @Composable
@@ -46,7 +46,10 @@ fun RootContent(
                         modifier = Modifier.fillMaxSize(),
                     )
 
-                    is Child.SettingsChild -> Text("Settings Screen")
+                    is Child.SettingsChild -> SettingsContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
             }
         }

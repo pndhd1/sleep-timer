@@ -6,9 +6,13 @@
     <string name="label_hours">Hours</string>
     <string name="label_minutes">Minutes</string>
     <string name="label_seconds">Seconds</string>
+    <string name="label_hours_short">H</string>
+    <string name="label_minutes_short">M</string>
+    <string name="label_seconds_short">S</string>
 
     <string name="preset_minutes">%d min</string>
     <string name="preset_hours">%d h</string>
+    <string name="preset_seconds">%d sec</string>
 
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
@@ -31,4 +35,24 @@
     <string name="notification_title">Sleep Timer</string>
     <string name="notification_action_stop">Stop</string>
     <string name="notification_action_extend">+%d min</string>
+
+    <string name="settings_default_duration_title">Default Timer Duration</string>
+    <string name="settings_default_duration_description">Duration used when starting a new timer</string>
+    <string name="settings_extend_duration_title">Extend Duration</string>
+    <string name="settings_extend_duration_description">Duration added when extending an active timer</string>
+    <string name="settings_presets_title">Quick Presets</string>
+    <string name="settings_presets_description">Shortcuts for quickly setting timer duration</string>
+    <string name="settings_duration_min">%d min</string>
+    <string name="settings_add_preset">Add preset</string>
+    <string name="settings_remove_preset">Remove preset</string>
+    <string name="settings_add_preset_title">Add Preset</string>
+    <string name="settings_add_preset_description">Enter duration in minutes</string>
+    <string name="settings_minutes_suffix">min</string>
+    <string name="settings_add">Add</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="settings_apply">Apply</string>
+    <string name="settings_reset">Reset Settings</string>
+    <string name="settings_edit_duration_title">Set Duration</string>
+    <string name="settings_min_duration_error">Minimum: %s</string>
+    <string name="settings_max_duration_error">Maximum: %s</string>
 </resources>

@@ -15,6 +15,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.settings.PreviewSettingsComponent
+import io.github.pndhd1.sleeptimer.ui.screens.settings.SettingsState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.PreviewTimerComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 
@@ -56,7 +58,7 @@ fun RootNavigationBar(
 private class ChildProvider : PreviewParameterProvider<Child> {
     override val values = sequenceOf(
         Child.TimerChild(PreviewTimerComponent(null)),
-        Child.SettingsChild,
+        Child.SettingsChild(PreviewSettingsComponent(SettingsState.Loading)),
     )
 }
 

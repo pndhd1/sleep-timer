@@ -24,6 +24,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.Defaults
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -98,8 +99,6 @@ private fun ErrorContent(
 
 // region Preview
 
-private val defaultPresets = listOf(5.minutes, 15.minutes, 30.minutes, 1.hours)
-
 private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child?> {
     override val values = sequenceOf(
         null, // Loading
@@ -110,7 +109,7 @@ private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child
                 TimerConfigState(
                     loading = false,
                     duration = 30.minutes,
-                    presets = defaultPresets,
+                    presets = Defaults.DefaultPresets,
                 )
             )
         ),

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
+import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -272,26 +274,6 @@ private fun PresetButtons(
 }
 
 @Composable
-private fun PresetChip(
-    duration: Duration,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val label = if (duration.inWholeHours > 0) {
-        stringResource(R.string.preset_hours, duration.inWholeHours.toInt())
-    } else {
-        stringResource(R.string.preset_minutes, duration.inWholeMinutes.toInt())
-    }
-
-    FilterChip(
-        selected = false,
-        onClick = onClick,
-        label = { Text(label) },
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun StartButton(
     enabled: Boolean,
     loading: Boolean,
@@ -334,17 +316,23 @@ private fun StartButton(
 
 // region Preview
 
-private val defaultPresets = listOf(5.minutes, 15.minutes, 30.minutes, 1.hours)
-
 private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigState> {
     override val values = sequenceOf(
-        TimerConfigState(loading = false, duration = Duration.ZERO, presets = defaultPresets),
+        TimerConfigState(
+            loading = false,
+            duration = Duration.ZERO,
+            presets = Defaults.DefaultPresets,
+        ),
         TimerConfigState(
             loading = false,
             duration = 1.hours + 30.minutes,
-            presets = defaultPresets
+            presets = Defaults.DefaultPresets,
         ),
-        TimerConfigState(loading = true, duration = 15.minutes, presets = defaultPresets),
+        TimerConfigState(
+            loading = true,
+            duration = 15.minutes,
+            presets = Defaults.DefaultPresets,
+        ),
     )
 }
 

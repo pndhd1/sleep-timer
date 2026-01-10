@@ -9,6 +9,7 @@ import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.settings.DefaultSettingsComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.DefaultTimerComponent
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ import kotlinx.serialization.Serializable
 class DefaultRootComponent(
     @Assisted componentContext: ComponentContext,
     private val timerComponentFactory: DefaultTimerComponent.Factory,
+    private val settingsComponentFactory: DefaultSettingsComponent.Factory,
 ) : RootComponent, ComponentContext by componentContext {
 
     @AssistedFactory
@@ -50,7 +52,9 @@ class DefaultRootComponent(
             component = timerComponentFactory.create(componentContext),
         )
 
-        StackConfig.SettingsConfig -> Child.SettingsChild
+        StackConfig.SettingsConfig -> Child.SettingsChild(
+            component = settingsComponentFactory.create(componentContext),
+        )
     }
 }
 

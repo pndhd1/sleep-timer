@@ -54,6 +54,16 @@ class SettingsRepositoryImpl(
             }
         }
     }
+
+    override suspend fun resetToDefaults() {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                remove(DefaultDurationSecondsKey)
+                remove(PresetSecondsKey)
+                remove(ExtendDurationSecondsKey)
+            }
+        }
+    }
 }
 
 private fun Preferences.toDomain() = TimerSettings(

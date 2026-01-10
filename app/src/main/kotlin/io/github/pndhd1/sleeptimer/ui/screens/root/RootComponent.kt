@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screens.root
 
 import com.arkivanov.decompose.router.stack.ChildStack
+import io.github.pndhd1.sleeptimer.ui.screens.settings.SettingsComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent
 import kotlinx.coroutines.flow.StateFlow
 
@@ -15,7 +16,7 @@ interface RootComponent {
 
         data class TimerChild(val component: TimerComponent) : Child
 
-        data object SettingsChild : Child
+        data class SettingsChild(val component: SettingsComponent) : Child
     }
 }
 

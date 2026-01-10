@@ -1,7 +1,9 @@
 package io.github.pndhd1.sleeptimer.utils
 
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Defaults {
 
@@ -16,4 +18,8 @@ object Defaults {
         )
 
     inline val DefaultExtendDuration: Duration get() = 5.minutes
+
+    val MinTimerDuration: Duration = 5.seconds
+
+    val MaxTimerDuration: Duration = 23.hours + 59.minutes + 59.seconds
 }
