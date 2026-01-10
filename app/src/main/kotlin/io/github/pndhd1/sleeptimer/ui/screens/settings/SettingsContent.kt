@@ -231,7 +231,7 @@ private fun PresetsCard(
 
     if (showAddDialog) {
         DurationEditDialog(
-            currentDuration = Defaults.MinTimerDuration,
+            currentDuration = Duration.ZERO,
             maxDuration = Defaults.MaxTimerDuration,
             title = stringResource(R.string.settings_add_preset_title),
             onConfirm = { duration ->
