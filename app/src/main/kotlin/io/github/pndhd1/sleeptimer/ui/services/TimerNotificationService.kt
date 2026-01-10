@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.data.service
+package io.github.pndhd1.sleeptimer.ui.services
 
 import android.app.*
 import android.content.Context
@@ -28,7 +28,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-class TimerService : Service() {
+class TimerNotificationService : Service() {
 
     @Inject
     private lateinit var activeTimerRepository: ActiveTimerRepository
@@ -43,6 +43,11 @@ class TimerService : Service() {
     private val extendDuration by lazy {
         settingsRepository.timerSettings.map { it.extendDuration }
             .stateIn(serviceScope, SharingStarted.Eagerly, DefaultExtendDuration)
+            .also { flow ->
+                serviceScope.launch {
+                    flow.collect { updateNotificationIfRunning() }
+                }
+            }
     }
 
     override fun onCreate() {
@@ -93,6 +98,15 @@ class TimerService : Service() {
         serviceScope.launch {
             val settings = settingsRepository.timerSettings.first()
             activeTimerRepository.extendTimer(settings.extendDuration)
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun updateNotificationIfRunning() {
+        if (updateJob?.isActive != true) return
+        serviceScope.launch {
+            val timerData = activeTimerRepository.activeTimer.first() ?: return@launch
+            notificationManager?.notify(NOTIFICATION_ID, createNotification(timerData))
         }
     }
 
@@ -149,14 +163,14 @@ class TimerService : Service() {
         val stopIntent = PendingIntent.getService(
             this,
             REQUEST_CODE_STOP,
-            Intent(this, TimerService::class.java).apply { action = ACTION_STOP },
+            Intent(this, TimerNotificationService::class.java).apply { action = ACTION_STOP },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val extendIntent = PendingIntent.getService(
             this,
             REQUEST_CODE_EXTEND,
-            Intent(this, TimerService::class.java).apply { action = ACTION_EXTEND },
+            Intent(this, TimerNotificationService::class.java).apply { action = ACTION_EXTEND },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -213,7 +227,7 @@ class TimerService : Service() {
         private const val REQUEST_CODE_EXTEND = 101
 
         fun start(context: Context) {
-            val intent = Intent(context, TimerService::class.java).apply {
+            val intent = Intent(context, TimerNotificationService::class.java).apply {
                 action = ACTION_START
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -224,7 +238,7 @@ class TimerService : Service() {
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, TimerService::class.java).apply {
+            val intent = Intent(context, TimerNotificationService::class.java).apply {
                 action = ACTION_STOP
             }
             context.startService(intent)

@@ -22,14 +22,11 @@
     <string name="error_message">Failed to load timer. Please try restart.</string>
 
     <string name="permission_grant_button">Grant Permission</string>
-
     <string name="permission_device_admin_title">Device Admin Permission</string>
     <string name="permission_device_admin_description">Sleep Timer needs device administrator permission to lock your screen when the timer expires.</string>
     <string name="permission_device_admin_system_explanation">Sleep Timer needs device admin permission to lock the screen when timer expires.</string>
-
     <string name="permission_exact_alarm_title">Alarm Permission</string>
     <string name="permission_exact_alarm_description">Sleep Timer needs permission to schedule exact alarms so the timer works precisely.</string>
-
     <string name="notification_channel_name">Timer</string>
     <string name="notification_channel_description">Shows timer progress and controls</string>
     <string name="notification_title">Sleep Timer</string>
@@ -55,4 +52,6 @@
     <string name="settings_edit_duration_title">Set Duration</string>
     <string name="settings_min_duration_error">Minimum: %s</string>
     <string name="settings_max_duration_error">Maximum: %s</string>
+    <string name="settings_show_notification_title">Show Notification</string>
+    <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
 </resources>

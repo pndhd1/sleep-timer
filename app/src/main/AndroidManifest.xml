@@ -69,7 +69,7 @@
         </receiver>
 
         <service
-            android:name=".data.service.TimerService"
+            android:name=".ui.services.TimerNotificationService"
             android:exported="false"
             android:foregroundServiceType="systemExempted" />
     </application>

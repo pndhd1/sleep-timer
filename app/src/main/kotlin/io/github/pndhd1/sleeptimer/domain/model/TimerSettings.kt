@@ -6,4 +6,5 @@ data class TimerSettings(
     val defaultDuration: Duration,
     val presets: List<Duration>,
     val extendDuration: Duration,
+    val showNotification: Boolean,
 )

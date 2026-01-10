@@ -22,11 +22,9 @@
     <string name="error_message">Не удалось загрузить таймер. Попробуйте перезапустить приложение.</string>
 
     <string name="permission_grant_button">Предоставить разрешение</string>
-
     <string name="permission_device_admin_title">Разрешение администратора</string>
     <string name="permission_device_admin_description">Таймеру сна необходимо разрешение администратора устройства для блокировки экрана по истечении таймера.</string>
     <string name="permission_device_admin_system_explanation">Таймеру сна необходимо разрешение администратора для блокировки экрана.</string>
-
     <string name="permission_exact_alarm_title">Разрешение будильника</string>
     <string name="permission_exact_alarm_description">Таймеру сна необходимо разрешение на точные будильники для корректной работы таймера.</string>
 
@@ -55,4 +53,6 @@
     <string name="settings_edit_duration_title">Установить время</string>
     <string name="settings_min_duration_error">Минимум: %s</string>
     <string name="settings_max_duration_error">Максимум: %s</string>
+    <string name="settings_show_notification_title">Показывать уведомление</string>
+    <string name="settings_show_notification_description">Отображать прогресс таймера в уведомлении. Изменения применятся при следующем запуске таймера.</string>
 </resources>

@@ -12,5 +12,6 @@ class PreviewSettingsComponent(
     override fun onExtendDurationChanged(duration: Duration) = Unit
     override fun onPresetAdded(duration: Duration) = Unit
     override fun onPresetRemoved(duration: Duration) = Unit
+    override fun onShowNotificationChanged(show: Boolean) = Unit
     override fun onResetSettings() = Unit
 }

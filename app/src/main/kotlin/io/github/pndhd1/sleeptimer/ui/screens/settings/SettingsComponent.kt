@@ -11,6 +11,7 @@ interface SettingsComponent {
     fun onExtendDurationChanged(duration: Duration)
     fun onPresetAdded(duration: Duration)
     fun onPresetRemoved(duration: Duration)
+    fun onShowNotificationChanged(show: Boolean)
     fun onResetSettings()
 }
 
@@ -24,5 +25,6 @@ sealed interface SettingsState {
         val defaultDuration: Duration,
         val extendDuration: Duration,
         val presets: List<Duration>,
+        val showNotification: Boolean,
     ) : SettingsState
 }

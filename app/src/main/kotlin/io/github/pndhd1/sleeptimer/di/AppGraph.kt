@@ -7,7 +7,7 @@ import dev.zacsweers.metro.Provides
 import io.github.pndhd1.sleeptimer.data.receiver.BootCompletedReceiver
 import io.github.pndhd1.sleeptimer.data.receiver.DeviceAdminReceiverImpl
 import io.github.pndhd1.sleeptimer.data.receiver.TimerAlarmReceiver
-import io.github.pndhd1.sleeptimer.data.service.TimerService
+import io.github.pndhd1.sleeptimer.ui.services.TimerNotificationService
 import io.github.pndhd1.sleeptimer.ui.MainActivity
 
 @DependencyGraph(AppScope::class)
@@ -17,7 +17,7 @@ interface AppGraph {
     fun inject(receiver: BootCompletedReceiver)
     fun inject(receiver: DeviceAdminReceiverImpl)
     fun inject(activity: MainActivity)
-    fun inject(service: TimerService)
+    fun inject(service: TimerNotificationService)
 
     @DependencyGraph.Factory
     interface Factory {

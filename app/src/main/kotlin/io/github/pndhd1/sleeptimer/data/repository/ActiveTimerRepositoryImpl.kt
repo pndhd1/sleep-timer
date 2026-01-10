@@ -14,7 +14,6 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.data.receiver.TimerAlarmReceiver
-import io.github.pndhd1.sleeptimer.data.service.TimerService
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +48,6 @@ class ActiveTimerRepositoryImpl(
             }
         }
         scheduleAlarm(targetTime)
-        TimerService.start(context)
     }
 
     override suspend fun extendTimer(additionalDuration: Duration) {
@@ -74,7 +72,6 @@ class ActiveTimerRepositoryImpl(
                 this.remove(TotalDurationKey)
             }
         }
-        TimerService.stop(context)
     }
 
     private fun scheduleAlarm(targetTime: Instant) {

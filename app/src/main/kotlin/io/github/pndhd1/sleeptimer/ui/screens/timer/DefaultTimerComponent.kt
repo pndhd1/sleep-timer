@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer
 
+import android.content.Context
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
@@ -19,6 +20,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerCom
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionType
+import io.github.pndhd1.sleeptimer.ui.services.TimerNotificationService
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
@@ -34,7 +36,8 @@ import kotlin.time.Instant
 @AssistedInject
 class DefaultTimerComponent(
     @Assisted componentContext: ComponentContext,
-    settingsRepository: SettingsRepository,
+    private val context: Context,
+    private val settingsRepository: SettingsRepository,
     deviceAdminRepository: DeviceAdminRepository,
     private val activeTimerRepository: ActiveTimerRepository,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
@@ -121,6 +124,12 @@ class DefaultTimerComponent(
         scope.launch {
             runCatchingSuspend { activeTimerRepository.startTimer(targetTime, duration) }
                 .onFailure { handleError() }
+                .onSuccess {
+                    val showNotification = settingsRepository.timerSettings.first().showNotification
+                    if (showNotification) {
+                        TimerNotificationService.start(context)
+                    }
+                }
         }
     }
 

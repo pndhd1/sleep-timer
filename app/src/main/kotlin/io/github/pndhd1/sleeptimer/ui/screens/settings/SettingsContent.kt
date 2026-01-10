@@ -54,6 +54,7 @@ fun SettingsContent(
             onExtendDurationChanged = component::onExtendDurationChanged,
             onPresetAdded = component::onPresetAdded,
             onPresetRemoved = component::onPresetRemoved,
+            onShowNotificationChanged = component::onShowNotificationChanged,
             modifier = modifier.fillMaxSize(),
         )
     }
@@ -105,6 +106,7 @@ private fun SettingsLayout(
     onExtendDurationChanged: (Duration) -> Unit,
     onPresetAdded: (Duration) -> Unit,
     onPresetRemoved: (Duration) -> Unit,
+    onShowNotificationChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -127,6 +129,11 @@ private fun SettingsLayout(
             presets = state.presets,
             onPresetAdded = onPresetAdded,
             onPresetRemoved = onPresetRemoved,
+        )
+
+        ShowNotificationCard(
+            showNotification = state.showNotification,
+            onShowNotificationChanged = onShowNotificationChanged,
         )
     }
 }
@@ -235,6 +242,49 @@ private fun PresetsCard(
             },
             onDismiss = { showAddDialog = false },
         )
+    }
+}
+
+@Composable
+private fun ShowNotificationCard(
+    showNotification: Boolean,
+    onShowNotificationChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.settings_show_notification_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = stringResource(R.string.settings_show_notification_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Switch(
+                checked = showNotification,
+                onCheckedChange = onShowNotificationChanged,
+            )
+        }
     }
 }
 
@@ -531,6 +581,7 @@ private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
             defaultDuration = 30.minutes,
             extendDuration = 5.minutes,
             presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
+            showNotification = true,
         ),
     )
 }

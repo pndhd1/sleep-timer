@@ -2,6 +2,7 @@ package io.github.pndhd1.sleeptimer.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import dev.zacsweers.metro.AppScope
@@ -21,6 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 private val DefaultDurationSecondsKey = intPreferencesKey("default_duration_seconds")
 private val PresetSecondsKey = byteArrayPreferencesKey("preset_seconds")
 private val ExtendDurationSecondsKey = intPreferencesKey("extend_duration_seconds")
+private val ShowNotificationKey = booleanPreferencesKey("show_notification")
 
 @Inject
 @SingleIn(AppScope::class)
@@ -55,12 +57,21 @@ class SettingsRepositoryImpl(
         }
     }
 
+    override suspend fun updateShowNotification(show: Boolean) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[ShowNotificationKey] = show
+            }
+        }
+    }
+
     override suspend fun resetToDefaults() {
         preferences.updateData { current ->
             current.toMutablePreferences().apply {
                 remove(DefaultDurationSecondsKey)
                 remove(PresetSecondsKey)
                 remove(ExtendDurationSecondsKey)
+                remove(ShowNotificationKey)
             }
         }
     }
@@ -71,4 +82,5 @@ private fun Preferences.toDomain() = TimerSettings(
     presets = get(PresetSecondsKey)?.let { it.toIntArray().map { it.seconds } }
         ?: Defaults.DefaultPresets,
     extendDuration = get(ExtendDurationSecondsKey)?.seconds ?: Defaults.DefaultExtendDuration,
+    showNotification = get(ShowNotificationKey) ?: Defaults.DefaultShowNotification,
 )

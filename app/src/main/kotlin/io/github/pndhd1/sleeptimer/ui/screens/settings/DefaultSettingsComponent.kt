@@ -40,6 +40,7 @@ class DefaultSettingsComponent(
                 defaultDuration = settings.defaultDuration,
                 extendDuration = settings.extendDuration,
                 presets = settings.presets,
+                showNotification = settings.showNotification,
             )
         }
     }
@@ -75,6 +76,13 @@ class DefaultSettingsComponent(
         updateLoadedState { it.copy(presets = newPresets) }
         launchWithErrorHandling {
             settingsRepository.updateTimerPresets(newPresets)
+        }
+    }
+
+    override fun onShowNotificationChanged(show: Boolean) {
+        updateLoadedState { it.copy(showNotification = show) }
+        launchWithErrorHandling {
+            settingsRepository.updateShowNotification(show)
         }
     }
 
