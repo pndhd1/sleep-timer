@@ -25,6 +25,7 @@ import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlinx.coroutines.delay
+import kotlin.math.round
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -363,7 +364,7 @@ private fun DurationSlider(
 
         Slider(
             value = sliderValue.coerceIn(minMinutes.toFloat(), maxMinutes.toFloat()),
-            onValueChange = { sliderValue = it },
+            onValueChange = { sliderValue = round(it) },
             onValueChangeFinished = { onDurationChanged(sliderValue.toInt().minutes) },
             valueRange = minMinutes.toFloat()..maxMinutes.toFloat(),
             steps = (maxMinutes - minMinutes - 1).coerceAtLeast(0),
@@ -473,6 +474,7 @@ private fun DurationEditDialog(
                                 R.string.settings_min_duration_error,
                                 Formatter.formatTime(minDuration),
                             )
+
                             else -> stringResource(
                                 R.string.settings_max_duration_error,
                                 Formatter.formatTime(maxDuration),
