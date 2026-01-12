@@ -6,6 +6,7 @@ import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.utils.componentScope
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +25,7 @@ class DefaultSettingsComponent(
         fun create(componentContext: ComponentContext): DefaultSettingsComponent
     }
 
-    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val scope = componentScope()
 
     private val _state = MutableStateFlow<SettingsState>(SettingsState.Loading)
     override val state: StateFlow<SettingsState> = _state.asStateFlow()

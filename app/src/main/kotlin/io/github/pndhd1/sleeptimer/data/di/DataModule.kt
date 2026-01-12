@@ -1,4 +1,4 @@
-package io.github.pndhd1.sleeptimer.data
+package io.github.pndhd1.sleeptimer.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -9,13 +9,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
-import dev.zacsweers.metro.SingleIn
 
 @ContributesTo(AppScope::class)
-interface DataStoreModule {
+interface DataModule {
 
     @Provides
-    @SingleIn(AppScope::class)
     fun providePreferencesDataStore(context: Context): DataStore<Preferences> = context.dataStore
 }
 

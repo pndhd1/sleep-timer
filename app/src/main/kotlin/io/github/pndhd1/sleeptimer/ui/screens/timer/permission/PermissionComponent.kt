@@ -6,7 +6,7 @@ interface PermissionComponent {
 
     val permissionType: PermissionType
 
-    fun getActivationIntent(): Intent
+    fun getActivationIntent(): Intent?
 
     fun onPermissionResult()
 }

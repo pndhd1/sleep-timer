@@ -6,7 +6,6 @@ import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
-import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -21,11 +20,10 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigCom
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionType
 import io.github.pndhd1.sleeptimer.ui.services.TimerNotificationService
+import io.github.pndhd1.sleeptimer.utils.componentScope
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -48,7 +46,7 @@ class DefaultTimerComponent(
         fun create(componentContext: ComponentContext): DefaultTimerComponent
     }
 
-    private val scope = coroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val scope = componentScope()
 
     private val nav = SlotNavigation<SlotConfig>()
     private val _slot: StateFlow<ChildSlot<SlotConfig, Child>> = childSlot(
@@ -122,19 +120,31 @@ class DefaultTimerComponent(
 
     private fun onStartTimer(targetTime: Instant, duration: Duration) {
         scope.launch {
-            runCatchingSuspend { activeTimerRepository.startTimer(targetTime, duration) }
-                .onFailure { handleError() }
-                .onSuccess {
-                    val showNotification = settingsRepository.timerSettings.first().showNotification
-                    if (showNotification) {
-                        TimerNotificationService.start(context)
-                    }
-                }
+            // Show error if starting the timer fails
+            runCatchingSuspend {
+                activeTimerRepository.startTimer(targetTime, duration)
+            }.onFailure {
+                handleError()
+                return@launch
+            }
+
+            // Ignore errors when starting the notification
+            val showNotification = runCatchingSuspend {
+                settingsRepository.timerSettings.first().showNotification
+            }.fold(
+                onSuccess = { it },
+                onFailure = { false }
+            )
+            if (showNotification) runCatchingSuspend { TimerNotificationService.start(context) }
         }
     }
 
     private fun onStopTimer() {
         scope.launch {
+            // Ignore errors when stopping the notification
+            runCatchingSuspend { TimerNotificationService.stop(context) }
+
+            // Show error if stopping the timer fails
             runCatchingSuspend { activeTimerRepository.clearTimer() }
                 .onFailure { handleError() }
         }

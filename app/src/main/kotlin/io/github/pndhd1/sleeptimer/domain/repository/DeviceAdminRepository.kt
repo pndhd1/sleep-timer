@@ -8,7 +8,7 @@ interface DeviceAdminRepository {
     val canScheduleExactAlarms: StateFlow<Boolean>
 
     fun getAdminActivationIntent(): Intent
-    fun getAlarmPermissionIntent(): Intent
+    fun getAlarmPermissionIntent(): Intent?
 
     fun lockScreen()
     fun refreshAdminState()

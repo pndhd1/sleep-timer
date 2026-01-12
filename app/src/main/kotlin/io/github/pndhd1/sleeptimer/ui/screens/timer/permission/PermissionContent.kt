@@ -57,7 +57,7 @@ fun PermissionContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { launcher.launch(component.getActivationIntent()) }) {
+        Button(onClick = { component.getActivationIntent()?.let(launcher::launch) }) {
             Text(text = stringResource(R.string.permission_grant_button))
         }
     }

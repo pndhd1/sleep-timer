@@ -1,14 +1,18 @@
 package io.github.pndhd1.sleeptimer.ui.services
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.getSystemService
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
@@ -19,16 +23,17 @@ import io.github.pndhd1.sleeptimer.ui.MainActivity
 import io.github.pndhd1.sleeptimer.utils.Defaults.DefaultExtendDuration
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-class TimerNotificationService : Service() {
+private inline val NotificationUpdateInterval get() = 0.5.seconds
+
+class TimerNotificationService : LifecycleService() {
 
     @Inject
     private lateinit var activeTimerRepository: ActiveTimerRepository
@@ -36,24 +41,23 @@ class TimerNotificationService : Service() {
     @Inject
     private lateinit var settingsRepository: SettingsRepository
 
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private var updateJob: Job? = null
     private val notificationManager: NotificationManager? by lazy(::getSystemService)
-
-    private val extendDuration by lazy {
-        settingsRepository.timerSettings.map { it.extendDuration }
-            .stateIn(serviceScope, SharingStarted.Eagerly, DefaultExtendDuration)
-            .also { flow ->
-                serviceScope.launch {
-                    flow.collect { updateNotificationIfRunning() }
-                }
-            }
-    }
+    private var notificationUpdateJob: Job? = null
+    private var cachedExtendDuration = DefaultExtendDuration
 
     override fun onCreate() {
         super.onCreate()
         requireAppGraph().inject(this)
         createNotificationChannel()
+
+        settingsRepository.timerSettings
+            .onEach {
+                if (cachedExtendDuration != it.extendDuration) {
+                    cachedExtendDuration = it.extendDuration
+                    updateNotificationIfRunning()
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -65,17 +69,11 @@ class TimerNotificationService : Service() {
         return START_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
-    }
-
     private fun startTimer() {
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
+            // Initial notification with no data; we need to foreground service ASAP
             createNotification(null),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
@@ -83,58 +81,51 @@ class TimerNotificationService : Service() {
                 0
             }
         )
-        startUpdatingNotification()
+        launchNotificationUpdateJob()
     }
 
     private fun stopTimer() {
-        serviceScope.launch {
+        lifecycleScope.launch {
             activeTimerRepository.clearTimer()
             stopSelf()
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun extendTimer() {
-        serviceScope.launch {
-            val settings = settingsRepository.timerSettings.first()
-            activeTimerRepository.extendTimer(settings.extendDuration)
+        lifecycleScope.launch {
+            activeTimerRepository.extendTimer(cachedExtendDuration)
         }
     }
 
-    @OptIn(ExperimentalTime::class)
-    private fun updateNotificationIfRunning() {
-        if (updateJob?.isActive != true) return
-        serviceScope.launch {
-            val timerData = activeTimerRepository.activeTimer.first() ?: return@launch
-            notificationManager?.notify(NOTIFICATION_ID, createNotification(timerData))
-        }
-    }
-
-    @OptIn(ExperimentalTime::class)
-    private fun startUpdatingNotification() {
-        updateJob?.cancel()
-        updateJob = serviceScope.launch {
-            while (true) {
-                val timerData = activeTimerRepository.activeTimer.first()
-                if (timerData == null) {
+    private fun launchNotificationUpdateJob() {
+        val prevJob = notificationUpdateJob
+        notificationUpdateJob = lifecycleScope.launch {
+            prevJob?.cancelAndJoin()
+            while (isActive) {
+                val timerData = activeTimerRepository.activeTimer.first() ?: run {
                     stopSelf()
                     return@launch
                 }
 
-                val now = Clock.System.now()
-                val remaining = timerData.targetTime - now
-                if (remaining.isNegative()) {
+                if (timerData.remaining.isNegative()) {
                     stopSelf()
                     return@launch
                 }
 
-                notificationManager?.notify(
-                    NOTIFICATION_ID,
-                    createNotification(timerData)
-                )
-                delay(0.5.seconds)
+                updateNotification(timerData)
+                delay(NotificationUpdateInterval)
             }
         }
+    }
+
+    private fun updateNotification(data: ActiveTimerData?) {
+        notificationManager?.notify(NOTIFICATION_ID, createNotification(data))
+    }
+
+    private suspend fun updateNotificationIfRunning() {
+        if (notificationUpdateJob?.isActive != true) return
+        val timerData = activeTimerRepository.activeTimer.first() ?: return
+        updateNotification(timerData)
     }
 
     private fun createNotificationChannel() {
@@ -155,7 +146,7 @@ class TimerNotificationService : Service() {
     private fun createNotification(timerData: ActiveTimerData?): Notification {
         val contentIntent = PendingIntent.getActivity(
             this,
-            0,
+            REQUEST_CODE_CONTENT,
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -175,7 +166,7 @@ class TimerNotificationService : Service() {
         )
 
         val (remainingText, progress) = if (timerData != null) {
-            val remaining = timerData.targetTime - Clock.System.now()
+            val remaining = timerData.remaining
             val totalSeconds = timerData.totalDuration.inWholeSeconds.toInt()
             val remainingSeconds = remaining.inWholeSeconds.toInt().coerceAtLeast(0)
             val progressPercent = if (totalSeconds > 0) {
@@ -192,8 +183,7 @@ class TimerNotificationService : Service() {
             "" to 0
         }
 
-        val extendMinutes = extendDuration.value.inWholeMinutes.toInt()
-
+        val extendMinutes = cachedExtendDuration.inWholeMinutes.toInt()
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(remainingText)
@@ -223,6 +213,7 @@ class TimerNotificationService : Service() {
         private const val ACTION_START = "io.github.pndhd1.sleeptimer.ACTION_START_TIMER_SERVICE"
         private const val ACTION_STOP = "io.github.pndhd1.sleeptimer.ACTION_STOP_TIMER_SERVICE"
         private const val ACTION_EXTEND = "io.github.pndhd1.sleeptimer.ACTION_EXTEND_TIMER"
+        private const val REQUEST_CODE_CONTENT = 99
         private const val REQUEST_CODE_STOP = 100
         private const val REQUEST_CODE_EXTEND = 101
 
@@ -245,3 +236,6 @@ class TimerNotificationService : Service() {
         }
     }
 }
+
+private inline val ActiveTimerData.remaining
+    get() = targetTime - Clock.System.now()

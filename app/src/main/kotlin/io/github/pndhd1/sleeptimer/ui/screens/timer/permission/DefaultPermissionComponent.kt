@@ -22,7 +22,7 @@ class DefaultPermissionComponent(
         ): DefaultPermissionComponent
     }
 
-    override fun getActivationIntent(): Intent = when (permissionType) {
+    override fun getActivationIntent(): Intent? = when (permissionType) {
         PermissionType.DeviceAdmin -> deviceAdminRepository.getAdminActivationIntent()
         PermissionType.ExactAlarm -> deviceAdminRepository.getAlarmPermissionIntent()
     }

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -44,9 +43,11 @@ class DeviceAdminRepositoryImpl(
             putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, explanation)
         }
 
-    @RequiresApi(Build.VERSION_CODES.S)
-    override fun getAlarmPermissionIntent() =
+    override fun getAlarmPermissionIntent() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+    } else {
+        null
+    }
 
     override fun lockScreen() {
         if (devicePolicyManager.isAdminActive) devicePolicyManager?.lockNow()
@@ -62,7 +63,7 @@ class DeviceAdminRepositoryImpl(
 
     private fun checkCanScheduleExactAlarms(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
-        return alarmManager?.canScheduleExactAlarms() ?: false
+        return alarmManager?.canScheduleExactAlarms() == true
     }
 
     private val DevicePolicyManager?.isAdminActive: Boolean

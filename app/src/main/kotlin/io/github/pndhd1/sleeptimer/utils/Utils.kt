@@ -1,13 +1,21 @@
 package io.github.pndhd1.sleeptimer.utils
 
 import android.content.BroadcastReceiver
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.value.ObserveLifecycleMode
+import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.subscribe
 import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.LifecycleOwner
+import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -39,4 +47,34 @@ fun BroadcastReceiver.launchAsync(job: suspend () -> Unit) {
             pendingResult.finish()
         }
     }
+}
+
+fun ComponentContext.componentScope(
+    context: CoroutineContext = Dispatchers.Main.immediate + SupervisorJob()
+) = coroutineScope(context)
+
+fun <T : Any> Value<T>.toStateFlow(
+    lifecycle: Lifecycle,
+    mode: ObserveLifecycleMode = ObserveLifecycleMode.START_STOP
+): StateFlow<T> {
+    val stateFlow = MutableStateFlow(value)
+    subscribe(lifecycle, mode) { stateFlow.value = it }
+    return stateFlow
+}
+
+context(owner: LifecycleOwner)
+fun <T : Any> Value<T>.toStateFlow(
+    mode: ObserveLifecycleMode = ObserveLifecycleMode.START_STOP
+): StateFlow<T> = toStateFlow(owner.lifecycle, mode)
+
+
+fun List<Int>.toByteArray(): ByteArray {
+    val buffer = ByteBuffer.allocate(size * Int.SIZE_BYTES)
+    forEach { buffer.putInt(it) }
+    return buffer.array()
+}
+
+fun ByteArray.toIntArray(): IntArray {
+    val buffer = ByteBuffer.wrap(this)
+    return IntArray(size / Int.SIZE_BYTES) { buffer.getInt() }
 }

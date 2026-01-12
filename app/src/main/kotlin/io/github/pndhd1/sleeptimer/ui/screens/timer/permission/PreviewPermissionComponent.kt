@@ -5,6 +5,6 @@ import android.content.Intent
 class PreviewPermissionComponent(
     override val permissionType: PermissionType = PermissionType.DeviceAdmin,
 ) : PermissionComponent {
-    override fun getActivationIntent(): Intent = Intent()
+    override fun getActivationIntent() = null
     override fun onPermissionResult() {}
 }
