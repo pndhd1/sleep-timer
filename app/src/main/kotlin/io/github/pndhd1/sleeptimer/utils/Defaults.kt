@@ -19,6 +19,10 @@ object Defaults {
     inline val DefaultExtendDuration: Duration get() = 5.minutes
     const val DefaultShowNotification: Boolean = true
 
-    val MinTimerDuration: Duration = 5.seconds
+    const val DefaultFadeOutEnabled: Boolean = true
+    inline val DefaultFadeStartBefore: Duration get() = 1.minutes
+    inline val DefaultFadeOutDuration: Duration get() = 15.seconds
+
+    inline val MinTimerDuration: Duration get() = 5.seconds
     val MaxTimerDuration: Duration = 23.hours + 59.minutes + 59.seconds
 }

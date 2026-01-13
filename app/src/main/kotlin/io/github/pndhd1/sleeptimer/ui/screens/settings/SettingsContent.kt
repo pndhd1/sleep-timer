@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
@@ -31,10 +32,23 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private const val DefaultDurationSliderMinMinutes = 5
-private const val DefaultDurationSliderMaxMinutes = 120
-private const val ExtendDurationSliderMinMinutes = 1
-private const val ExtendDurationSliderMaxMinutes = 30
+private inline val DefaultDurationSliderMin get() = 5.minutes
+private inline val DefaultDurationSliderMax get() = 120.minutes
+private inline val DefaultDurationSliderStep get() = 1.minutes
+
+private inline val ExtendDurationSliderMin get() = 1.minutes
+private inline val ExtendDurationSliderMax get() = 30.minutes
+private inline val ExtendDurationSliderStep get() = 30.seconds
+
+private inline val FadeStartBeforeSliderMin get() = 1.minutes
+private inline val FadeStartBeforeSliderMax get() = 30.minutes
+private inline val FadeStartBeforeSliderStep get() = 30.seconds
+
+private inline val FadeDurationSliderMin get() = 1.seconds
+private inline val FadeDurationSliderMax get() = 1.minutes
+private inline val FadeDurationSliderStep get() = 1.seconds
+
+private const val PresetAnimationDurationMillis = 200
 
 @Composable
 fun SettingsContent(
@@ -56,6 +70,9 @@ fun SettingsContent(
             onPresetAdded = component::onPresetAdded,
             onPresetRemoved = component::onPresetRemoved,
             onShowNotificationChanged = component::onShowNotificationChanged,
+            onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
+            onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
+            onFadeOutDurationChanged = component::onFadeOutDurationChanged,
             modifier = modifier.fillMaxSize(),
         )
     }
@@ -108,6 +125,9 @@ private fun SettingsLayout(
     onPresetAdded: (Duration) -> Unit,
     onPresetRemoved: (Duration) -> Unit,
     onShowNotificationChanged: (Boolean) -> Unit,
+    onFadeOutEnabledChanged: (Boolean) -> Unit,
+    onFadeOutStartBeforeChanged: (Duration) -> Unit,
+    onFadeOutDurationChanged: (Duration) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -136,6 +156,13 @@ private fun SettingsLayout(
             showNotification = state.showNotification,
             onShowNotificationChanged = onShowNotificationChanged,
         )
+
+        FadeOutCard(
+            fadeOut = state.fadeOut,
+            onFadeOutEnabledChanged = onFadeOutEnabledChanged,
+            onFadeOutStartBeforeChanged = onFadeOutStartBeforeChanged,
+            onFadeOutDurationChanged = onFadeOutDurationChanged,
+        )
     }
 }
 
@@ -145,8 +172,6 @@ private fun DefaultDurationCard(
     onDurationChanged: (Duration) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showEditDialog by remember { mutableStateOf(false) }
-
     SettingsCard(
         title = stringResource(R.string.settings_default_duration_title),
         description = stringResource(R.string.settings_default_duration_description),
@@ -155,21 +180,9 @@ private fun DefaultDurationCard(
         DurationSlider(
             duration = duration,
             onDurationChanged = onDurationChanged,
-            onEditClick = { showEditDialog = true },
-            minMinutes = DefaultDurationSliderMinMinutes,
-            maxMinutes = DefaultDurationSliderMaxMinutes,
-        )
-    }
-
-    if (showEditDialog) {
-        DurationEditDialog(
-            currentDuration = duration,
-            maxDuration = Defaults.MaxTimerDuration,
-            onConfirm = { newDuration ->
-                onDurationChanged(newDuration)
-                showEditDialog = false
-            },
-            onDismiss = { showEditDialog = false },
+            minDuration = DefaultDurationSliderMin,
+            maxDuration = DefaultDurationSliderMax,
+            step = DefaultDurationSliderStep,
         )
     }
 }
@@ -180,8 +193,6 @@ private fun ExtendDurationCard(
     onDurationChanged: (Duration) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showEditDialog by remember { mutableStateOf(false) }
-
     SettingsCard(
         title = stringResource(R.string.settings_extend_duration_title),
         description = stringResource(R.string.settings_extend_duration_description),
@@ -190,21 +201,9 @@ private fun ExtendDurationCard(
         DurationSlider(
             duration = duration,
             onDurationChanged = onDurationChanged,
-            onEditClick = { showEditDialog = true },
-            minMinutes = ExtendDurationSliderMinMinutes,
-            maxMinutes = ExtendDurationSliderMaxMinutes,
-        )
-    }
-
-    if (showEditDialog) {
-        DurationEditDialog(
-            currentDuration = duration,
-            maxDuration = Defaults.MaxTimerDuration,
-            onConfirm = { newDuration ->
-                onDurationChanged(newDuration)
-                showEditDialog = false
-            },
-            onDismiss = { showEditDialog = false },
+            minDuration = ExtendDurationSliderMin,
+            maxDuration = ExtendDurationSliderMax,
+            step = ExtendDurationSliderStep,
         )
     }
 }
@@ -233,7 +232,6 @@ private fun PresetsCard(
     if (showAddDialog) {
         DurationEditDialog(
             currentDuration = Duration.ZERO,
-            maxDuration = Defaults.MaxTimerDuration,
             title = stringResource(R.string.settings_add_preset_title),
             onConfirm = { duration ->
                 if (duration !in presets && duration >= Defaults.MinTimerDuration) {
@@ -252,41 +250,80 @@ private fun ShowNotificationCard(
     onShowNotificationChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.settings_show_notification_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = stringResource(R.string.settings_show_notification_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
+    SettingsCard(
+        title = stringResource(R.string.settings_show_notification_title),
+        description = stringResource(R.string.settings_show_notification_description),
+        modifier = modifier,
+        endContent = {
             Switch(
                 checked = showNotification,
                 onCheckedChange = onShowNotificationChanged,
             )
-        }
-    }
+        },
+    )
+}
+
+@Composable
+private fun FadeOutCard(
+    fadeOut: FadeOutSettings,
+    onFadeOutEnabledChanged: (Boolean) -> Unit,
+    onFadeOutStartBeforeChanged: (Duration) -> Unit,
+    onFadeOutDurationChanged: (Duration) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsCard(
+        title = stringResource(R.string.settings_fade_out_title),
+        description = stringResource(R.string.settings_fade_out_description),
+        modifier = modifier,
+        endContent = {
+            Switch(
+                checked = fadeOut.enabled,
+                onCheckedChange = onFadeOutEnabledChanged,
+            )
+        },
+        content = {
+            AnimatedVisibility(visible = fadeOut.enabled) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_fade_start_before_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DurationSlider(
+                        duration = fadeOut.startBefore,
+                        onDurationChanged = onFadeOutStartBeforeChanged,
+                        minDuration = FadeStartBeforeSliderMin,
+                        maxDuration = FadeStartBeforeSliderMax,
+                        step = FadeStartBeforeSliderStep,
+                        dialogMinDuration = FadeStartBeforeSliderMin,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = stringResource(R.string.settings_fade_duration_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DurationSlider(
+                        duration = fadeOut.duration,
+                        onDurationChanged = onFadeOutDurationChanged,
+                        minDuration = FadeDurationSliderMin,
+                        maxDuration = FadeDurationSliderMax,
+                        step = FadeDurationSliderStep,
+                        dialogMinDuration = FadeDurationSliderMin,
+                        dialogMaxDuration = FadeDurationSliderMax,
+                    )
+                }
+            }
+        },
+    )
 }
 
 @Composable
@@ -294,7 +331,8 @@ private fun SettingsCard(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    endContent: @Composable (RowScope.() -> Unit)? = null,
+    content: @Composable (ColumnScope.() -> Unit)? = null,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -302,26 +340,35 @@ private fun SettingsCard(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = if (endContent != null) Modifier.weight(1f) else Modifier) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
 
-            Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                endContent?.invoke(this)
+            }
 
-            content()
+            if (content != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                content()
+            }
         }
     }
 }
@@ -330,27 +377,40 @@ private fun SettingsCard(
 private fun DurationSlider(
     duration: Duration,
     onDurationChanged: (Duration) -> Unit,
-    onEditClick: () -> Unit,
-    minMinutes: Int,
-    maxMinutes: Int,
+    minDuration: Duration,
+    maxDuration: Duration,
     modifier: Modifier = Modifier,
+    step: Duration? = null,
+    dialogMaxDuration: Duration = Defaults.MaxTimerDuration,
+    dialogMinDuration: Duration = Defaults.MinTimerDuration,
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val minSeconds = minDuration.inWholeSeconds.toFloat()
+    val maxSeconds = maxDuration.inWholeSeconds.toFloat()
+
     var sliderValue by remember(duration) {
-        mutableFloatStateOf(duration.inWholeMinutes.toFloat())
+        mutableFloatStateOf(duration.inWholeSeconds.toFloat())
     }
 
-    // Show slider value during drag, otherwise show actual duration (which might have seconds)
-    val sliderMinutes = sliderValue.toInt()
-    val durationMinutes = duration.inWholeMinutes.toInt()
-    val displayDuration = if (sliderMinutes != durationMinutes) {
-        sliderMinutes.minutes
+    // Show slider value during drag, otherwise show actual duration
+    val sliderSeconds = sliderValue.toInt()
+    val durationSeconds = duration.inWholeSeconds.toInt()
+    val displayDuration = if (sliderSeconds != durationSeconds) {
+        sliderSeconds.seconds
     } else {
         duration
     }
 
+    val steps = step?.let {
+        val range = (maxSeconds - minSeconds).toInt()
+        val stepSeconds = it.inWholeSeconds.toInt()
+        if (stepSeconds > 0) (range / stepSeconds - 1).coerceAtLeast(0) else 0
+    } ?: 0
+
     Column(modifier = modifier) {
         OutlinedButton(
-            onClick = onEditClick,
+            onClick = { showDialog = true },
             modifier = Modifier.align(Alignment.CenterHorizontally),
         ) {
             Text(
@@ -363,11 +423,11 @@ private fun DurationSlider(
         Spacer(modifier = Modifier.height(8.dp))
 
         Slider(
-            value = sliderValue.coerceIn(minMinutes.toFloat(), maxMinutes.toFloat()),
+            value = sliderValue.coerceIn(minSeconds, maxSeconds),
             onValueChange = { sliderValue = round(it) },
-            onValueChangeFinished = { onDurationChanged(sliderValue.toInt().minutes) },
-            valueRange = minMinutes.toFloat()..maxMinutes.toFloat(),
-            steps = (maxMinutes - minMinutes - 1).coerceAtLeast(0),
+            onValueChangeFinished = { onDurationChanged(sliderValue.toInt().seconds) },
+            valueRange = minSeconds..maxSeconds,
+            steps = steps,
         )
 
         Row(
@@ -375,26 +435,39 @@ private fun DurationSlider(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = stringResource(R.string.settings_duration_min, minMinutes),
+                text = Formatter.formatTimeWithUnits(minDuration),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = stringResource(R.string.settings_duration_min, maxMinutes),
+                text = Formatter.formatTimeWithUnits(maxDuration),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+
+    if (showDialog) {
+        DurationEditDialog(
+            currentDuration = duration,
+            maxDuration = dialogMaxDuration,
+            minDuration = dialogMinDuration,
+            onConfirm = { newDuration ->
+                onDurationChanged(newDuration)
+                showDialog = false
+            },
+            onDismiss = { showDialog = false },
+        )
     }
 }
 
 @Composable
 private fun DurationEditDialog(
     currentDuration: Duration,
-    maxDuration: Duration,
     onConfirm: (Duration) -> Unit,
     onDismiss: () -> Unit,
     title: String = stringResource(R.string.settings_edit_duration_title),
+    maxDuration: Duration = Defaults.MaxTimerDuration,
     minDuration: Duration = Defaults.MinTimerDuration,
 ) {
     var hours by remember { mutableStateOf(currentDuration.inWholeHours.toString()) }
@@ -502,8 +575,6 @@ private fun DurationEditDialog(
     )
 }
 
-private const val PresetAnimationDurationMillis = 200
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PresetChips(
@@ -584,6 +655,11 @@ private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
             extendDuration = 5.minutes,
             presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
             showNotification = true,
+            fadeOut = FadeOutSettings(
+                enabled = false,
+                startBefore = 1.minutes,
+                duration = 3.seconds,
+            ),
         ),
     )
 }

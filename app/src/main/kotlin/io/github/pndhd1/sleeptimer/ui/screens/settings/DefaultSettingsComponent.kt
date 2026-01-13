@@ -5,6 +5,7 @@ import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.utils.componentScope
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
@@ -42,6 +43,7 @@ class DefaultSettingsComponent(
                 extendDuration = settings.extendDuration,
                 presets = settings.presets,
                 showNotification = settings.showNotification,
+                fadeOut = settings.fadeOut,
             )
         }
     }
@@ -84,6 +86,27 @@ class DefaultSettingsComponent(
         updateLoadedState { it.copy(showNotification = show) }
         launchWithErrorHandling {
             settingsRepository.updateShowNotification(show)
+        }
+    }
+
+    override fun onFadeOutEnabledChanged(enabled: Boolean) {
+        updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(enabled = enabled)) }
+        launchWithErrorHandling {
+            settingsRepository.updateFadeOutEnabled(enabled)
+        }
+    }
+
+    override fun onFadeOutStartBeforeChanged(duration: Duration) {
+        updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(startBefore = duration)) }
+        launchWithErrorHandling {
+            settingsRepository.updateFadeStartBefore(duration)
+        }
+    }
+
+    override fun onFadeOutDurationChanged(duration: Duration) {
+        updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(duration = duration)) }
+        launchWithErrorHandling {
+            settingsRepository.updateFadeOutDuration(duration)
         }
     }
 

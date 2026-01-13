@@ -55,4 +55,14 @@
     <string name="settings_max_duration_error">Максимум: %s</string>
     <string name="settings_show_notification_title">Показывать уведомление</string>
     <string name="settings_show_notification_description">Отображать прогресс таймера в уведомлении. Изменения применятся при следующем запуске таймера.</string>
+    <string name="settings_duration_sec">%d сек</string>
+    <string name="settings_fade_out_title">Затухание звука</string>
+    <string name="settings_fade_out_description">Плавно уменьшать громкость медиа перед окончанием таймера. Изменения применятся при следующем запуске таймера.</string>
+    <string name="settings_fade_start_before_label">Начать затухание до окончания таймера</string>
+    <string name="settings_fade_duration_label">Длительность затухания</string>
+
+    <string name="fade_notification_channel_name">Затухание звука</string>
+    <string name="fade_notification_channel_description">Показывается при затухании звука</string>
+    <string name="fade_notification_title">Затухание звука</string>
+    <string name="fade_notification_text">Громкость уменьшается</string>
 </resources>

@@ -1,7 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.services
 
 import android.app.Notification
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -18,6 +17,9 @@ import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
+import io.github.pndhd1.sleeptimer.domain.usecase.ExtendTimerUseCase
+import io.github.pndhd1.sleeptimer.domain.usecase.StopTimerUseCase
 import io.github.pndhd1.sleeptimer.requireAppGraph
 import io.github.pndhd1.sleeptimer.ui.MainActivity
 import io.github.pndhd1.sleeptimer.utils.Defaults.DefaultExtendDuration
@@ -41,6 +43,15 @@ class TimerNotificationService : LifecycleService() {
     @Inject
     private lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    private lateinit var extendTimerUseCase: ExtendTimerUseCase
+
+    @Inject
+    private lateinit var stopTimerUseCase: StopTimerUseCase
+
+    @Inject
+    private lateinit var notificationChannelManager: NotificationChannelManager
+
     private val notificationManager: NotificationManager? by lazy(::getSystemService)
     private var notificationUpdateJob: Job? = null
     private var cachedExtendDuration = DefaultExtendDuration
@@ -48,7 +59,6 @@ class TimerNotificationService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         requireAppGraph().inject(this)
-        createNotificationChannel()
 
         settingsRepository.timerSettings
             .onEach {
@@ -63,14 +73,14 @@ class TimerNotificationService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
-            ACTION_START -> startTimer()
+            ACTION_START -> startNotificationUpdateJob()
             ACTION_STOP -> stopTimer()
             ACTION_EXTEND -> extendTimer()
         }
         return START_STICKY
     }
 
-    private fun startTimer() {
+    private fun startNotificationUpdateJob() {
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
@@ -82,23 +92,7 @@ class TimerNotificationService : LifecycleService() {
                 0
             }
         )
-        launchNotificationUpdateJob()
-    }
 
-    private fun stopTimer() {
-        lifecycleScope.launch {
-            activeTimerRepository.clearTimer()
-            stopSelf()
-        }
-    }
-
-    private fun extendTimer() {
-        lifecycleScope.launch {
-            activeTimerRepository.extendTimer(cachedExtendDuration)
-        }
-    }
-
-    private fun launchNotificationUpdateJob() {
         val prevJob = notificationUpdateJob
         notificationUpdateJob = lifecycleScope.launch {
             prevJob?.cancelAndJoin()
@@ -119,6 +113,19 @@ class TimerNotificationService : LifecycleService() {
         }
     }
 
+    private fun stopTimer() {
+        lifecycleScope.launch {
+            stopTimerUseCase()
+            stopSelf()
+        }
+    }
+
+    private fun extendTimer() {
+        lifecycleScope.launch {
+            extendTimerUseCase(cachedExtendDuration)
+        }
+    }
+
     private fun updateNotification(data: ActiveTimerData?) {
         notificationManager?.notify(NOTIFICATION_ID, createNotification(data))
     }
@@ -127,20 +134,6 @@ class TimerNotificationService : LifecycleService() {
         if (notificationUpdateJob?.isActive != true) return
         val timerData = activeTimerRepository.activeTimer.first() ?: return
         updateNotification(timerData)
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = getString(R.string.notification_channel_description)
-                setShowBadge(false)
-            }
-            notificationManager?.createNotificationChannel(channel)
-        }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -185,7 +178,7 @@ class TimerNotificationService : LifecycleService() {
         }
 
         val extendMinutes = cachedExtendDuration.inWholeMinutes.toInt()
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat.Builder(this, notificationChannelManager.channelId)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(remainingText)
             .setSmallIcon(R.drawable.ic_timer)
@@ -209,7 +202,6 @@ class TimerNotificationService : LifecycleService() {
     }
 
     companion object {
-        private const val CHANNEL_ID = "timer_channel"
         private const val NOTIFICATION_ID = 1
         private const val ACTION_START = "io.github.pndhd1.sleeptimer.ACTION_START_TIMER_SERVICE"
         private const val ACTION_STOP = "io.github.pndhd1.sleeptimer.ACTION_STOP_TIMER_SERVICE"

@@ -14,6 +14,8 @@ import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.domain.usecase.StartTimerUseCase
+import io.github.pndhd1.sleeptimer.domain.usecase.StopTimerUseCase
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.DefaultActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.DefaultTimerConfigComponent
@@ -38,6 +40,8 @@ class DefaultTimerComponent(
     private val settingsRepository: SettingsRepository,
     deviceAdminRepository: DeviceAdminRepository,
     private val activeTimerRepository: ActiveTimerRepository,
+    private val startTimerUseCase: StartTimerUseCase,
+    private val stopTimerUseCase: StopTimerUseCase,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
 ) : TimerComponent, ComponentContext by componentContext {
 
@@ -122,7 +126,7 @@ class DefaultTimerComponent(
         scope.launch {
             // Show error if starting the timer fails
             runCatchingSuspend {
-                activeTimerRepository.startTimer(targetTime, duration)
+                startTimerUseCase(targetTime, duration)
             }.onFailure {
                 handleError()
                 return@launch
@@ -145,7 +149,7 @@ class DefaultTimerComponent(
             runCatchingSuspend { TimerNotificationService.stop(context) }
 
             // Show error if stopping the timer fails
-            runCatchingSuspend { activeTimerRepository.clearTimer() }
+            runCatchingSuspend { stopTimerUseCase() }
                 .onFailure { handleError() }
         }
     }

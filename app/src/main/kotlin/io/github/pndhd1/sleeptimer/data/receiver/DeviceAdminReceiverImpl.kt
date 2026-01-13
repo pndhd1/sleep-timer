@@ -16,14 +16,12 @@ class DeviceAdminReceiverImpl : DeviceAdminReceiver() {
     override fun onEnabled(context: Context, intent: Intent) {
         super.onEnabled(context, intent)
         context.requireAppGraph().inject(this)
-
         deviceAdminRepository.refreshAdminState()
     }
 
     override fun onDisabled(context: Context, intent: Intent) {
         super.onDisabled(context, intent)
         context.requireAppGraph().inject(this)
-
         deviceAdminRepository.refreshAdminState()
     }
 

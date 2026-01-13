@@ -54,4 +54,14 @@
     <string name="settings_max_duration_error">Maximum: %s</string>
     <string name="settings_show_notification_title">Show Notification</string>
     <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
+    <string name="settings_duration_sec">%d sec</string>
+    <string name="settings_fade_out_title">Fade Out Audio</string>
+    <string name="settings_fade_out_description">Gradually reduce media volume before timer ends. Changes apply on next timer start.</string>
+    <string name="settings_fade_start_before_label">Start fading before timer ends</string>
+    <string name="settings_fade_duration_label">Fade duration</string>
+
+    <string name="fade_notification_channel_name">Audio Fade</string>
+    <string name="fade_notification_channel_description">Shows when audio is fading out</string>
+    <string name="fade_notification_title">Fading Audio</string>
+    <string name="fade_notification_text">Volume is decreasing</string>
 </resources>

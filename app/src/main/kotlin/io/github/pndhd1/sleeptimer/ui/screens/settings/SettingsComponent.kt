@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
+import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 
@@ -12,6 +13,9 @@ interface SettingsComponent {
     fun onPresetAdded(duration: Duration)
     fun onPresetRemoved(duration: Duration)
     fun onShowNotificationChanged(show: Boolean)
+    fun onFadeOutEnabledChanged(enabled: Boolean)
+    fun onFadeOutStartBeforeChanged(duration: Duration)
+    fun onFadeOutDurationChanged(duration: Duration)
     fun onResetSettings()
 }
 
@@ -26,5 +30,6 @@ sealed interface SettingsState {
         val extendDuration: Duration,
         val presets: List<Duration>,
         val showNotification: Boolean,
+        val fadeOut: FadeOutSettings,
     ) : SettingsState
 }

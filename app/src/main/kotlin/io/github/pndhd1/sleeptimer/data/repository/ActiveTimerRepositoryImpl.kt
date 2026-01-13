@@ -14,11 +14,14 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.data.receiver.TimerAlarmReceiver
+import io.github.pndhd1.sleeptimer.data.service.AudioFadeService
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
+import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -26,6 +29,7 @@ import kotlin.time.Instant
 private val TargetTimeKey = longPreferencesKey("target_time_epoch_seconds")
 private val TotalDurationKey = longPreferencesKey("total_duration_seconds")
 private const val ALARM_REQUEST_CODE = 1001
+private const val FADE_ALARM_REQUEST_CODE = 1002
 
 @Inject
 @SingleIn(AppScope::class)
@@ -40,7 +44,11 @@ class ActiveTimerRepositoryImpl(
     override val activeTimer: Flow<ActiveTimerData?> =
         preferences.data.map(Preferences::toDomain)
 
-    override suspend fun startTimer(targetTime: Instant, totalDuration: Duration) {
+    override suspend fun startTimer(
+        targetTime: Instant,
+        totalDuration: Duration,
+        fadeOutSettings: FadeOutSettings,
+    ) {
         preferences.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this[TargetTimeKey] = targetTime.epochSeconds
@@ -48,13 +56,19 @@ class ActiveTimerRepositoryImpl(
             }
         }
         scheduleAlarm(targetTime)
+        scheduleFadeAlarmIfEnabled(targetTime, fadeOutSettings)
     }
 
-    override suspend fun extendTimer(additionalDuration: Duration) {
+    override suspend fun extendTimer(
+        additionalDuration: Duration,
+        fadeOutSettings: FadeOutSettings,
+    ) {
         val current = activeTimer.first() ?: return
         val newTargetTime = current.targetTime + additionalDuration
         val newTotalDuration = current.totalDuration + additionalDuration
         cancelAlarm()
+        cancelFadeAlarm()
+        AudioFadeService.stop(context)
         preferences.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this[TargetTimeKey] = newTargetTime.epochSeconds
@@ -62,10 +76,13 @@ class ActiveTimerRepositoryImpl(
             }
         }
         scheduleAlarm(newTargetTime)
+        scheduleFadeAlarmIfEnabled(newTargetTime, fadeOutSettings)
     }
 
     override suspend fun clearTimer() {
         cancelAlarm()
+        cancelFadeAlarm()
+        AudioFadeService.stop(context)
         preferences.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this.remove(TargetTimeKey)
@@ -111,6 +128,79 @@ class ActiveTimerRepositoryImpl(
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             ALARM_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager?.cancel(pendingIntent)
+    }
+
+    private fun scheduleFadeAlarmIfEnabled(targetTime: Instant, fadeOutSettings: FadeOutSettings) {
+        if (!fadeOutSettings.enabled) return
+
+        val now = Clock.System.now()
+        val timeUntilEnd = targetTime - now
+        if (timeUntilEnd.isNegative()) return
+
+        val fadeStartTime = targetTime - fadeOutSettings.startBefore
+        val startImmediately = fadeStartTime <= now
+
+        // Fade duration should not exceed remaining time
+        val timeFromFadeToEnd = if (startImmediately) timeUntilEnd else fadeOutSettings.startBefore
+        val actualFadeDuration = minOf(fadeOutSettings.duration, timeFromFadeToEnd)
+
+        if (startImmediately) {
+            triggerFadeBroadcast(actualFadeDuration)
+        } else {
+            scheduleFadeAlarm(fadeStartTime, actualFadeDuration)
+        }
+    }
+
+    private fun triggerFadeBroadcast(fadeDuration: Duration) {
+        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
+            action = TimerAlarmReceiver.ACTION_FADE_START
+            putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
+        }
+        context.sendBroadcast(intent)
+    }
+
+    private fun scheduleFadeAlarm(fadeStartTime: Instant, fadeDuration: Duration) {
+        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
+            action = TimerAlarmReceiver.ACTION_FADE_START
+            putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            FADE_ALARM_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val triggerAtMillis = fadeStartTime.toEpochMilliseconds()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager?.canScheduleExactAlarms() == true) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent
+                )
+            }
+        } else {
+            alarmManager?.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerAtMillis,
+                pendingIntent
+            )
+        }
+    }
+
+    private fun cancelFadeAlarm() {
+        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
+            action = TimerAlarmReceiver.ACTION_FADE_START
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            FADE_ALARM_REQUEST_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

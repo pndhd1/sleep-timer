@@ -7,4 +7,5 @@ data class TimerSettings(
     val presets: List<Duration>,
     val extendDuration: Duration,
     val showNotification: Boolean,
+    val fadeOut: FadeOutSettings,
 )
