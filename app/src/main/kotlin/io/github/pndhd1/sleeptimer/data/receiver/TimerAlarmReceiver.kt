@@ -4,25 +4,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dev.zacsweers.metro.Inject
-import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
-import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
+import io.github.pndhd1.sleeptimer.domain.usecase.CompleteTimerUseCase
 import io.github.pndhd1.sleeptimer.requireAppGraph
 import io.github.pndhd1.sleeptimer.utils.launchAsync
 
 class TimerAlarmReceiver : BroadcastReceiver() {
 
     @Inject
-    private lateinit var deviceAdminRepository: DeviceAdminRepository
-
-    @Inject
-    private lateinit var activeTimerRepository: ActiveTimerRepository
+    private lateinit var completeTimerUseCase: CompleteTimerUseCase
 
     override fun onReceive(context: Context, intent: Intent?) {
-        if (intent?.action != ACTION_TIMER_EXPIRED) return
         context.requireAppGraph().inject(this)
 
-        deviceAdminRepository.lockScreen()
-        launchAsync { activeTimerRepository.clearTimer() }
+        launchAsync {
+            when (intent?.action) {
+                ACTION_TIMER_EXPIRED -> completeTimerUseCase()
+            }
+        }
     }
 
     companion object {
