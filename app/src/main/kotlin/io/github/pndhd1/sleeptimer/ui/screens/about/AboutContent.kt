@@ -19,10 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.plus
 import kotlinx.coroutines.launch
 
 private const val LicensesScrollOffset = 800f
@@ -66,6 +68,12 @@ fun AboutContent(
                     .fillMaxSize(),
                 lazyListState = listState,
                 contentPadding = WindowInsets.navigationBars.asPaddingValues(),
+                padding = LibraryDefaults.libraryPadding(
+                    contentPadding = WindowInsets.safeContent
+                        .only(WindowInsetsSides.Horizontal)
+                        .asPaddingValues()
+                        .plus(PaddingValues(vertical = 16.dp)),
+                ),
                 header = {
                     item {
                         AppInfoSection(
@@ -86,12 +94,15 @@ fun AboutContent(
                                     scope.launch {
                                         listState.animateScrollBy(LicensesScrollOffset)
                                     }
-                                },
+                                }
+                                .padding(vertical = 16.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.about_licenses_title),
                                 style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.windowInsetsPadding(
+                                    WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
+                                )
                             )
                         }
                     }

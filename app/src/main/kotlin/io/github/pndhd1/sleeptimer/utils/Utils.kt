@@ -5,6 +5,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.ObserveLifecycleMode
 import com.arkivanov.decompose.value.Value
@@ -96,4 +103,18 @@ fun <I> ActivityResultLauncher<I>.launchCatching(input: I, onError: () -> Unit) 
     } catch (_: ActivityNotFoundException) {
         onError()
     }
+}
+
+@Composable
+@Stable
+fun PaddingValues.plus(
+    other: PaddingValues,
+    layoutDirection: LayoutDirection = LocalLayoutDirection.current,
+): PaddingValues {
+    return PaddingValues(
+        start = calculateStartPadding(layoutDirection) + other.calculateStartPadding(layoutDirection),
+        top = calculateTopPadding() + other.calculateTopPadding(),
+        end = calculateEndPadding(layoutDirection) + other.calculateEndPadding(layoutDirection),
+        bottom = calculateBottomPadding() + other.calculateBottomPadding(),
+    )
 }
