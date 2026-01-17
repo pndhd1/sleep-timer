@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id(libs.plugins.android.application)
     id(libs.plugins.kotlin.android)
@@ -6,10 +8,28 @@ plugins {
     alias(libs.plugins.metro)
 }
 
+val keystoreProperties = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+fun getKeystoreProperty(envKey: String, propertyKey: String): String? {
+    return System.getenv(envKey) ?: keystoreProperties.getProperty(propertyKey)
+}
+
 android {
     namespace = BuildConfig.ApplicationId
     compileSdk {
         version = release(BuildConfig.CompileSdk)
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootProject.projectDir}/keystore/release.jks")
+            storePassword =
+                getKeystoreProperty("SLEEPTIMER_RELEASE_STORE_PASSWORD", "storePassword")
+            keyAlias = getKeystoreProperty("SLEEPTIMER_RELEASE_KEY_ALIAS", "keyAlias")
+            keyPassword = getKeystoreProperty("SLEEPTIMER_RELEASE_KEY_PASSWORD", "keyPassword")
+        }
     }
 
     defaultConfig {
@@ -35,7 +55,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // TODO: Replace with release keystore
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -50,6 +70,15 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        resources.excludes += listOf(
+            "/META-INF/{AL2.0,LGPL2.1}",
+            "DebugProbesKt.bin",
+            "META-INF/versions/9/previous-compilation-data.bin",
+            "kotlin-tooling-metadata.json"
+        )
     }
 }
 
