@@ -19,4 +19,5 @@ class PreviewSettingsComponent(
     override fun onFadeOutStartBeforeChanged(duration: Duration) = Unit
     override fun onFadeOutDurationChanged(duration: Duration) = Unit
     override fun onResetSettings() = Unit
+    override fun onAboutClick() = Unit
 }

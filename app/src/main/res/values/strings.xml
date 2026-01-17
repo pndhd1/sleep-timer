@@ -72,4 +72,12 @@
     <string name="fade_notification_channel_description">Shows when audio is fading out</string>
     <string name="fade_notification_title">Fading Audio</string>
     <string name="fade_notification_text">Volume is decreasing</string>
+
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_description">Version, licenses, and source code</string>
+    <string name="about_title">About</string>
+    <string name="about_back">Back</string>
+    <string name="about_version">Version %s</string>
+    <string name="about_github">View on GitHub</string>
+    <string name="about_licenses_title">Open Source Licenses</string>
 </resources>

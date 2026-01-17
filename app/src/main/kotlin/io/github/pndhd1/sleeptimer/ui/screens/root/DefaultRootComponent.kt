@@ -1,16 +1,13 @@
 package io.github.pndhd1.sleeptimer.ui.screens.root
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.stack.ChildStack
-import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.bringToFront
-import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.*
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import io.github.pndhd1.sleeptimer.ui.screens.about.DefaultAboutComponent
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.DefaultBottomNavComponent
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
-import io.github.pndhd1.sleeptimer.ui.screens.settings.DefaultSettingsComponent
-import io.github.pndhd1.sleeptimer.ui.screens.timer.DefaultTimerComponent
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -18,8 +15,7 @@ import kotlinx.serialization.Serializable
 @AssistedInject
 class DefaultRootComponent(
     @Assisted componentContext: ComponentContext,
-    private val timerComponentFactory: DefaultTimerComponent.Factory,
-    private val settingsComponentFactory: DefaultSettingsComponent.Factory,
+    private val bottomNavComponentFactory: DefaultBottomNavComponent.Factory,
 ) : RootComponent, ComponentContext by componentContext {
 
     @AssistedFactory
@@ -27,43 +23,49 @@ class DefaultRootComponent(
         fun create(componentContext: ComponentContext): DefaultRootComponent
     }
 
-    private val nav = StackNavigation<StackConfig>()
-    private val _stack: StateFlow<ChildStack<StackConfig, Child>> = childStack(
-        source = nav,
-        serializer = StackConfig.serializer(),
-        initialConfiguration = StackConfig.TimerConfig,
+    private val navigation = StackNavigation<Config>()
+    private val _stack: StateFlow<ChildStack<Config, Child>> = childStack(
+        source = navigation,
+        serializer = Config.serializer(),
+        initialConfiguration = Config.BottomNav,
         childFactory = ::createChild,
+        handleBackButton = true,
     ).toStateFlow()
     override val stack: StateFlow<ChildStack<*, Child>> get() = _stack
 
-    override fun onTimerTabClick() {
-        nav.bringToFront(StackConfig.TimerConfig)
+    private fun onAboutClick() {
+        navigation.pushNew(Config.About)
     }
 
-    override fun onSettingsTabClick() {
-        nav.bringToFront(StackConfig.SettingsConfig)
+    private fun onBack() {
+        navigation.pop()
     }
 
     private fun createChild(
-        config: StackConfig,
+        config: Config,
         componentContext: ComponentContext,
     ): Child = when (config) {
-        StackConfig.TimerConfig -> Child.TimerChild(
-            component = timerComponentFactory.create(componentContext),
+        Config.BottomNav -> Child.BottomNav(
+            component = bottomNavComponentFactory.create(
+                componentContext = componentContext,
+                onNavigateToAbout = ::onAboutClick,
+            ),
         )
 
-        StackConfig.SettingsConfig -> Child.SettingsChild(
-            component = settingsComponentFactory.create(componentContext),
+        Config.About -> Child.About(
+            component = DefaultAboutComponent(
+                componentContext = componentContext,
+                onBack = ::onBack,
+            ),
         )
     }
 }
 
 @Serializable
-private sealed interface StackConfig {
+private sealed interface Config {
+    @Serializable
+    data object BottomNav : Config
 
     @Serializable
-    data object TimerConfig : StackConfig
-
-    @Serializable
-    data object SettingsConfig : StackConfig
+    data object About : Config
 }

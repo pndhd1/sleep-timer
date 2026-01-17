@@ -15,13 +15,17 @@ import kotlin.time.Duration
 @AssistedInject
 class DefaultSettingsComponent(
     @Assisted componentContext: ComponentContext,
+    @Assisted private val onNavigateToAbout: () -> Unit,
     private val settingsRepository: SettingsRepository,
     private val systemRepository: SystemRepository,
 ) : SettingsComponent, ComponentContext by componentContext {
 
     @AssistedFactory
     fun interface Factory {
-        fun create(componentContext: ComponentContext): DefaultSettingsComponent
+        fun create(
+            componentContext: ComponentContext,
+            onNavigateToAbout: () -> Unit,
+        ): DefaultSettingsComponent
     }
 
     private val scope = componentScope()
@@ -130,6 +134,10 @@ class DefaultSettingsComponent(
             runCatchingSuspend { settingsRepository.resetToDefaults() }
             loadSettings()
         }
+    }
+
+    override fun onAboutClick() {
+        onNavigateToAbout()
     }
 
     private inline fun updateLoadedState(transform: (SettingsState.Loaded) -> SettingsState.Loaded) {

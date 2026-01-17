@@ -19,6 +19,7 @@ interface SettingsComponent {
     fun onFadeOutStartBeforeChanged(duration: Duration)
     fun onFadeOutDurationChanged(duration: Duration)
     fun onResetSettings()
+    fun onAboutClick()
 }
 
 sealed interface SettingsState {

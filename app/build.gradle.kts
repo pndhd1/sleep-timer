@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.metro)
+    alias(libs.plugins.aboutlibraries)
 }
 
 val keystoreProperties = Properties().apply {
@@ -70,6 +71,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -105,4 +107,7 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
 
     implementation(libs.flowext)
+
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.aboutlibraries.compose.m3)
 }

@@ -73,4 +73,12 @@
     <string name="fade_notification_channel_description">Показывается при затухании звука</string>
     <string name="fade_notification_title">Затухание звука</string>
     <string name="fade_notification_text">Громкость уменьшается</string>
+
+    <string name="settings_about_title">О приложении</string>
+    <string name="settings_about_description">Версия, лицензии и исходный код</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_back">Назад</string>
+    <string name="about_version">Версия %s</string>
+    <string name="about_github">Открыть на GitHub</string>
+    <string name="about_licenses_title">Лицензии открытого ПО</string>
 </resources>

@@ -102,6 +102,7 @@ fun SettingsContent(
             onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
             onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
             onFadeOutDurationChanged = component::onFadeOutDurationChanged,
+            onAboutClick = component::onAboutClick,
             modifier = modifier.fillMaxSize(),
         )
     }
@@ -166,6 +167,7 @@ private fun SettingsLayout(
     onFadeOutEnabledChanged: (Boolean) -> Unit,
     onFadeOutStartBeforeChanged: (Duration) -> Unit,
     onFadeOutDurationChanged: (Duration) -> Unit,
+    onAboutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -203,6 +205,56 @@ private fun SettingsLayout(
             onFadeOutStartBeforeChanged = onFadeOutStartBeforeChanged,
             onFadeOutDurationChanged = onFadeOutDurationChanged,
         )
+
+        AboutCard(onClick = onAboutClick)
+    }
+}
+
+@Composable
+private fun AboutCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_info),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_about_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_about_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

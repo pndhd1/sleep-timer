@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.2"
 kotlin = "2.3.0"
+aboutlibraries = "13.2.1"
 coreKtx = "1.17.0"
 lifecycle = "2.10.0"
 activityCompose = "1.12.2"
@@ -34,6 +35,8 @@ essenty-lifecycle-coroutines = { group = "com.arkivanov.essenty", name = "lifecy
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 flowext = { module = "io.github.hoc081098:FlowExt-jvm", version.ref = "flowext" }
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
+aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutlibraries" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -41,4 +44,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
 
