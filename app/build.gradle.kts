@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.metro)
     alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val keystoreProperties = Properties().apply {
@@ -48,6 +50,13 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+
+            // Disable Crashlytics for debug builds
+            extra["enableCrashlytics"] = false
+            extra["alwaysUpdateBuildId"] = false
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
         release {
             isMinifyEnabled = true
@@ -110,4 +119,7 @@ dependencies {
 
     implementation(libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.m3)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 }

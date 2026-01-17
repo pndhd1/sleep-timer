@@ -1,6 +1,8 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
 import com.arkivanov.decompose.ComponentContext
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -152,7 +154,10 @@ class DefaultSettingsComponent(
     private inline fun launchWithErrorHandling(crossinline block: suspend () -> Unit) {
         scope.launch {
             runCatchingSuspend { block() }
-                .onFailure { _state.value = SettingsState.Error }
+                .onFailure {
+                    Firebase.crashlytics.recordException(it)
+                    _state.value = SettingsState.Error
+                }
         }
     }
 }

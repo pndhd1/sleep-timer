@@ -6,6 +6,8 @@ import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.hoc081098.flowext.combine
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -71,7 +73,7 @@ class DefaultTimerComponent(
             systemRepository.wasNotificationPermissionRequested,
             transform = ::createSlotConfig,
         )
-            .catch { handleError() }
+            .catch { handleError(it) }
             .onEach { nav.activate(it) }
             .flowWithLifecycle(lifecycle)
             .launchIn(scope)
@@ -135,7 +137,7 @@ class DefaultTimerComponent(
             runCatchingSuspend {
                 startTimerUseCase(targetTime, duration)
             }.onFailure {
-                handleError()
+                handleError(it)
                 return@launch
             }
 
@@ -156,12 +158,12 @@ class DefaultTimerComponent(
             runCatchingSuspend { TimerNotificationService.stop(context) }
 
             // Show error if stopping the timer fails
-            runCatchingSuspend { stopTimerUseCase() }
-                .onFailure { handleError() }
+            runCatchingSuspend { stopTimerUseCase() }.onFailure(::handleError)
         }
     }
 
-    private fun handleError() {
+    private fun handleError(throwable: Throwable) {
+        Firebase.crashlytics.recordException(throwable)
         nav.activate(SlotConfig.Error)
     }
 }
