@@ -13,6 +13,8 @@ class PreviewSettingsComponent(
     override fun onPresetAdded(duration: Duration) = Unit
     override fun onPresetRemoved(duration: Duration) = Unit
     override fun onShowNotificationChanged(show: Boolean) = Unit
+    override fun onNotificationPermissionResult(granted: Boolean) = Unit
+    override fun getNotificationPermission(): String? = null
     override fun onFadeOutEnabledChanged(enabled: Boolean) = Unit
     override fun onFadeOutStartBeforeChanged(duration: Duration) = Unit
     override fun onFadeOutDurationChanged(duration: Duration) = Unit

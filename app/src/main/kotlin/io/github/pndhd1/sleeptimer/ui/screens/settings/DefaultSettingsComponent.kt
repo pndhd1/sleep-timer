@@ -1,16 +1,13 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
-import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 import io.github.pndhd1.sleeptimer.utils.componentScope
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -19,6 +16,7 @@ import kotlin.time.Duration
 class DefaultSettingsComponent(
     @Assisted componentContext: ComponentContext,
     private val settingsRepository: SettingsRepository,
+    private val systemRepository: SystemRepository,
 ) : SettingsComponent, ComponentContext by componentContext {
 
     @AssistedFactory
@@ -43,6 +41,7 @@ class DefaultSettingsComponent(
                 extendDuration = settings.extendDuration,
                 presets = settings.presets,
                 showNotification = settings.showNotification,
+                hasNotificationPermission = systemRepository.canSendNotifications.value,
                 fadeOut = settings.fadeOut,
             )
         }
@@ -88,6 +87,21 @@ class DefaultSettingsComponent(
             settingsRepository.updateShowNotification(show)
         }
     }
+
+    override fun onNotificationPermissionResult(granted: Boolean) {
+        systemRepository.refreshNotificationPermissionState()
+        updateLoadedState {
+            it.copy(
+                hasNotificationPermission = granted,
+                showNotification = granted,
+            )
+        }
+        if (granted) launchWithErrorHandling {
+            settingsRepository.updateShowNotification(true)
+        }
+    }
+
+    override fun getNotificationPermission(): String? = systemRepository.getNotificationPermission()
 
     override fun onFadeOutEnabledChanged(enabled: Boolean) {
         updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(enabled = enabled)) }

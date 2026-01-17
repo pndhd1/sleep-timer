@@ -13,6 +13,8 @@ interface SettingsComponent {
     fun onPresetAdded(duration: Duration)
     fun onPresetRemoved(duration: Duration)
     fun onShowNotificationChanged(show: Boolean)
+    fun onNotificationPermissionResult(granted: Boolean)
+    fun getNotificationPermission(): String?
     fun onFadeOutEnabledChanged(enabled: Boolean)
     fun onFadeOutStartBeforeChanged(duration: Duration)
     fun onFadeOutDurationChanged(duration: Duration)
@@ -30,6 +32,7 @@ sealed interface SettingsState {
         val extendDuration: Duration,
         val presets: List<Duration>,
         val showNotification: Boolean,
+        val hasNotificationPermission: Boolean,
         val fadeOut: FadeOutSettings,
     ) : SettingsState
 }

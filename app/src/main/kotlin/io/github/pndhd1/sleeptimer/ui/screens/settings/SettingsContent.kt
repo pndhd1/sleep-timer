@@ -1,5 +1,11 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -11,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
@@ -25,6 +33,7 @@ import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.startActivityCatching
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
@@ -56,6 +65,26 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    var showPermissionSettingsDialog by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            component.onNotificationPermissionResult(granted)
+            if (!granted) {
+                val permission = component.getNotificationPermission()
+                val shouldShowRationale = permission != null && activity != null &&
+                    !ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+                if (shouldShowRationale) {
+                    showPermissionSettingsDialog = true
+                }
+            }
+        },
+    )
+
     when (val currentState = state) {
         is SettingsState.Loading -> LoadingContent(modifier = modifier.fillMaxSize())
         is SettingsState.Error -> ErrorContent(
@@ -70,10 +99,26 @@ fun SettingsContent(
             onPresetAdded = component::onPresetAdded,
             onPresetRemoved = component::onPresetRemoved,
             onShowNotificationChanged = component::onShowNotificationChanged,
+            onRequestNotificationPermission = {
+                component.getNotificationPermission()?.let(permissionLauncher::launch)
+            },
             onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
             onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
             onFadeOutDurationChanged = component::onFadeOutDurationChanged,
             modifier = modifier.fillMaxSize(),
+        )
+    }
+
+    if (showPermissionSettingsDialog) {
+        NotificationPermissionSettingsDialog(
+            onOpenSettings = {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
+                context.startActivityCatching(intent)
+                showPermissionSettingsDialog = false
+            },
+            onDismiss = { showPermissionSettingsDialog = false },
         )
     }
 }
@@ -125,6 +170,7 @@ private fun SettingsLayout(
     onPresetAdded: (Duration) -> Unit,
     onPresetRemoved: (Duration) -> Unit,
     onShowNotificationChanged: (Boolean) -> Unit,
+    onRequestNotificationPermission: () -> Unit,
     onFadeOutEnabledChanged: (Boolean) -> Unit,
     onFadeOutStartBeforeChanged: (Duration) -> Unit,
     onFadeOutDurationChanged: (Duration) -> Unit,
@@ -154,7 +200,9 @@ private fun SettingsLayout(
 
         ShowNotificationCard(
             showNotification = state.showNotification,
+            hasPermission = state.hasNotificationPermission,
             onShowNotificationChanged = onShowNotificationChanged,
+            onRequestPermission = onRequestNotificationPermission,
         )
 
         FadeOutCard(
@@ -247,7 +295,9 @@ private fun PresetsCard(
 @Composable
 private fun ShowNotificationCard(
     showNotification: Boolean,
+    hasPermission: Boolean,
     onShowNotificationChanged: (Boolean) -> Unit,
+    onRequestPermission: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsCard(
@@ -256,8 +306,14 @@ private fun ShowNotificationCard(
         modifier = modifier,
         endContent = {
             Switch(
-                checked = showNotification,
-                onCheckedChange = onShowNotificationChanged,
+                checked = showNotification && hasPermission,
+                onCheckedChange = { enabled ->
+                    if (enabled && !hasPermission) {
+                        onRequestPermission()
+                    } else {
+                        onShowNotificationChanged(enabled)
+                    }
+                },
             )
         },
     )
@@ -644,6 +700,28 @@ private fun PresetChips(
     }
 }
 
+@Composable
+private fun NotificationPermissionSettingsDialog(
+    onOpenSettings: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_notification_permission_title)) },
+        text = { Text(stringResource(R.string.settings_notification_permission_message)) },
+        confirmButton = {
+            TextButton(onClick = onOpenSettings) {
+                Text(stringResource(R.string.settings_notification_permission_open_settings))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.settings_cancel))
+            }
+        },
+    )
+}
+
 // region Preview
 
 private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
@@ -655,6 +733,7 @@ private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
             extendDuration = 5.minutes,
             presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
             showNotification = true,
+            hasNotificationPermission = true,
             fadeOut = FadeOutSettings(
                 enabled = false,
                 startBefore = 1.minutes,

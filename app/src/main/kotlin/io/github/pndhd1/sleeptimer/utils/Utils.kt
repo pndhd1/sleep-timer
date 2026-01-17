@@ -1,6 +1,9 @@
 package io.github.pndhd1.sleeptimer.utils
 
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.ObserveLifecycleMode
 import com.arkivanov.decompose.value.Value
@@ -77,4 +80,11 @@ fun List<Int>.toByteArray(): ByteArray {
 fun ByteArray.toIntArray(): IntArray {
     val buffer = ByteBuffer.wrap(this)
     return IntArray(size / Int.SIZE_BYTES) { buffer.getInt() }
+}
+
+fun Context.startActivityCatching(intent: Intent): Boolean = try {
+    startActivity(intent)
+    true
+} catch (_: ActivityNotFoundException) {
+    false
 }

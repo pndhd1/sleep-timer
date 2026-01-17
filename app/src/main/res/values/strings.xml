@@ -56,6 +56,9 @@
     <string name="settings_max_duration_error">Maximum: %s</string>
     <string name="settings_show_notification_title">Show Notification</string>
     <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
+    <string name="settings_notification_permission_title">Notification Permission Required</string>
+    <string name="settings_notification_permission_message">To show notifications, please enable the permission in app settings.</string>
+    <string name="settings_notification_permission_open_settings">Open Settings</string>
     <string name="settings_duration_sec">%d sec</string>
     <string name="settings_fade_out_title">Fade Out Audio</string>
     <string name="settings_fade_out_description">Gradually reduce media volume before timer ends. Changes apply on next timer start.</string>
