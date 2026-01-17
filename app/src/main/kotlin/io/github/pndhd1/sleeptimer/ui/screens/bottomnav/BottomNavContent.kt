@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.ChildStack
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.BottomNavComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screens.settings.PreviewSettingsComponent
@@ -35,35 +36,31 @@ fun BottomNavContent(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    Scaffold(
-        modifier = modifier,
-        bottomBar = {
-            if (!isLandscape) {
+    if (isLandscape) {
+        Row(modifier = modifier.fillMaxSize()) {
+            NavigationRailBar(
+                activeChild = stack.active.instance,
+                onTimerTabClick = component::onTimerTabClick,
+                onSettingsTabClick = component::onSettingsTabClick,
+            )
+            NavContent(
+                stack = stack,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End + WindowInsetsSides.Vertical)),
+            )
+        }
+    } else {
+        Scaffold(
+            modifier = modifier,
+            bottomBar = {
                 BottomNavigationBar(
                     activeChild = stack.active.instance,
                     onTimerTabClick = component::onTimerTabClick,
                     onSettingsTabClick = component::onSettingsTabClick,
                 )
-            }
-        },
-    ) { innerPadding ->
-        if (isLandscape) {
-            Row(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            ) {
-                NavigationRailBar(
-                    activeChild = stack.active.instance,
-                    onTimerTabClick = component::onTimerTabClick,
-                    onSettingsTabClick = component::onSettingsTabClick,
-                )
-                NavContent(
-                    stack = stack,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-        } else {
+            },
+        ) { innerPadding ->
             NavContent(
                 stack = stack,
                 modifier = Modifier
@@ -76,7 +73,7 @@ fun BottomNavContent(
 
 @Composable
 private fun NavContent(
-    stack: com.arkivanov.decompose.router.stack.ChildStack<*, Child>,
+    stack: ChildStack<*, Child>,
     modifier: Modifier = Modifier,
 ) {
     Children(
@@ -105,7 +102,10 @@ private fun NavigationRailBar(
     onSettingsTabClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationRail(modifier = modifier.fillMaxHeight()) {
+    NavigationRail(
+        modifier = modifier.fillMaxHeight(),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
         NavigationRailItem(
             selected = activeChild is Child.Timer,
             onClick = onTimerTabClick,
