@@ -338,7 +338,7 @@ private fun FadeOutCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     DurationSlider(
                         duration = fadeOut.startBefore,
@@ -357,7 +357,7 @@ private fun FadeOutCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     DurationSlider(
                         duration = fadeOut.duration,
@@ -698,18 +698,6 @@ private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
     override val values = sequenceOf(
         SettingsState.Loading,
         SettingsState.Error,
-        SettingsState.Loaded(
-            defaultDuration = 30.minutes,
-            extendDuration = 5.minutes,
-            presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
-            showNotification = true,
-            hasNotificationPermission = true,
-            fadeOut = FadeOutSettings(
-                enabled = false,
-                startBefore = 1.minutes,
-                duration = 3.seconds,
-            ),
-        ),
     )
 }
 
@@ -723,6 +711,24 @@ private fun SettingsContentPreview(
             component = PreviewSettingsComponent(state),
         )
     }
+}
+
+@Preview(showBackground = true, heightDp = 1500)
+@Composable
+private fun SettingsContentPreview() {
+    val state =  SettingsState.Loaded(
+        defaultDuration = 30.minutes,
+        extendDuration = 5.minutes,
+        presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
+        showNotification = true,
+        hasNotificationPermission = true,
+        fadeOut = FadeOutSettings(
+            enabled = true,
+            startBefore = 1.minutes,
+            duration = 3.seconds,
+        ),
+    )
+    SettingsContentPreview(state)
 }
 
 // endregion
