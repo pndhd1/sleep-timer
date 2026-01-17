@@ -1,29 +1,38 @@
 package io.github.pndhd1.sleeptimer.data.repository
 
+import android.Manifest
 import android.app.AlarmManager
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.data.receiver.DeviceAdminReceiverImpl
-import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
+import kotlinx.coroutines.flow.*
+
+private val NotificationPermissionRequestedKey =
+    booleanPreferencesKey("notification_permission_requested")
 
 @Inject
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class DeviceAdminRepositoryImpl(
+class SystemRepositoryImpl(
     private val context: Context,
-) : DeviceAdminRepository {
+    private val preferences: DataStore<Preferences>,
+) : SystemRepository {
 
     private val devicePolicyManager: DevicePolicyManager? = context.getSystemService()
     private val alarmManager: AlarmManager? = context.getSystemService()
@@ -35,6 +44,16 @@ class DeviceAdminRepositoryImpl(
 
     private val _canScheduleExactAlarms = MutableStateFlow(checkCanScheduleExactAlarms())
     override val canScheduleExactAlarms: StateFlow<Boolean> = _canScheduleExactAlarms.asStateFlow()
+
+    private val _canSendNotifications = MutableStateFlow(checkNotificationsPermission())
+    override val canSendNotifications: StateFlow<Boolean> = _canSendNotifications.asStateFlow()
+
+    override val wasNotificationPermissionRequested: Flow<Boolean> =
+        preferences.data.map { it[NotificationPermissionRequestedKey] ?: false }
+
+    override fun lockScreen() {
+        if (devicePolicyManager.isAdminActive) devicePolicyManager?.lockNow()
+    }
 
     override fun getAdminActivationIntent() =
         Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
@@ -49,9 +68,12 @@ class DeviceAdminRepositoryImpl(
         null
     }
 
-    override fun lockScreen() {
-        if (devicePolicyManager.isAdminActive) devicePolicyManager?.lockNow()
-    }
+    override fun getNotificationPermission() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.POST_NOTIFICATIONS
+        } else {
+            null
+        }
 
     override fun refreshAdminState() {
         _isAdminActive.value = devicePolicyManager.isAdminActive
@@ -61,9 +83,25 @@ class DeviceAdminRepositoryImpl(
         _canScheduleExactAlarms.value = checkCanScheduleExactAlarms()
     }
 
+    override fun refreshNotificationPermissionState() {
+        _canSendNotifications.value = checkNotificationsPermission()
+    }
+
+    override suspend fun markNotificationPermissionRequested() {
+        preferences.edit { it[NotificationPermissionRequestedKey] = true }
+    }
+
     private fun checkCanScheduleExactAlarms(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
         return alarmManager?.canScheduleExactAlarms() == true
+    }
+
+    private fun checkNotificationsPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private val DevicePolicyManager?.isAdminActive: Boolean

@@ -23,14 +23,20 @@ fun PermissionContent(
     component: PermissionComponent,
     modifier: Modifier = Modifier,
 ) {
-    val launcher = rememberLauncherForActivityResult(
+    val intentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { component.onPermissionResult() },
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
         onResult = { component.onPermissionResult() },
     )
 
     val (titleRes, descriptionRes) = when (component.permissionType) {
         PermissionType.DeviceAdmin -> R.string.permission_device_admin_title to R.string.permission_device_admin_description
         PermissionType.ExactAlarm -> R.string.permission_exact_alarm_title to R.string.permission_exact_alarm_description
+        PermissionType.Notification -> R.string.permission_notification_title to R.string.permission_notification_description
     }
 
     Column(
@@ -57,7 +63,12 @@ fun PermissionContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { component.getActivationIntent()?.let(launcher::launch) }) {
+        Button(
+            onClick = {
+                component.getRuntimePermission()?.let(permissionLauncher::launch)
+                    ?: component.getActivationIntent()?.let(intentLauncher::launch)
+            },
+        ) {
             Text(text = stringResource(R.string.permission_grant_button))
         }
     }
@@ -66,7 +77,7 @@ fun PermissionContent(
 // region Preview
 
 private class PermissionTypePreviewProvider : PreviewParameterProvider<PermissionType> {
-    override val values = sequenceOf(PermissionType.DeviceAdmin, PermissionType.ExactAlarm)
+    override val values = PermissionType.entries.asSequence()
 }
 
 @Preview(showBackground = true)

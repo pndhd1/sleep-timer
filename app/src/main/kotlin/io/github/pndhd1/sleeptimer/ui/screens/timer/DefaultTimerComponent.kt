@@ -6,14 +6,15 @@ import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
+import com.hoc081098.flowext.combine
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
-import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
+import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 import io.github.pndhd1.sleeptimer.domain.usecase.StartTimerUseCase
 import io.github.pndhd1.sleeptimer.domain.usecase.StopTimerUseCase
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerComponent.Child
@@ -38,8 +39,8 @@ class DefaultTimerComponent(
     @Assisted componentContext: ComponentContext,
     private val context: Context,
     private val settingsRepository: SettingsRepository,
-    deviceAdminRepository: DeviceAdminRepository,
-    private val activeTimerRepository: ActiveTimerRepository,
+    systemRepository: SystemRepository,
+    activeTimerRepository: ActiveTimerRepository,
     private val startTimerUseCase: StartTimerUseCase,
     private val stopTimerUseCase: StopTimerUseCase,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
@@ -64,8 +65,10 @@ class DefaultTimerComponent(
         combine(
             settingsRepository.timerSettings,
             activeTimerRepository.activeTimer,
-            deviceAdminRepository.isAdminActive,
-            deviceAdminRepository.canScheduleExactAlarms,
+            systemRepository.isAdminActive,
+            systemRepository.canScheduleExactAlarms,
+            systemRepository.canSendNotifications,
+            systemRepository.wasNotificationPermissionRequested,
             transform = ::createSlotConfig,
         )
             .catch { handleError() }
@@ -112,9 +115,13 @@ class DefaultTimerComponent(
         activeTimer: ActiveTimerData?,
         isAdminActive: Boolean,
         canScheduleExactAlarms: Boolean,
+        canSendNotifications: Boolean,
+        wasNotificationPermissionRequested: Boolean,
     ): SlotConfig = when {
         !isAdminActive -> SlotConfig.Permission(PermissionType.DeviceAdmin)
         !canScheduleExactAlarms -> SlotConfig.Permission(PermissionType.ExactAlarm)
+        !wasNotificationPermissionRequested && !canSendNotifications ->
+            SlotConfig.Permission(PermissionType.Notification)
 
         activeTimer != null && activeTimer.targetTime >= Clock.System.now() ->
             activeTimer.toActiveTimerSlot()

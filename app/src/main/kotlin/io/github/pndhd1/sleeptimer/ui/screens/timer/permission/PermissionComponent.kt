@@ -8,10 +8,13 @@ interface PermissionComponent {
 
     fun getActivationIntent(): Intent?
 
+    fun getRuntimePermission(): String?
+
     fun onPermissionResult()
 }
 
 enum class PermissionType {
     DeviceAdmin,
     ExactAlarm,
+    Notification,
 }

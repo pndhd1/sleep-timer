@@ -27,6 +27,8 @@
     <string name="permission_device_admin_system_explanation">Таймеру сна необходимо разрешение администратора для блокировки экрана.</string>
     <string name="permission_exact_alarm_title">Разрешение будильника</string>
     <string name="permission_exact_alarm_description">Таймеру сна необходимо разрешение на точные будильники для корректной работы таймера.</string>
+    <string name="permission_notification_title">Разрешение на уведомления</string>
+    <string name="permission_notification_description">Разрешите уведомления, чтобы видеть прогресс таймера и элементы управления. Это необязательно — таймер будет работать и без него.</string>
 
     <string name="notification_channel_name">Таймер</string>
     <string name="notification_channel_description">Показывает прогресс таймера и элементы управления</string>

@@ -27,6 +27,8 @@
     <string name="permission_device_admin_system_explanation">Sleep Timer needs device admin permission to lock the screen when timer expires.</string>
     <string name="permission_exact_alarm_title">Alarm Permission</string>
     <string name="permission_exact_alarm_description">Sleep Timer needs permission to schedule exact alarms so the timer works precisely.</string>
+    <string name="permission_notification_title">Notification Permission</string>
+    <string name="permission_notification_description">Allow notifications to see timer progress and controls. This is optional — the timer will work without it.</string>
     <string name="notification_channel_name">Timer</string>
     <string name="notification_channel_description">Shows timer progress and controls</string>
     <string name="notification_title">Sleep Timer</string>

@@ -2,16 +2,16 @@ package io.github.pndhd1.sleeptimer.domain.usecase
 
 import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
-import io.github.pndhd1.sleeptimer.domain.repository.DeviceAdminRepository
+import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 
 @Inject
 class CompleteTimerUseCase(
-    private val deviceAdminRepository: DeviceAdminRepository,
+    private val systemRepository: SystemRepository,
     private val activeTimerRepository: ActiveTimerRepository,
 ) {
 
     suspend operator fun invoke() {
-        deviceAdminRepository.lockScreen()
+        systemRepository.lockScreen()
         activeTimerRepository.clearTimer()
     }
 }
