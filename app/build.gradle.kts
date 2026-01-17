@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     id(libs.plugins.android.application)
     id(libs.plugins.kotlin.android)
@@ -11,9 +9,8 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-val keystoreProperties = Properties().apply {
-    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
-}
+val keystoreProperties = loadProperties("keystore.properties")
+val yandexProperties = loadProperties("yandex.properties")
 
 fun getKeystoreProperty(envKey: String, propertyKey: String): String? {
     return System.getenv(envKey) ?: keystoreProperties.getProperty(propertyKey)
@@ -51,6 +48,8 @@ android {
         debug {
             applicationIdSuffix = ".debug"
 
+            buildConfigField("String", "AD_BANNER_UNIT_ID", "\"demo-banner-yandex\"")
+
             // Disable Crashlytics for debug builds
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
@@ -59,6 +58,12 @@ android {
             }
         }
         release {
+            buildConfigField(
+                "String",
+                "AD_BANNER_UNIT_ID",
+                "\"${yandexProperties.getProperty("adBannerUnitId", "demo-banner-yandex")}\"",
+            )
+
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -122,4 +127,6 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
+
+    implementation(libs.yandex.mobileads)
 }

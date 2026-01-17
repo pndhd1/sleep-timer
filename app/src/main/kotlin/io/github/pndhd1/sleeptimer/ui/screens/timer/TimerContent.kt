@@ -24,6 +24,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.AdBanner
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -34,32 +35,39 @@ fun TimerContent(
     modifier: Modifier = Modifier,
 ) {
     val slot by component.slot.collectAsStateWithLifecycle()
-    Crossfade(slot?.child?.instance, modifier = modifier) { child ->
-        when (child) {
-            is TimerComponent.Child.Permission -> {
-                PermissionContent(
-                    component = child.component,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+    Column(modifier = modifier) {
+        Crossfade(
+            targetState = slot?.child?.instance,
+            modifier = Modifier.weight(1f),
+        ) { child ->
+            when (child) {
+                is TimerComponent.Child.Permission -> {
+                    PermissionContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
 
-            is TimerComponent.Child.Config -> {
-                TimerConfigContent(
-                    component = child.component,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+                is TimerComponent.Child.Config -> {
+                    TimerConfigContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
 
-            is TimerComponent.Child.Active -> {
-                ActiveTimerContent(
-                    component = child.component,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+                is TimerComponent.Child.Active -> {
+                    ActiveTimerContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
 
-            null -> LoadingContent(modifier = Modifier.fillMaxSize())
-            is TimerComponent.Child.Error -> ErrorContent(modifier = Modifier.fillMaxSize())
+                is TimerComponent.Child.Error -> ErrorContent(modifier = Modifier.fillMaxSize())
+                null -> LoadingContent(modifier = Modifier.fillMaxSize())
+            }
         }
+
+        AdBanner()
     }
 }
 
