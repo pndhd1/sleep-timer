@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,12 +17,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
+import io.github.pndhd1.sleeptimer.utils.launchCatching
 
 @Composable
 fun PermissionContent(
     component: PermissionComponent,
     modifier: Modifier = Modifier,
 ) {
+    var showSettingsDialog by remember { mutableStateOf(false) }
+
     val intentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { component.onPermissionResult() },
@@ -65,12 +69,25 @@ fun PermissionContent(
 
         Button(
             onClick = {
-                component.getRuntimePermission()?.let(permissionLauncher::launch)
-                    ?: component.getActivationIntent()?.let(intentLauncher::launch)
+                val onError = { showSettingsDialog = true }
+                component.getRuntimePermission()?.let {
+                    permissionLauncher.launchCatching(it, onError)
+                }
+                component.getActivationIntent()?.let {
+                    intentLauncher.launchCatching(it, onError)
+                }
             },
         ) {
             Text(text = stringResource(R.string.permission_grant_button))
         }
+    }
+
+    if (showSettingsDialog) {
+        OpenSettingsDialog(
+            title = stringResource(R.string.settings_permission_unavailable_title),
+            message = stringResource(R.string.settings_permission_unavailable_message),
+            onDismiss = { showSettingsDialog = false },
+        )
     }
 }
 

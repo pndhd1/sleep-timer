@@ -1,9 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -30,10 +27,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
-import io.github.pndhd1.sleeptimer.utils.startActivityCatching
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
@@ -110,14 +107,9 @@ fun SettingsContent(
     }
 
     if (showPermissionSettingsDialog) {
-        NotificationPermissionSettingsDialog(
-            onOpenSettings = {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", context.packageName, null)
-                }
-                context.startActivityCatching(intent)
-                showPermissionSettingsDialog = false
-            },
+        OpenSettingsDialog(
+            title = stringResource(R.string.settings_notification_permission_title),
+            message = stringResource(R.string.settings_notification_permission_message),
             onDismiss = { showPermissionSettingsDialog = false },
         )
     }
@@ -698,28 +690,6 @@ private fun PresetChips(
             )
         }
     }
-}
-
-@Composable
-private fun NotificationPermissionSettingsDialog(
-    onOpenSettings: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.settings_notification_permission_title)) },
-        text = { Text(stringResource(R.string.settings_notification_permission_message)) },
-        confirmButton = {
-            TextButton(onClick = onOpenSettings) {
-                Text(stringResource(R.string.settings_notification_permission_open_settings))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.settings_cancel))
-            }
-        },
-    )
 }
 
 // region Preview

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.ObserveLifecycleMode
 import com.arkivanov.decompose.value.Value
@@ -87,4 +88,12 @@ fun Context.startActivityCatching(intent: Intent): Boolean = try {
     true
 } catch (_: ActivityNotFoundException) {
     false
+}
+
+fun <I> ActivityResultLauncher<I>.launchCatching(input: I, onError: () -> Unit) {
+    try {
+        launch(input)
+    } catch (_: ActivityNotFoundException) {
+        onError()
+    }
 }

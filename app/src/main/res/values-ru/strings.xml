@@ -50,6 +50,7 @@
     <string name="settings_minutes_suffix">мин</string>
     <string name="settings_add">Добавить</string>
     <string name="settings_cancel">Отмена</string>
+    <string name="dialog_ok">OK</string>
     <string name="settings_apply">Применить</string>
     <string name="settings_reset">Сбросить настройки</string>
     <string name="settings_edit_duration_title">Установить время</string>
@@ -59,7 +60,9 @@
     <string name="settings_show_notification_description">Отображать прогресс таймера в уведомлении. Изменения применятся при следующем запуске таймера.</string>
     <string name="settings_notification_permission_title">Требуется разрешение</string>
     <string name="settings_notification_permission_message">Для показа уведомлений включите разрешение в настройках приложения.</string>
-    <string name="settings_notification_permission_open_settings">Открыть настройки</string>
+    <string name="settings_open_app_settings">Открыть настройки</string>
+    <string name="settings_permission_unavailable_title">Разрешение недоступно</string>
+    <string name="settings_permission_unavailable_message">Не удалось запросить разрешение. Пожалуйста, предоставьте его вручную в настройках приложения.</string>
     <string name="settings_duration_sec">%d сек</string>
     <string name="settings_fade_out_title">Затухание звука</string>
     <string name="settings_fade_out_description">Плавно уменьшать громкость медиа перед окончанием таймера. Изменения применятся при следующем запуске таймера.</string>

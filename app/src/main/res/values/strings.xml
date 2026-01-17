@@ -49,6 +49,7 @@
     <string name="settings_minutes_suffix">min</string>
     <string name="settings_add">Add</string>
     <string name="settings_cancel">Cancel</string>
+    <string name="dialog_ok">OK</string>
     <string name="settings_apply">Apply</string>
     <string name="settings_reset">Reset Settings</string>
     <string name="settings_edit_duration_title">Set Duration</string>
@@ -58,7 +59,9 @@
     <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
     <string name="settings_notification_permission_title">Notification Permission Required</string>
     <string name="settings_notification_permission_message">To show notifications, please enable the permission in app settings.</string>
-    <string name="settings_notification_permission_open_settings">Open Settings</string>
+    <string name="settings_open_app_settings">Open Settings</string>
+    <string name="settings_permission_unavailable_title">Permission Unavailable</string>
+    <string name="settings_permission_unavailable_message">Unable to request permission. Please grant it manually in app settings.</string>
     <string name="settings_duration_sec">%d sec</string>
     <string name="settings_fade_out_title">Fade Out Audio</string>
     <string name="settings_fade_out_description">Gradually reduce media volume before timer ends. Changes apply on next timer start.</string>
