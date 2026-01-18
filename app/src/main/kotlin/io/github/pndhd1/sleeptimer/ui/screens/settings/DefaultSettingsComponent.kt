@@ -49,6 +49,7 @@ class DefaultSettingsComponent(
                 showNotification = settings.showNotification,
                 hasNotificationPermission = systemRepository.canSendNotifications.value,
                 fadeOut = settings.fadeOut,
+                goHomeOnExpire = settings.goHomeOnExpire,
             )
         }
     }
@@ -127,6 +128,13 @@ class DefaultSettingsComponent(
         updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(duration = duration)) }
         launchWithErrorHandling {
             settingsRepository.updateFadeOutDuration(duration)
+        }
+    }
+
+    override fun onGoHomeOnExpireChanged(enabled: Boolean) {
+        updateLoadedState { it.copy(goHomeOnExpire = enabled) }
+        launchWithErrorHandling {
+            settingsRepository.updateGoHomeOnExpire(enabled)
         }
     }
 

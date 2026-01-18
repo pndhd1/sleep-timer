@@ -68,6 +68,9 @@
     <string name="settings_fade_start_before_label">Start fading before timer ends</string>
     <string name="settings_fade_duration_label">Fade duration</string>
 
+    <string name="settings_go_home_title">Close Current App</string>
+    <string name="settings_go_home_description">Return to home screen when timer expires, closing any running app</string>
+
     <string name="fade_notification_channel_name">Audio Fade</string>
     <string name="fade_notification_channel_description">Shows when audio is fading out</string>
     <string name="fade_notification_title">Fading Audio</string>

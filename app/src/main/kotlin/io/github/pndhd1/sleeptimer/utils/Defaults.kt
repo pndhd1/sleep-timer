@@ -23,6 +23,8 @@ object Defaults {
     inline val DefaultFadeStartBefore: Duration get() = 1.minutes
     inline val DefaultFadeOutDuration: Duration get() = 15.seconds
 
+    const val DefaultGoHomeOnExpire: Boolean = true
+
     inline val MinTimerDuration: Duration get() = 5.seconds
     val MaxTimerDuration: Duration = 23.hours + 59.minutes + 59.seconds
 }

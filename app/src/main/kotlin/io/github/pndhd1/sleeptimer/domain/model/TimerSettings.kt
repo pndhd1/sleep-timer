@@ -8,4 +8,5 @@ data class TimerSettings(
     val extendDuration: Duration,
     val showNotification: Boolean,
     val fadeOut: FadeOutSettings,
+    val goHomeOnExpire: Boolean,
 )

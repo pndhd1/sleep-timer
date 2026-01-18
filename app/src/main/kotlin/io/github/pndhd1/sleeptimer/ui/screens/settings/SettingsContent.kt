@@ -114,6 +114,7 @@ fun SettingsContent(
             onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
             onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
             onFadeOutDurationChanged = component::onFadeOutDurationChanged,
+            onGoHomeOnExpireChanged = component::onGoHomeOnExpireChanged,
             onAboutClick = component::onAboutClick,
             modifier = layoutModifier,
         )
@@ -180,6 +181,7 @@ private fun SettingsLayout(
     onFadeOutEnabledChanged: (Boolean) -> Unit,
     onFadeOutStartBeforeChanged: (Duration) -> Unit,
     onFadeOutDurationChanged: (Duration) -> Unit,
+    onGoHomeOnExpireChanged: (Boolean) -> Unit,
     onAboutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -242,6 +244,12 @@ private fun SettingsLayout(
                 )
             }
             item {
+                GoHomeOnExpireCard(
+                    enabled = state.goHomeOnExpire,
+                    onEnabledChanged = onGoHomeOnExpireChanged,
+                )
+            }
+            item {
                 AboutCard(onClick = onAboutClick)
             }
             item {
@@ -275,6 +283,25 @@ private fun SettingsLayout(
             )
         }
     }
+}
+
+@Composable
+private fun GoHomeOnExpireCard(
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsCard(
+        title = stringResource(R.string.settings_go_home_title),
+        description = stringResource(R.string.settings_go_home_description),
+        modifier = modifier,
+        endContent = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = onEnabledChanged,
+            )
+        },
+    )
 }
 
 @Composable
@@ -847,6 +874,7 @@ private fun SettingsContentPreview() {
             startBefore = 1.minutes,
             duration = 3.seconds,
         ),
+        goHomeOnExpire = false,
     )
     SettingsContentPreview(state)
 }

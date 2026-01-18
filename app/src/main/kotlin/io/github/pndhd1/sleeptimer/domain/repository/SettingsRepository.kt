@@ -15,5 +15,6 @@ interface SettingsRepository {
     suspend fun updateFadeOutEnabled(enabled: Boolean)
     suspend fun updateFadeStartBefore(duration: Duration)
     suspend fun updateFadeOutDuration(duration: Duration)
+    suspend fun updateGoHomeOnExpire(enabled: Boolean)
     suspend fun resetToDefaults()
 }

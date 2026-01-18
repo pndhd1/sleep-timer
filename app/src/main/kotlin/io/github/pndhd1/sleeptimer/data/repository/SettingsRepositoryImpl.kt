@@ -27,6 +27,7 @@ private val ShowNotificationKey = booleanPreferencesKey("show_notification")
 private val FadeOutEnabledKey = booleanPreferencesKey("fade_out_enabled")
 private val FadeStartBeforeSecondsKey = intPreferencesKey("fade_start_before_seconds")
 private val FadeOutDurationSecondsKey = intPreferencesKey("fade_out_duration_seconds")
+private val GoHomeOnExpireKey = booleanPreferencesKey("go_home_on_expire")
 
 @Inject
 @SingleIn(AppScope::class)
@@ -93,6 +94,14 @@ class SettingsRepositoryImpl(
         }
     }
 
+    override suspend fun updateGoHomeOnExpire(enabled: Boolean) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[GoHomeOnExpireKey] = enabled
+            }
+        }
+    }
+
     override suspend fun resetToDefaults() {
         preferences.updateData { current ->
             current.toMutablePreferences().apply {
@@ -103,6 +112,7 @@ class SettingsRepositoryImpl(
                 remove(FadeOutEnabledKey)
                 remove(FadeStartBeforeSecondsKey)
                 remove(FadeOutDurationSecondsKey)
+                remove(GoHomeOnExpireKey)
             }
         }
     }
@@ -119,4 +129,5 @@ private fun Preferences.toDomain() = TimerSettings(
         startBefore = get(FadeStartBeforeSecondsKey)?.seconds ?: Defaults.DefaultFadeStartBefore,
         duration = get(FadeOutDurationSecondsKey)?.seconds ?: Defaults.DefaultFadeOutDuration,
     ),
+    goHomeOnExpire = get(GoHomeOnExpireKey) ?: Defaults.DefaultGoHomeOnExpire,
 )

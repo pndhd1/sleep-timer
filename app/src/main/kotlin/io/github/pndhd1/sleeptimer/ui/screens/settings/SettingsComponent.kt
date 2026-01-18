@@ -18,6 +18,7 @@ interface SettingsComponent {
     fun onFadeOutEnabledChanged(enabled: Boolean)
     fun onFadeOutStartBeforeChanged(duration: Duration)
     fun onFadeOutDurationChanged(duration: Duration)
+    fun onGoHomeOnExpireChanged(enabled: Boolean)
     fun onResetSettings()
     fun onAboutClick()
 }
@@ -35,5 +36,6 @@ sealed interface SettingsState {
         val showNotification: Boolean,
         val hasNotificationPermission: Boolean,
         val fadeOut: FadeOutSettings,
+        val goHomeOnExpire: Boolean,
     ) : SettingsState
 }

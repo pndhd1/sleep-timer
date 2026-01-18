@@ -69,6 +69,9 @@
     <string name="settings_fade_start_before_label">Начать затухание до окончания таймера</string>
     <string name="settings_fade_duration_label">Длительность затухания</string>
 
+    <string name="settings_go_home_title">Закрывать приложение</string>
+    <string name="settings_go_home_description">Переход на домашний экран при срабатывании таймера, закрывая текущее приложение</string>
+
     <string name="fade_notification_channel_name">Затухание звука</string>
     <string name="fade_notification_channel_description">Показывается при затухании звука</string>
     <string name="fade_notification_title">Затухание звука</string>

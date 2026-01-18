@@ -82,9 +82,8 @@ fun TimerContent(
                 start = imePadding.calculateStartPadding(LocalLayoutDirection.current),
                 end = imePadding.calculateEndPadding(LocalLayoutDirection.current),
                 top = imePadding.calculateTopPadding(),
-                bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation).coerceAtLeast(
-                    0.dp
-                ),
+                bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation)
+                    .coerceAtLeast(0.dp),
             )
 
             Spacer(Modifier.padding(resultPadding))

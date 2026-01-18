@@ -55,6 +55,14 @@ class SystemRepositoryImpl(
         if (devicePolicyManager.isAdminActive) devicePolicyManager?.lockNow()
     }
 
+    override fun goHome() {
+        val homeIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(homeIntent)
+    }
+
     override fun getAdminActivationIntent() =
         Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
             val explanation = context.getString(R.string.permission_device_admin_system_explanation)

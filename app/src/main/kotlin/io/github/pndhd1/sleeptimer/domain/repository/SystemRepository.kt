@@ -11,6 +11,7 @@ interface SystemRepository {
     val wasNotificationPermissionRequested: Flow<Boolean>
 
     fun lockScreen()
+    fun goHome()
 
     fun getAdminActivationIntent(): Intent
     fun getAlarmPermissionIntent(): Intent?
