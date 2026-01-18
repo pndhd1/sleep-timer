@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer.permission
 
 import android.content.Intent
+import kotlinx.serialization.Serializable
 
 interface PermissionComponent {
 
@@ -13,6 +14,7 @@ interface PermissionComponent {
     fun onPermissionResult()
 }
 
+@Serializable
 enum class PermissionType {
     DeviceAdmin,
     ExactAlarm,

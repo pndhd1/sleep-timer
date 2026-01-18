@@ -87,7 +87,7 @@ class DefaultTimerComponent(
         is SlotConfig.Permission -> Child.Permission(
             component = permissionComponentFactory.create(
                 componentContext = componentContext,
-                permissionType = config.type,
+                permissionType = config.permissionType,
             ),
         )
 
@@ -176,7 +176,7 @@ private sealed interface SlotConfig {
     data object Error : SlotConfig
 
     @Serializable
-    data class Permission(val type: PermissionType) : SlotConfig
+    data class Permission(val permissionType: PermissionType) : SlotConfig
 
     @Serializable
     data class Config(
