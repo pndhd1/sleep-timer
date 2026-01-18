@@ -23,7 +23,6 @@ import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
 import kotlinx.coroutines.launch
@@ -70,7 +69,7 @@ fun AboutContent(
                 lazyListState = listState,
                 contentPadding = WindowInsets.navigationBars.asPaddingValues(),
                 padding = LibraryDefaults.libraryPadding(
-                    contentPadding = UIDefaults.defaultInsets
+                    contentPadding = WindowInsets.safeContent
                         .only(WindowInsetsSides.Horizontal)
                         .union(WindowInsets(top = 16.dp, bottom = 16.dp))
                         .asPaddingValues()
@@ -102,7 +101,7 @@ fun AboutContent(
                                 text = stringResource(R.string.about_licenses_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.windowInsetsPadding(
-                                    UIDefaults.defaultInsets.only(WindowInsetsSides.Horizontal)
+                                    WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
                                 )
                             )
                         }
