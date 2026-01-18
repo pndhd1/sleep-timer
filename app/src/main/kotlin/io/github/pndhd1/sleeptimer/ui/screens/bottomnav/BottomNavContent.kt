@@ -17,8 +17,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatableV1
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.ChildStack
 import io.github.pndhd1.sleeptimer.R
@@ -48,6 +51,7 @@ fun BottomNavContent(
     val navContent = remember {
         movableContentOf {
             NavContent(
+                component = component,
                 stack = stack,
                 bannerState = bannerState,
                 modifier = Modifier.fillMaxSize(),
@@ -128,8 +132,10 @@ fun BottomNavContent(
     }
 }
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 private fun NavContent(
+    component: BottomNavComponent,
     stack: ChildStack<*, Child>,
     bannerState: BottomNavAdBannerState,
     timerBottomInsetCompensation: Dp,
@@ -138,18 +144,21 @@ private fun NavContent(
     Children(
         stack = stack,
         modifier = modifier,
-        animation = stackAnimation(fade()),
+        animation = predictiveBackAnimation(
+            backHandler = component.backHandler,
+            fallbackAnimation = stackAnimation(fade()),
+            onBack = component::onBackClicked,
+            selector = { backEvent, _, _ -> androidPredictiveBackAnimatableV1(backEvent) }
+        ),
     ) { child ->
         when (val instance = child.instance) {
             is Child.Timer -> TimerContent(
                 component = instance.component,
                 bottomInsetCompensation = timerBottomInsetCompensation,
-                modifier = Modifier.fillMaxSize(),
             )
 
             is Child.Settings -> SettingsContent(
                 component = instance.component,
-                modifier = Modifier.fillMaxSize(),
                 bannerState = bannerState,
             )
         }

@@ -38,6 +38,10 @@ class DefaultBottomNavComponent(
     ).toStateFlow()
     override val stack: StateFlow<ChildStack<*, Child>> get() = _stack
 
+    override fun onBackClicked() {
+        navigation.pop()
+    }
+
     override fun onTimerTabClick() {
         navigation.replaceAll(Config.Timer)
     }

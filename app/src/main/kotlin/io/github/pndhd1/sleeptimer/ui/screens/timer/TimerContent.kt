@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screens.timer
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +39,11 @@ fun TimerContent(
     bottomInsetCompensation: Dp = 0.dp,
 ) {
     val slot by component.slot.collectAsStateWithLifecycle()
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+    ) {
         Crossfade(
             targetState = slot?.child?.instance,
             modifier = Modifier.weight(1f),
@@ -77,7 +82,9 @@ fun TimerContent(
                 start = imePadding.calculateStartPadding(LocalLayoutDirection.current),
                 end = imePadding.calculateEndPadding(LocalLayoutDirection.current),
                 top = imePadding.calculateTopPadding(),
-                bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation).coerceAtLeast(0.dp),
+                bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation).coerceAtLeast(
+                    0.dp
+                ),
             )
 
             Spacer(Modifier.padding(resultPadding))

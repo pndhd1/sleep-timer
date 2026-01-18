@@ -89,11 +89,15 @@ fun SettingsContent(
         },
     )
 
+    val layoutModifier = modifier
+        .background(MaterialTheme.colorScheme.surface)
+        .fillMaxSize()
+
     when (val currentState = state) {
-        is SettingsState.Loading -> LoadingContent(modifier = modifier.fillMaxSize())
+        is SettingsState.Loading -> LoadingContent(modifier = layoutModifier)
         is SettingsState.Error -> ErrorContent(
             onResetClick = component::onResetSettings,
-            modifier = modifier.fillMaxSize(),
+            modifier = layoutModifier,
         )
 
         is SettingsState.Loaded -> SettingsLayout(
@@ -111,7 +115,7 @@ fun SettingsContent(
             onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
             onFadeOutDurationChanged = component::onFadeOutDurationChanged,
             onAboutClick = component::onAboutClick,
-            modifier = modifier.fillMaxSize(),
+            modifier = layoutModifier,
         )
     }
 

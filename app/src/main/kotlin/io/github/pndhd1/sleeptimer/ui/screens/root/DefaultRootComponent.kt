@@ -33,12 +33,12 @@ class DefaultRootComponent(
     ).toStateFlow()
     override val stack: StateFlow<ChildStack<*, Child>> get() = _stack
 
-    private fun onAboutClick() {
-        navigation.pushNew(Config.About)
+    override fun onBackClicked() {
+        navigation.pop()
     }
 
-    private fun onBack() {
-        navigation.pop()
+    private fun onAboutClick() {
+        navigation.pushNew(Config.About)
     }
 
     private fun createChild(
@@ -55,7 +55,7 @@ class DefaultRootComponent(
         Config.About -> Child.About(
             component = DefaultAboutComponent(
                 componentContext = componentContext,
-                onBack = ::onBack,
+                onBack = ::onBackClicked,
             ),
         )
     }
