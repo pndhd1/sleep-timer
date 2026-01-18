@@ -3,6 +3,8 @@ package io.github.pndhd1.sleeptimer.ui.widgets
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -11,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import io.github.pndhd1.sleeptimer.R
-import io.github.pndhd1.sleeptimer.utils.startActivityCatching
+import io.github.pndhd1.sleeptimer.utils.launchCatching
 
 @Composable
 fun OpenSettingsDialog(
@@ -28,6 +30,10 @@ fun OpenSettingsDialog(
     val canOpenSettings = remember {
         settingsIntent.resolveActivity(context.packageManager) != null
     }
+    val settingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { onDismiss() },
+    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -36,10 +42,7 @@ fun OpenSettingsDialog(
         confirmButton = {
             if (canOpenSettings) {
                 TextButton(
-                    onClick = {
-                        context.startActivityCatching(settingsIntent)
-                        onDismiss()
-                    },
+                    onClick = { settingsLauncher.launchCatching(settingsIntent) {} },
                 ) {
                     Text(stringResource(R.string.settings_open_app_settings))
                 }

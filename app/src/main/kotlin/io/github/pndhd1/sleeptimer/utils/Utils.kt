@@ -2,19 +2,12 @@ package io.github.pndhd1.sleeptimer.utils
 
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.ObserveLifecycleMode
 import com.arkivanov.decompose.value.Value
@@ -91,13 +84,6 @@ fun List<Int>.toByteArray(): ByteArray {
 fun ByteArray.toIntArray(): IntArray {
     val buffer = ByteBuffer.wrap(this)
     return IntArray(size / Int.SIZE_BYTES) { buffer.getInt() }
-}
-
-fun Context.startActivityCatching(intent: Intent): Boolean = try {
-    startActivity(intent)
-    true
-} catch (_: ActivityNotFoundException) {
-    false
 }
 
 fun <I> ActivityResultLauncher<I>.launchCatching(input: I, onError: () -> Unit) {
