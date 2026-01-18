@@ -5,20 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.ActiveTimerContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.active.PreviewActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.config.PreviewTimerConfigComponent
@@ -27,6 +24,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
 import io.github.pndhd1.sleeptimer.utils.AdStickySizeInset
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import kotlin.time.Duration.Companion.hours
@@ -70,7 +68,7 @@ fun TimerContent(
                     )
                 }
 
-                is TimerComponent.Child.Error -> ErrorContent(modifier = Modifier.fillMaxSize())
+                is TimerComponent.Child.Error -> ErrorScreen(modifier = Modifier.fillMaxSize())
                 null -> LoadingContent(modifier = Modifier.fillMaxSize())
             }
         }
@@ -104,28 +102,6 @@ private fun LoadingContent(
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.error_title),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.error_message),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

@@ -23,18 +23,29 @@ object YandexAdsState {
     private val _isInitialized = mutableStateOf(false)
     val isInitialized: State<Boolean> get() = _isInitialized
 
+    private val _gdprConsentInitialized = mutableStateOf(false)
+    val gdprConsentInitialized: State<Boolean> get() = _gdprConsentInitialized
+
     fun initialize(context: Context) {
         MobileAds.initialize(context) {
-            mainHandler.post {
-                _isInitialized.value = true
-            }
+            mainHandler.post { _isInitialized.value = true }
         }
 
         // Disable Ad debug error indicator
         MobileAds.enableDebugErrorIndicator(BuildConfig.DEBUG)
     }
 
-    // https://ads.yandex.com/helpcenter/ru/dev/android/adaptive-sticky-banner
+    // https://ads.yandex.com/helpcenter/en/dev/android/gdpr
+    // GDPR: Pass user consent to Yandex Ads SDK
+    // Must be called on every app launch after user makes their choice
+    fun setUserConsent(consent: Boolean) {
+        mainHandler.post {
+            MobileAds.setUserConsent(consent)
+            _gdprConsentInitialized.value = true
+        }
+    }
+
+    // https://ads.yandex.com/helpcenter/en/dev/android/adaptive-sticky-banner
     // It is recommended to recalculate the size on initialization
     @Stable
     fun stickySize(context: Context, width: Int): BannerAdSize {

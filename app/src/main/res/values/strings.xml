@@ -29,7 +29,7 @@
 
     <!-- Errors -->
     <string name="error_title">Something went wrong</string>
-    <string name="error_message">Failed to load timer. Please try restart.</string>
+    <string name="error_message">An unexpected error occurred. Please restart the app.</string>
 
     <!-- Permissions -->
     <string name="permission_grant_button">Grant Permission</string>
@@ -114,4 +114,10 @@
     <string name="about_version">Version %s</string>
     <string name="about_github">View on GitHub</string>
     <string name="about_licenses_title">Open Source Licenses</string>
+
+    <!-- GDPR Consent -->
+    <string name="gdpr_dialog_title">Privacy Notice</string>
+    <string name="gdpr_dialog_message">This app uses advertising services that may collect and process your personal data. By accepting, you consent to the processing of your data for personalized advertising. You can decline and still use the app with limited ad functionality.</string>
+    <string name="gdpr_accept">Accept</string>
+    <string name="gdpr_decline">Decline</string>
 </resources>

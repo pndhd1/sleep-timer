@@ -29,7 +29,7 @@
 
     <!-- Errors -->
     <string name="error_title">Что-то пошло не так</string>
-    <string name="error_message">Не удалось загрузить таймер. Попробуйте перезапустить приложение.</string>
+    <string name="error_message">Произошла непредвиденная ошибка. Попробуйте перезапустить приложение.</string>
 
     <!-- Permissions -->
     <string name="permission_grant_button">Предоставить разрешение</string>
@@ -114,4 +114,10 @@
     <string name="about_version">Версия %s</string>
     <string name="about_github">Открыть на GitHub</string>
     <string name="about_licenses_title">Лицензии открытого ПО</string>
+
+    <!-- GDPR Consent -->
+    <string name="gdpr_dialog_title">Уведомление о конфиденциальности</string>
+    <string name="gdpr_dialog_message">Это приложение использует рекламные сервисы, которые могут собирать и обрабатывать ваши персональные данные. Принимая, вы соглашаетесь на обработку данных для персонализированной рекламы. Вы можете отказаться и продолжить использовать приложение с ограниченной функциональностью рекламы.</string>
+    <string name="gdpr_accept">Принять</string>
+    <string name="gdpr_decline">Отклонить</string>
 </resources>

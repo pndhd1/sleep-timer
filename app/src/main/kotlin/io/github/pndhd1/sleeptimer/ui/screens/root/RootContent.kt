@@ -16,6 +16,9 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import io.github.pndhd1.sleeptimer.ui.screens.about.AboutContent
 import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.BottomNavContent
 import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.root.RootComponent.State
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
+import io.github.pndhd1.sleeptimer.ui.widgets.GdprConsentDialog
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -24,28 +27,44 @@ fun RootContent(
     modifier: Modifier = Modifier,
 ) {
     val stack by component.stack.collectAsStateWithLifecycle()
-    Children(
-        stack = stack,
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        animation = predictiveBackAnimation(
-            backHandler = component.backHandler,
-            fallbackAnimation = stackAnimation(fade()),
-            onBack = component::onBackClicked,
-            selector = { backEvent, _, _ -> androidPredictiveBackAnimatableV1(backEvent) }
-        ),
-    ) { child ->
-        when (val instance = child.instance) {
-            is Child.BottomNav -> BottomNavContent(
-                component = instance.component,
-                modifier = Modifier.fillMaxSize(),
-            )
+    val state by component.state.collectAsStateWithLifecycle()
 
-            is Child.About -> AboutContent(
-                component = instance.component,
-                modifier = Modifier.fillMaxSize(),
-            )
+    when (val currentState = state) {
+        is State.Error -> ErrorScreen(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        )
+
+        is State.Root -> {
+            Children(
+                stack = stack,
+                modifier = modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                animation = predictiveBackAnimation(
+                    backHandler = component.backHandler,
+                    fallbackAnimation = stackAnimation(fade()),
+                    onBack = component::onBackClicked,
+                    selector = { backEvent, _, _ -> androidPredictiveBackAnimatableV1(backEvent) }
+                ),
+            ) { child ->
+                when (val instance = child.instance) {
+                    is Child.BottomNav -> BottomNavContent(
+                        component = instance.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+
+                    is Child.About -> AboutContent(
+                        component = instance.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+
+            if (currentState.showGdprDialog) {
+                GdprConsentDialog(onResult = component::onGdprConsentResult)
+            }
         }
     }
 }

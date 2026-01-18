@@ -30,6 +30,7 @@ import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.BottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
@@ -99,7 +100,7 @@ fun SettingsContent(
 
     when (val currentState = state) {
         is SettingsState.Loading -> LoadingContent(modifier = layoutModifier)
-        is SettingsState.Error -> ErrorContent(modifier = layoutModifier)
+        is SettingsState.Error -> ErrorScreen(modifier = layoutModifier)
 
         is SettingsState.Loaded -> SettingsLayout(
             state = currentState,
@@ -130,28 +131,6 @@ private fun LoadingContent(
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.error_title),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.error_message),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

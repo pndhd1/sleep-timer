@@ -10,7 +10,16 @@ interface RootComponent : BackHandlerOwner {
 
     val stack: StateFlow<ChildStack<*, Child>>
 
+    val state: StateFlow<State>
+
     fun onBackClicked()
+
+    fun onGdprConsentResult(accepted: Boolean)
+
+    sealed interface State {
+        data class Root(val showGdprDialog: Boolean) : State
+        data object Error : State
+    }
 
     sealed interface Child {
         data class BottomNav(val component: BottomNavComponent) : Child

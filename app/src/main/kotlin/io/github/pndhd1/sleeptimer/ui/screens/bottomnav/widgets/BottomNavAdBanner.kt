@@ -9,24 +9,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.yandex.mobile.ads.banner.BannerAdEventListener
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import io.github.pndhd1.sleeptimer.BuildConfig
-import io.github.pndhd1.sleeptimer.utils.exceptions.AdLoadException
 import io.github.pndhd1.sleeptimer.utils.YandexAdsState
+import io.github.pndhd1.sleeptimer.utils.exceptions.AdLoadException
 
 @Composable
 fun BottomNavAdBanner(
     modifier: Modifier = Modifier,
     state: BottomNavAdBannerState = rememberBottomNavAdBannerState(),
 ) {
-    if (LocalInspectionMode.current) return
+    if (LocalInspectionMode.current || !YandexAdsState.gdprConsentInitialized.value) return
     val context = LocalContext.current
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val adSize = YandexAdsState.stickySize(context, maxWidth.value.toInt())
