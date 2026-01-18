@@ -58,11 +58,15 @@ android {
             }
         }
         release {
-            buildConfigField(
-                "String",
-                "AD_BANNER_UNIT_ID",
-                "\"${yandexProperties.getProperty("adBannerUnitId", "demo-banner-yandex")}\"",
-            )
+            requireNotNull(yandexProperties.getProperty("adBannerUnitId")) {
+                "Missing Yandex Ad Banner Unit ID in properties/yandex.properties"
+            }.let {
+                buildConfigField(
+                    "String",
+                    "AD_BANNER_UNIT_ID",
+                    "\"$it\"",
+                )
+            }
 
             isMinifyEnabled = true
             isShrinkResources = true
