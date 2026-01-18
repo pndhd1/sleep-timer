@@ -3,18 +3,19 @@ package io.github.pndhd1.sleeptimer.ui.screens.bottomnav
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.movableContentOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -39,15 +40,18 @@ fun BottomNavContent(
     component: BottomNavComponent,
     modifier: Modifier = Modifier,
 ) {
+    val density = LocalDensity.current
     val stack by component.stack.collectAsStateWithLifecycle()
     val isPortrait = isPortrait()
     val bannerState = rememberBottomNavAdBannerState()
+    var timerBottomInsetCompensation by remember { mutableStateOf(0.dp) }
     val navContent = remember {
         movableContentOf {
             NavContent(
                 stack = stack,
                 bannerState = bannerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                timerBottomInsetCompensation = timerBottomInsetCompensation,
             )
         }
     }
@@ -59,7 +63,11 @@ fun BottomNavContent(
                 activeChild = stack.active.instance,
                 onTimerTabClick = component::onTimerTabClick,
                 onSettingsTabClick = component::onSettingsTabClick,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged {
+                        timerBottomInsetCompensation = with(density) { it.height.toDp() }
+                    },
             )
         },
         // Window insets are handled manually inside the content
@@ -124,6 +132,7 @@ fun BottomNavContent(
 private fun NavContent(
     stack: ChildStack<*, Child>,
     bannerState: BottomNavAdBannerState,
+    timerBottomInsetCompensation: Dp,
     modifier: Modifier = Modifier,
 ) {
     Children(
@@ -134,6 +143,7 @@ private fun NavContent(
         when (val instance = child.instance) {
             is Child.Timer -> TimerContent(
                 component = instance.component,
+                bottomInsetCompensation = timerBottomInsetCompensation,
                 modifier = Modifier.fillMaxSize(),
             )
 

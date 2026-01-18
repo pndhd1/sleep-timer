@@ -290,7 +290,7 @@ private fun StartButton(
         modifier = modifier,
     ) { curLoading ->
         Box(
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier.requiredHeight(56.dp),
             contentAlignment = Alignment.Center,
         ) {
             if (curLoading) {

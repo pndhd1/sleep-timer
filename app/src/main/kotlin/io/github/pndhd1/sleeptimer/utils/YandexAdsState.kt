@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.dp
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.common.MobileAds
 import io.github.pndhd1.sleeptimer.BuildConfig
@@ -48,6 +49,6 @@ fun AdStickySizeInset(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Layout(modifier) { _, constraints ->
         val adSize = YandexAdsState.stickySize(context, constraints.maxWidth)
-        layout(constraints.maxWidth, adSize.height) {}
+        layout(adSize.width.dp.toPx().toInt(), adSize.height.dp.toPx().toInt()) {}
     }
 }
