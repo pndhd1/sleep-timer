@@ -82,7 +82,7 @@ private fun PortraitLayout(
     ) {
         TimeDisplay(state = state)
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         TimeInputSection(
             hours = state.hours,
@@ -100,7 +100,7 @@ private fun PortraitLayout(
             onPresetSelected = onPresetSelected,
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         StartButton(
             enabled = state.hasTime,
@@ -127,12 +127,12 @@ private fun LandscapeLayout(
         contentAlignment = Alignment.Center,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(48.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 TimeDisplay(state = state)
 
