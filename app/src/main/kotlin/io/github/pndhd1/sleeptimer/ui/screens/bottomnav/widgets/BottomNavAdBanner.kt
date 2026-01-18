@@ -15,7 +15,10 @@ import com.yandex.mobile.ads.banner.BannerAdView
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import io.github.pndhd1.sleeptimer.BuildConfig
+import io.github.pndhd1.sleeptimer.utils.exceptions.AdLoadException
 import io.github.pndhd1.sleeptimer.utils.YandexAdsState
 
 @Composable
@@ -35,7 +38,9 @@ fun BottomNavAdBanner(
                     setAdSize(adSize)
                     setBannerAdEventListener(object : BannerAdEventListener {
                         override fun onAdFailedToLoad(error: AdRequestError) {
-                            // TODO: Send to analytics
+                            Firebase.crashlytics.recordException(
+                                AdLoadException(error.code, error.description)
+                            )
                         }
 
                         override fun onAdLoaded() {
