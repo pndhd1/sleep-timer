@@ -24,7 +24,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.config.TimerConfigState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.ui.widgets.AdBanner
+import io.github.pndhd1.sleeptimer.utils.AdStickySizeInset
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -67,7 +67,9 @@ fun TimerContent(
             }
         }
 
-        AdBanner()
+        // We are adding ad banner inset here directly without checking BottomNavAdBannerState.visible
+        // to avoid UI jump when banner visibility changes
+        AdStickySizeInset()
     }
 }
 

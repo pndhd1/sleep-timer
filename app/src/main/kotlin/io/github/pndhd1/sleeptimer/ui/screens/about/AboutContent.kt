@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
@@ -25,6 +24,9 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.plus
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
+import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
 import kotlinx.coroutines.launch
 
 private const val LicensesScrollOffset = 800f
@@ -69,7 +71,7 @@ fun AboutContent(
                 lazyListState = listState,
                 contentPadding = WindowInsets.navigationBars.asPaddingValues(),
                 padding = LibraryDefaults.libraryPadding(
-                    contentPadding = WindowInsets.safeContent
+                    contentPadding = UIDefaults.defaultInsets
                         .only(WindowInsetsSides.Horizontal)
                         .asPaddingValues()
                         .plus(PaddingValues(vertical = 16.dp)),
@@ -101,7 +103,7 @@ fun AboutContent(
                                 text = stringResource(R.string.about_licenses_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.windowInsetsPadding(
-                                    WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
+                                    UIDefaults.defaultInsets.only(WindowInsetsSides.Horizontal)
                                 )
                             )
                         }
@@ -109,13 +111,17 @@ fun AboutContent(
                 },
             )
 
-            Spacer(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                    .background(Color.Black.copy(alpha = 0.5f)),
-            )
+            VisibilityCrossfade(
+                isVisible = listState.canScrollForward,
+                modifier = Modifier.align(Alignment.BottomCenter),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                        .background(SystemBarsBackgroundColor),
+                )
+            }
         }
     }
 }

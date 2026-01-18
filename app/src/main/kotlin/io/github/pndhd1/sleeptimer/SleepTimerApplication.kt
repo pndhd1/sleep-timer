@@ -4,19 +4,20 @@ import android.app.Application
 import android.content.Context
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
-import com.yandex.mobile.ads.common.MobileAds
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.createGraphFactory
 import io.github.pndhd1.sleeptimer.di.AppGraph
 import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
+import io.github.pndhd1.sleeptimer.utils.YandexAdsState
 
 class SleepTimerApplication : Application() {
 
     @Inject
-    private lateinit var notificationChannelManager: NotificationChannelManager
-
     lateinit var appGraph: AppGraph
         private set
+
+    @Inject
+    private lateinit var notificationChannelManager: NotificationChannelManager
 
     override fun onCreate() {
         super.onCreate()
@@ -29,9 +30,7 @@ class SleepTimerApplication : Application() {
     private fun initLibs() {
         // Disable Crashlytics collection in debug builds
         Firebase.crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-
-        // Disable Ad debug error indicator
-        MobileAds.enableDebugErrorIndicator(BuildConfig.DEBUG)
+        YandexAdsState.initialize(this)
     }
 }
 

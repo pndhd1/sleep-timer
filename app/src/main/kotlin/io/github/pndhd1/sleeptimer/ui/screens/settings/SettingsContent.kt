@@ -5,10 +5,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,11 +27,16 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.BottomNavAdBannerState
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
+import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
@@ -59,6 +65,7 @@ private const val PresetAnimationDurationMillis = 200
 @Composable
 fun SettingsContent(
     component: SettingsComponent,
+    bannerState: BottomNavAdBannerState,
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.collectAsStateWithLifecycle()
@@ -91,6 +98,7 @@ fun SettingsContent(
 
         is SettingsState.Loaded -> SettingsLayout(
             state = currentState,
+            bannerState = bannerState,
             onDefaultDurationChanged = component::onDefaultDurationChanged,
             onExtendDurationChanged = component::onExtendDurationChanged,
             onPresetAdded = component::onPresetAdded,
@@ -158,6 +166,7 @@ private fun ErrorContent(
 @Composable
 private fun SettingsLayout(
     state: SettingsState.Loaded,
+    bannerState: BottomNavAdBannerState,
     onDefaultDurationChanged: (Duration) -> Unit,
     onExtendDurationChanged: (Duration) -> Unit,
     onPresetAdded: (Duration) -> Unit,
@@ -170,43 +179,97 @@ private fun SettingsLayout(
     onAboutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        DefaultDurationCard(
-            duration = state.defaultDuration,
-            onDurationChanged = onDefaultDurationChanged,
-        )
+    val listState = rememberLazyListState()
+    Box(modifier = modifier) {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = run {
+                    val bannerSize = bannerState.bannerSize
+                    if (bannerState.isBannerVisible && bannerSize != null) {
+                        bannerSize.height.dp
+                    } else {
+                        0.dp
+                    }
+                },
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Spacer(
+                    modifier = Modifier.windowInsetsTopHeight(UIDefaults.defaultInsets)
+                )
+            }
+            item {
+                DefaultDurationCard(
+                    duration = state.defaultDuration,
+                    onDurationChanged = onDefaultDurationChanged,
+                )
+            }
+            item {
+                ExtendDurationCard(
+                    duration = state.extendDuration,
+                    onDurationChanged = onExtendDurationChanged,
+                )
+            }
+            item {
+                PresetsCard(
+                    presets = state.presets,
+                    onPresetAdded = onPresetAdded,
+                    onPresetRemoved = onPresetRemoved,
+                )
+            }
+            item {
+                ShowNotificationCard(
+                    showNotification = state.showNotification,
+                    hasPermission = state.hasNotificationPermission,
+                    onShowNotificationChanged = onShowNotificationChanged,
+                    onRequestPermission = onRequestNotificationPermission,
+                )
+            }
+            item {
+                FadeOutCard(
+                    fadeOut = state.fadeOut,
+                    onFadeOutEnabledChanged = onFadeOutEnabledChanged,
+                    onFadeOutStartBeforeChanged = onFadeOutStartBeforeChanged,
+                    onFadeOutDurationChanged = onFadeOutDurationChanged,
+                )
+            }
+            item {
+                AboutCard(onClick = onAboutClick)
+            }
+            item {
+                Spacer(
+                    modifier = Modifier.windowInsetsBottomHeight(UIDefaults.defaultInsets)
+                )
+            }
+        }
 
-        ExtendDurationCard(
-            duration = state.extendDuration,
-            onDurationChanged = onExtendDurationChanged,
-        )
+        VisibilityCrossfade(
+            isVisible = listState.canScrollBackward,
+            modifier = Modifier.align(Alignment.TopCenter),
+        ) {
+            Box(
+                modifier = Modifier
+                    .windowInsetsTopHeight(UIDefaults.defaultInsets)
+                    .fillMaxWidth()
+                    .background(SystemBarsBackgroundColor)
+            )
+        }
 
-        PresetsCard(
-            presets = state.presets,
-            onPresetAdded = onPresetAdded,
-            onPresetRemoved = onPresetRemoved,
-        )
-
-        ShowNotificationCard(
-            showNotification = state.showNotification,
-            hasPermission = state.hasNotificationPermission,
-            onShowNotificationChanged = onShowNotificationChanged,
-            onRequestPermission = onRequestNotificationPermission,
-        )
-
-        FadeOutCard(
-            fadeOut = state.fadeOut,
-            onFadeOutEnabledChanged = onFadeOutEnabledChanged,
-            onFadeOutStartBeforeChanged = onFadeOutStartBeforeChanged,
-            onFadeOutDurationChanged = onFadeOutDurationChanged,
-        )
-
-        AboutCard(onClick = onAboutClick)
+        VisibilityCrossfade(
+            isVisible = listState.canScrollForward,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            Box(
+                modifier = Modifier
+                    .windowInsetsBottomHeight(UIDefaults.defaultInsets)
+                    .fillMaxWidth()
+                    .background(SystemBarsBackgroundColor)
+            )
+        }
     }
 }
 
@@ -761,6 +824,7 @@ private fun SettingsContentPreview(
     SleepTimerTheme {
         SettingsContent(
             component = PreviewSettingsComponent(state),
+            bannerState = rememberBottomNavAdBannerState(),
         )
     }
 }
@@ -768,7 +832,7 @@ private fun SettingsContentPreview(
 @Preview(showBackground = true, heightDp = 1500)
 @Composable
 private fun SettingsContentPreview() {
-    val state =  SettingsState.Loaded(
+    val state = SettingsState.Loaded(
         defaultDuration = 30.minutes,
         extendDuration = 5.minutes,
         presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),

@@ -1,13 +1,15 @@
 package io.github.pndhd1.sleeptimer.ui.screens.bottomnav
 
-import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,12 +22,17 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.ChildStack
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.BottomNavComponent.Child
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.BottomNavAdBanner
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.BottomNavAdBannerState
+import io.github.pndhd1.sleeptimer.ui.screens.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.screens.settings.PreviewSettingsComponent
 import io.github.pndhd1.sleeptimer.ui.screens.settings.SettingsContent
 import io.github.pndhd1.sleeptimer.ui.screens.settings.SettingsState
 import io.github.pndhd1.sleeptimer.ui.screens.timer.PreviewTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screens.timer.TimerContent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.isPortrait
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 
 @Composable
 fun BottomNavContent(
@@ -33,40 +40,82 @@ fun BottomNavContent(
     modifier: Modifier = Modifier,
 ) {
     val stack by component.stack.collectAsStateWithLifecycle()
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isPortrait = isPortrait()
+    val bannerState = rememberBottomNavAdBannerState()
+    val navContent = remember {
+        movableContentOf {
+            NavContent(
+                stack = stack,
+                bannerState = bannerState,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
 
-    if (isLandscape) {
-        Row(modifier = modifier.fillMaxSize()) {
-            NavigationRailBar(
+    Scaffold(
+        modifier = modifier,
+        bottomBar = {
+            if (isPortrait) BottomNavigationBar(
                 activeChild = stack.active.instance,
                 onTimerTabClick = component::onTimerTabClick,
                 onSettingsTabClick = component::onSettingsTabClick,
+                modifier = Modifier.fillMaxWidth(),
             )
-            NavContent(
-                stack = stack,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End + WindowInsetsSides.Vertical)),
-            )
-        }
-    } else {
-        Scaffold(
-            modifier = modifier,
-            bottomBar = {
-                BottomNavigationBar(
-                    activeChild = stack.active.instance,
-                    onTimerTabClick = component::onTimerTabClick,
-                    onSettingsTabClick = component::onSettingsTabClick,
-                )
-            },
-        ) { innerPadding ->
-            NavContent(
-                stack = stack,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            )
+        },
+        // Window insets are handled manually inside the content
+        contentWindowInsets = WindowInsets(0)
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            Box {
+                if (!isPortrait) {
+                    Row {
+                        LeftNavigationRail(
+                            activeChild = stack.active.instance,
+                            onTimerTabClick = component::onTimerTabClick,
+                            onSettingsTabClick = component::onSettingsTabClick,
+                            modifier = Modifier.fillMaxHeight(),
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .consumeWindowInsets(
+                                    NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                                ),
+                        ) {
+                            navContent()
+                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .consumeWindowInsets(
+                                NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
+                            )
+                    ) {
+                        navContent()
+                    }
+                }
+
+                Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    BottomNavAdBanner(state = bannerState)
+                    if (!isPortrait) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .windowInsetsBottomHeight(UIDefaults.defaultInsets)
+                                .let {
+                                    if (bannerState.isBannerVisible) {
+                                        it.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                                    } else {
+                                        it
+                                    }
+                                }
+
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -74,6 +123,7 @@ fun BottomNavContent(
 @Composable
 private fun NavContent(
     stack: ChildStack<*, Child>,
+    bannerState: BottomNavAdBannerState,
     modifier: Modifier = Modifier,
 ) {
     Children(
@@ -90,20 +140,21 @@ private fun NavContent(
             is Child.Settings -> SettingsContent(
                 component = instance.component,
                 modifier = Modifier.fillMaxSize(),
+                bannerState = bannerState,
             )
         }
     }
 }
 
 @Composable
-private fun NavigationRailBar(
+private fun LeftNavigationRail(
     activeChild: Child,
     onTimerTabClick: () -> Unit,
     onSettingsTabClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavigationRail(
-        modifier = modifier.fillMaxHeight(),
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
         NavigationRailItem(
@@ -190,11 +241,11 @@ private fun BottomNavigationBarPreview(
 
 @Preview
 @Composable
-private fun NavigationRailBarPreview(
+private fun LeftNavigationRailPreview(
     @PreviewParameter(ChildProvider::class) child: Child,
 ) {
     SleepTimerTheme {
-        NavigationRailBar(
+        LeftNavigationRail(
             activeChild = child,
             onTimerTabClick = {},
             onSettingsTabClick = {},

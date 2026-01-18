@@ -4,12 +4,15 @@ import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.arkivanov.decompose.ComponentContext
@@ -118,3 +121,8 @@ fun PaddingValues.plus(
         bottom = calculateBottomPadding() + other.calculateBottomPadding(),
     )
 }
+
+@Composable
+@Stable
+fun isPortrait(configuration: Configuration = LocalConfiguration.current) =
+    configuration.orientation == ORIENTATION_PORTRAIT
