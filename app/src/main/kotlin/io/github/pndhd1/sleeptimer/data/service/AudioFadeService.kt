@@ -16,7 +16,7 @@ import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.requireAppGraph
-import io.github.pndhd1.sleeptimer.ui.MainActivity
+import io.github.pndhd1.sleeptimer.ui.activity.MainActivity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

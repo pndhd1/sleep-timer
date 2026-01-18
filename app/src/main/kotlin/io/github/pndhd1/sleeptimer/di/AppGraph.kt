@@ -9,8 +9,8 @@ import io.github.pndhd1.sleeptimer.data.receiver.DeviceAdminReceiverImpl
 import io.github.pndhd1.sleeptimer.data.receiver.TimerAlarmReceiver
 import io.github.pndhd1.sleeptimer.data.service.AudioFadeService
 import io.github.pndhd1.sleeptimer.SleepTimerApplication
-import io.github.pndhd1.sleeptimer.ui.services.TimerNotificationService
-import io.github.pndhd1.sleeptimer.ui.MainActivity
+import io.github.pndhd1.sleeptimer.ui.service.TimerNotificationService
+import io.github.pndhd1.sleeptimer.ui.activity.MainActivity
 
 @DependencyGraph(AppScope::class)
 interface AppGraph {

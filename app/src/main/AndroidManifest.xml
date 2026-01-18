@@ -41,7 +41,7 @@
         android:theme="@style/Theme.Sleeptimer">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Sleeptimer.Splash">
@@ -88,7 +88,7 @@
         </receiver>
 
         <service
-            android:name=".ui.services.TimerNotificationService"
+            android:name=".ui.service.TimerNotificationService"
             android:exported="false"
             android:foregroundServiceType="systemExempted" />
 
