@@ -110,19 +110,5 @@ fun <I> ActivityResultLauncher<I>.launchCatching(input: I, onError: () -> Unit) 
 
 @Composable
 @Stable
-fun PaddingValues.plus(
-    other: PaddingValues,
-    layoutDirection: LayoutDirection = LocalLayoutDirection.current,
-): PaddingValues {
-    return PaddingValues(
-        start = calculateStartPadding(layoutDirection) + other.calculateStartPadding(layoutDirection),
-        top = calculateTopPadding() + other.calculateTopPadding(),
-        end = calculateEndPadding(layoutDirection) + other.calculateEndPadding(layoutDirection),
-        bottom = calculateBottomPadding() + other.calculateBottomPadding(),
-    )
-}
-
-@Composable
-@Stable
 fun isPortrait(configuration: Configuration = LocalConfiguration.current) =
     configuration.orientation == ORIENTATION_PORTRAIT

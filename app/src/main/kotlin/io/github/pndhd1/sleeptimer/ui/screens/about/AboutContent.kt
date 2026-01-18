@@ -23,7 +23,6 @@ import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.utils.plus
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
@@ -73,8 +72,8 @@ fun AboutContent(
                 padding = LibraryDefaults.libraryPadding(
                     contentPadding = UIDefaults.defaultInsets
                         .only(WindowInsetsSides.Horizontal)
+                        .union(WindowInsets(top = 16.dp, bottom = 16.dp))
                         .asPaddingValues()
-                        .plus(PaddingValues(vertical = 16.dp)),
                 ),
                 header = {
                     item {
