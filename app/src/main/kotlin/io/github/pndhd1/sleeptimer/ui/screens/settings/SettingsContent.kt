@@ -52,9 +52,9 @@ private inline val ExtendDurationSliderMin get() = 1.minutes
 private inline val ExtendDurationSliderMax get() = 30.minutes
 private inline val ExtendDurationSliderStep get() = 30.seconds
 
-private inline val FadeStartBeforeSliderMin get() = 1.minutes
-private inline val FadeStartBeforeSliderMax get() = 30.minutes
-private inline val FadeStartBeforeSliderStep get() = 30.seconds
+private inline val FadeStartBeforeSliderMin get() = 30.seconds
+private inline val FadeStartBeforeSliderMax get() = 5.minutes
+private inline val FadeStartBeforeSliderStep get() = 15.seconds
 
 private inline val FadeDurationSliderMin get() = 1.seconds
 private inline val FadeDurationSliderMax get() = 1.minutes

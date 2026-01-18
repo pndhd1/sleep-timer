@@ -15,8 +15,8 @@ object Defaults {
             60.minutes
         )
 
-    inline val DefaultDuration: Duration get() = 30.minutes
-    inline val DefaultExtendDuration: Duration get() = 5.minutes
+    inline val DefaultDuration: Duration get() = 45.minutes
+    inline val DefaultExtendDuration: Duration get() = 20.minutes
     const val DefaultShowNotification: Boolean = true
 
     const val DefaultFadeOutEnabled: Boolean = true
