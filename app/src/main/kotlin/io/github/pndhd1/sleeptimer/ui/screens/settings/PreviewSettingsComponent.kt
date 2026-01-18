@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
+import android.content.Intent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
@@ -20,6 +21,9 @@ class PreviewSettingsComponent(
     override fun onFadeOutDurationChanged(duration: Duration) = Unit
     override fun onFadeTargetVolumePercentChanged(percent: Int) = Unit
     override fun onGoHomeOnExpireChanged(enabled: Boolean) = Unit
+    override fun onFullScreenIntentPermissionResult() = Unit
+    override fun getFullScreenIntentSettingsIntent(): Intent? = null
+    override fun getNotificationChannelSettingsIntent(): Intent = Intent()
     override fun onStopMediaOnExpireChanged(enabled: Boolean) = Unit
     override fun onAboutClick() = Unit
 }

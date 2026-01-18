@@ -23,7 +23,7 @@ class SleepTimerApplication : Application() {
         super.onCreate()
         appGraph = createGraphFactory<AppGraph.Factory>().create(this)
         appGraph.inject(this)
-        notificationChannelManager.createChannel()
+        notificationChannelManager.createChannels()
         initLibs()
     }
 

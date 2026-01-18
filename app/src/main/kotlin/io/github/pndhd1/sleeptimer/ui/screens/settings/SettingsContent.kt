@@ -1,6 +1,9 @@
 package io.github.pndhd1.sleeptimer.ui.screens.settings
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -12,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +39,7 @@ import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.launchCatching
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
@@ -77,7 +82,14 @@ fun SettingsContent(
     val context = LocalContext.current
     val activity = context as? Activity
 
-    var showPermissionSettingsDialog by remember { mutableStateOf(false) }
+    var showPermissionSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var showChannelSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var showFullScreenIntentSettingsDialog by rememberSaveable { mutableStateOf(false) }
+
+    val goHomeSettingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { component.onFullScreenIntentPermissionResult() },
+    )
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -109,6 +121,15 @@ fun SettingsContent(
             onRequestNotificationPermission = {
                 component.getNotificationPermission()?.let(permissionLauncher::launch)
             },
+            onRequestFullScreenIntentPermission = {
+                // First check if channel is disabled
+                if (!currentState.isActionsChannelEnabled) {
+                    showChannelSettingsDialog = true
+                    return@SettingsLayout
+                }
+                // Then check full-screen intent permission
+                showFullScreenIntentSettingsDialog = true
+            },
             modifier = layoutModifier,
         )
     }
@@ -120,6 +141,101 @@ fun SettingsContent(
             onDismiss = { showPermissionSettingsDialog = false },
         )
     }
+
+    if (showChannelSettingsDialog) {
+        ChannelSettingsDialog(
+            channelIntent = remember { component.getNotificationChannelSettingsIntent() },
+            onLaunch = { intent ->
+                goHomeSettingsLauncher.launchCatching(intent) {}
+            },
+            onDismiss = { showChannelSettingsDialog = false },
+        )
+    }
+
+    val fullScreenIntentSettingsIntent = remember { component.getFullScreenIntentSettingsIntent() }
+    if (showFullScreenIntentSettingsDialog && fullScreenIntentSettingsIntent != null) {
+        FullScreenIntentSettingsDialog(
+            fullScreenIntent = fullScreenIntentSettingsIntent,
+            onLaunch = { intent ->
+                goHomeSettingsLauncher.launchCatching(intent) {}
+            },
+            onDismiss = { showFullScreenIntentSettingsDialog = false },
+        )
+    }
+}
+
+@Composable
+private fun ChannelSettingsDialog(
+    channelIntent: Intent,
+    onLaunch: (Intent) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val appSettingsIntent = remember {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+    }
+    val canOpenChannelSettings = remember {
+        channelIntent.resolveActivity(context.packageManager) != null
+    }
+    val intentToLaunch = if (canOpenChannelSettings) channelIntent else appSettingsIntent
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_channel_permission_title)) },
+        text = { Text(stringResource(R.string.settings_channel_permission_message)) },
+        confirmButton = {
+            TextButton(onClick = {
+                onLaunch(intentToLaunch)
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.settings_open_app_settings))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.settings_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun FullScreenIntentSettingsDialog(
+    fullScreenIntent: Intent,
+    onLaunch: (Intent) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val appSettingsIntent = remember {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+    }
+    val canOpenFullScreenSettings = remember {
+        fullScreenIntent.resolveActivity(context.packageManager) != null
+    }
+    val intentToLaunch = if (canOpenFullScreenSettings) fullScreenIntent else appSettingsIntent
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_full_screen_intent_permission_title)) },
+        text = { Text(stringResource(R.string.settings_full_screen_intent_permission_message)) },
+        confirmButton = {
+            TextButton(onClick = {
+                onLaunch(intentToLaunch)
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.settings_open_app_settings))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.settings_cancel))
+            }
+        },
+    )
 }
 
 @Composable
@@ -140,6 +256,7 @@ private fun SettingsLayout(
     component: SettingsComponent,
     bannerState: BottomNavAdBannerState,
     onRequestNotificationPermission: () -> Unit,
+    onRequestFullScreenIntentPermission: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -210,7 +327,9 @@ private fun SettingsLayout(
             item {
                 GoHomeOnExpireCard(
                     enabled = state.goHomeOnExpire,
+                    hasPermission = state.hasFullScreenIntentPermission && state.isActionsChannelEnabled,
                     onEnabledChanged = component::onGoHomeOnExpireChanged,
+                    onRequestPermission = onRequestFullScreenIntentPermission,
                 )
             }
             item {
@@ -252,7 +371,9 @@ private fun SettingsLayout(
 @Composable
 private fun GoHomeOnExpireCard(
     enabled: Boolean,
+    hasPermission: Boolean,
     onEnabledChanged: (Boolean) -> Unit,
+    onRequestPermission: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsCard(
@@ -261,8 +382,14 @@ private fun GoHomeOnExpireCard(
         modifier = modifier,
         endContent = {
             Switch(
-                checked = enabled,
-                onCheckedChange = onEnabledChanged,
+                checked = enabled && hasPermission,
+                onCheckedChange = { newEnabled ->
+                    if (newEnabled && !hasPermission) {
+                        onRequestPermission()
+                    } else {
+                        onEnabledChanged(newEnabled)
+                    }
+                },
             )
         },
     )
@@ -344,7 +471,7 @@ private fun PresetsCard(
     onPresetRemoved: (Duration) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showAddDialog by remember { mutableStateOf(false) }
+    var showAddDialog by rememberSaveable { mutableStateOf(false) }
 
     SettingsCard(
         title = stringResource(R.string.settings_presets_title),
@@ -633,7 +760,7 @@ private fun DurationSlider(
     dialogMaxDuration: Duration = Defaults.MaxTimerDuration,
     dialogMinDuration: Duration = Defaults.MinTimerDuration,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
     val minSeconds = minDuration.inWholeSeconds.toFloat()
     val maxSeconds = maxDuration.inWholeSeconds.toFloat()
@@ -719,9 +846,9 @@ private fun DurationEditDialog(
     maxDuration: Duration = Defaults.MaxTimerDuration,
     minDuration: Duration = Defaults.MinTimerDuration,
 ) {
-    var hours by remember { mutableStateOf(currentDuration.inWholeHours.toString()) }
-    var minutes by remember { mutableStateOf((currentDuration.inWholeMinutes % 60).toString()) }
-    var seconds by remember { mutableStateOf((currentDuration.inWholeSeconds % 60).toString()) }
+    var hours by rememberSaveable { mutableStateOf(currentDuration.inWholeHours.toString()) }
+    var minutes by rememberSaveable { mutableStateOf((currentDuration.inWholeMinutes % 60).toString()) }
+    var seconds by rememberSaveable { mutableStateOf((currentDuration.inWholeSeconds % 60).toString()) }
 
     val parsedHours = hours.toIntOrNull() ?: 0
     val parsedMinutes = minutes.toIntOrNull() ?: 0
@@ -862,7 +989,9 @@ private fun PresetChips(
     }
 
     FlowRow(
-        modifier = modifier.fillMaxWidth().animateContentSize(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -931,6 +1060,8 @@ private fun SettingsContentLoadedPreview() {
             targetVolumePercent = 0,
         ),
         goHomeOnExpire = false,
+        hasFullScreenIntentPermission = true,
+        isActionsChannelEnabled = true,
         stopMediaOnExpire = false,
     )
     SleepTimerTheme {

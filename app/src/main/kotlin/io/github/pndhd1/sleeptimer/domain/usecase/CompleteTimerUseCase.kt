@@ -18,10 +18,10 @@ class CompleteTimerUseCase(
         if (settings.stopMediaOnExpire) {
             systemRepository.requestAudioFocusToStopMedia()
         }
-        if (settings.goHomeOnExpire) {
-            systemRepository.goHome()
-        }
         systemRepository.lockScreen()
+        if (settings.goHomeOnExpire) {
+            systemRepository.goHomeAfterLock()
+        }
         activeTimerRepository.clearTimer()
     }
 }

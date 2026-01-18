@@ -15,9 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
+import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
-import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.usecase.ExtendTimerUseCase
 import io.github.pndhd1.sleeptimer.domain.usecase.StopTimerUseCase
 import io.github.pndhd1.sleeptimer.requireAppGraph
@@ -178,7 +178,7 @@ class TimerNotificationService : LifecycleService() {
         }
 
         val extendMinutes = cachedExtendDuration.inWholeMinutes.toInt()
-        return NotificationCompat.Builder(this, notificationChannelManager.channelId)
+        return NotificationCompat.Builder(this, notificationChannelManager.progressChannelId)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(remainingText)
             .setSmallIcon(R.drawable.ic_timer)

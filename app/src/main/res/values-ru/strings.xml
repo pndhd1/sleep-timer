@@ -42,7 +42,7 @@
     <string name="permission_notification_description">Разрешите уведомления, чтобы видеть прогресс таймера и элементы управления. Это необязательно — таймер будет работать и без него.</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_name">Таймер</string>
+    <string name="notification_channel_name">Прогресс таймера</string>
     <string name="notification_channel_description">Показывает прогресс таймера и элементы управления</string>
     <string name="notification_title">Таймер сна</string>
     <string name="notification_action_stop">Стоп</string>
@@ -53,6 +53,11 @@
     <string name="fade_notification_channel_description">Показывается при затухании звука</string>
     <string name="fade_notification_title">Затухание звука</string>
     <string name="fade_notification_text">Громкость уменьшается</string>
+
+    <!-- High Priority Notifications -->
+    <string name="high_priority_channel_name">Действия таймера</string>
+    <string name="high_priority_channel_description">Используется для действий по истечении таймера. Рекомендуется не отключать для стабильной работы.</string>
+    <string name="go_home_notification_text">Закрытие текущего приложения</string>
 
     <!-- Settings: General -->
     <string name="settings_apply">Применить</string>
@@ -88,6 +93,10 @@
     <string name="settings_notification_permission_message">Для показа уведомлений включите разрешение в настройках приложения.</string>
     <string name="settings_permission_unavailable_title">Разрешение недоступно</string>
     <string name="settings_permission_unavailable_message">Не удалось запросить разрешение. Пожалуйста, предоставьте его вручную в настройках приложения.</string>
+    <string name="settings_channel_permission_title">Канал уведомлений отключён</string>
+    <string name="settings_channel_permission_message">Для закрытия приложений при срабатывании таймера включите канал уведомлений \"Действия таймера\".</string>
+    <string name="settings_full_screen_intent_permission_title">Требуется разрешение</string>
+    <string name="settings_full_screen_intent_permission_message">Для закрытия приложений при срабатывании таймера включите \"Полноэкранные уведомления\" в настройках приложения.</string>
 
     <!-- Settings: Fade Out -->
     <string name="settings_fade_out_title">Затухание звука</string>

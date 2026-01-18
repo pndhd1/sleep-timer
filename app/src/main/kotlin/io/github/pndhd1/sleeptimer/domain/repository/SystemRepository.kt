@@ -8,19 +8,22 @@ interface SystemRepository {
     val isAdminActive: StateFlow<Boolean>
     val canScheduleExactAlarms: StateFlow<Boolean>
     val canSendNotifications: StateFlow<Boolean>
+    val canUseFullScreenIntent: StateFlow<Boolean>
     val wasNotificationPermissionRequested: Flow<Boolean>
 
     fun lockScreen()
-    fun goHome()
+    fun goHomeAfterLock()
     fun requestAudioFocusToStopMedia()
 
     fun getAdminActivationIntent(): Intent
     fun getAlarmPermissionIntent(): Intent?
     fun getNotificationPermission(): String?
+    fun getFullScreenIntentSettingsIntent(): Intent?
 
     fun refreshAdminState()
     fun refreshAlarmPermissionState()
     fun refreshNotificationPermissionState()
+    fun refreshFullScreenIntentPermissionState()
 
     suspend fun markNotificationPermissionRequested()
 }

@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.crashlytics
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 import io.github.pndhd1.sleeptimer.utils.componentScope
@@ -21,6 +22,7 @@ class DefaultSettingsComponent(
     @Assisted private val onNavigateToAbout: () -> Unit,
     private val settingsRepository: SettingsRepository,
     private val systemRepository: SystemRepository,
+    private val notificationChannelManager: NotificationChannelManager,
 ) : SettingsComponent, ComponentContext by componentContext {
 
     @AssistedFactory
@@ -51,6 +53,8 @@ class DefaultSettingsComponent(
                 hasNotificationPermission = systemRepository.canSendNotifications.value,
                 fadeOut = settings.fadeOut,
                 goHomeOnExpire = settings.goHomeOnExpire,
+                hasFullScreenIntentPermission = systemRepository.canUseFullScreenIntent.value,
+                isActionsChannelEnabled = notificationChannelManager.isActionsChannelEnabled(),
                 stopMediaOnExpire = settings.stopMediaOnExpire,
             )
         }
@@ -146,6 +150,20 @@ class DefaultSettingsComponent(
             settingsRepository.updateGoHomeOnExpire(enabled)
         }
     }
+
+    override fun onFullScreenIntentPermissionResult() {
+        systemRepository.refreshFullScreenIntentPermissionState()
+        updateLoadedState {
+            it.copy(
+                hasFullScreenIntentPermission = systemRepository.canUseFullScreenIntent.value,
+                isActionsChannelEnabled = notificationChannelManager.isActionsChannelEnabled(),
+            )
+        }
+    }
+
+    override fun getFullScreenIntentSettingsIntent() = systemRepository.getFullScreenIntentSettingsIntent()
+
+    override fun getNotificationChannelSettingsIntent() = notificationChannelManager.getActionsChannelSettingsIntent()
 
     override fun onStopMediaOnExpireChanged(enabled: Boolean) {
         updateLoadedState { it.copy(stopMediaOnExpire = enabled) }

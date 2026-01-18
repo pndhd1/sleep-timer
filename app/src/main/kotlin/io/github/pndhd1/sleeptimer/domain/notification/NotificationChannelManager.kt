@@ -1,7 +1,13 @@
 package io.github.pndhd1.sleeptimer.domain.notification
 
-interface NotificationChannelManager {
-    val channelId: String
+import android.content.Intent
 
-    fun createChannel()
+interface NotificationChannelManager {
+
+    val progressChannelId: String
+    val actionsChannelId: String
+
+    fun createChannels()
+    fun isActionsChannelEnabled(): Boolean
+    fun getActionsChannelSettingsIntent(): Intent
 }

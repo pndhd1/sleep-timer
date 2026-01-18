@@ -42,7 +42,7 @@
     <string name="permission_notification_description">Allow notifications to see timer progress and controls. This is optional — the timer will work without it.</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_name">Timer</string>
+    <string name="notification_channel_name">Timer Progress</string>
     <string name="notification_channel_description">Shows timer progress and controls</string>
     <string name="notification_title">Sleep Timer</string>
     <string name="notification_action_stop">Stop</string>
@@ -53,6 +53,11 @@
     <string name="fade_notification_channel_description">Shows when audio is fading out</string>
     <string name="fade_notification_title">Fading Audio</string>
     <string name="fade_notification_text">Volume is decreasing</string>
+
+    <!-- High Priority Notifications -->
+    <string name="high_priority_channel_name">Timer Actions</string>
+    <string name="high_priority_channel_description">Used for timer expiration actions. Recommended to keep enabled for stability.</string>
+    <string name="go_home_notification_text">Closing current app</string>
 
     <!-- Settings: General -->
     <string name="settings_apply">Apply</string>
@@ -88,6 +93,10 @@
     <string name="settings_notification_permission_message">To show notifications, please enable the permission in app settings.</string>
     <string name="settings_permission_unavailable_title">Permission Unavailable</string>
     <string name="settings_permission_unavailable_message">Unable to request permission. Please grant it manually in app settings.</string>
+    <string name="settings_channel_permission_title">Notification Channel Disabled</string>
+    <string name="settings_channel_permission_message">To close apps when timer expires, please enable the \"Timer Actions\" notification channel.</string>
+    <string name="settings_full_screen_intent_permission_title">Full Screen Permission Required</string>
+    <string name="settings_full_screen_intent_permission_message">To close apps when timer expires, please enable \"Allow full screen notifications\" in app settings.</string>
 
     <!-- Settings: Fade Out -->
     <string name="settings_fade_out_title">Fade Out Audio</string>

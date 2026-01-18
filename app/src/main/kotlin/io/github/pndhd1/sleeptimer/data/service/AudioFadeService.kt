@@ -117,7 +117,7 @@ class AudioFadeService : LifecycleService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        return NotificationCompat.Builder(this, notificationChannelManager.channelId)
+        return NotificationCompat.Builder(this, notificationChannelManager.progressChannelId)
             .setContentTitle(getString(R.string.fade_notification_title))
             .setContentText(getString(R.string.fade_notification_text))
             .setSmallIcon(R.drawable.ic_volume_down)

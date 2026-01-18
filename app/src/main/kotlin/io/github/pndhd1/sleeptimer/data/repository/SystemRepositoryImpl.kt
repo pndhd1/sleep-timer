@@ -1,7 +1,10 @@
 package io.github.pndhd1.sleeptimer.data.repository
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
@@ -11,8 +14,10 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import android.provider.Settings
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -22,7 +27,9 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.data.activity.GoHomeActivity
 import io.github.pndhd1.sleeptimer.data.receiver.DeviceAdminReceiverImpl
+import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 import kotlinx.coroutines.flow.*
 
@@ -35,11 +42,13 @@ private val NotificationPermissionRequestedKey =
 class SystemRepositoryImpl(
     private val context: Context,
     private val preferences: DataStore<Preferences>,
+    private val notificationChannelManager: NotificationChannelManager,
 ) : SystemRepository {
 
     private val devicePolicyManager: DevicePolicyManager? = context.getSystemService()
     private val alarmManager: AlarmManager? = context.getSystemService()
     private val audioManager: AudioManager? = context.getSystemService()
+    private val notificationManager: NotificationManager? = context.getSystemService()
 
     private val componentName = DeviceAdminReceiverImpl.getComponentName(context)
 
@@ -52,6 +61,9 @@ class SystemRepositoryImpl(
     private val _canSendNotifications = MutableStateFlow(checkNotificationsPermission())
     override val canSendNotifications: StateFlow<Boolean> = _canSendNotifications.asStateFlow()
 
+    private val _canUseFullScreenIntent = MutableStateFlow(checkFullScreenIntentPermission())
+    override val canUseFullScreenIntent: StateFlow<Boolean> = _canUseFullScreenIntent.asStateFlow()
+
     override val wasNotificationPermissionRequested: Flow<Boolean> =
         preferences.data.map { it[NotificationPermissionRequestedKey] ?: false }
 
@@ -59,12 +71,32 @@ class SystemRepositoryImpl(
         if (devicePolicyManager.isAdminActive) devicePolicyManager?.lockNow()
     }
 
-    override fun goHome() {
-        val homeIntent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_HOME)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    override fun goHomeAfterLock() {
+        if (notificationManager == null || !canUseFullScreenIntent.value) return
+
+        val fullScreenIntent = Intent(context, GoHomeActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
-        context.startActivity(homeIntent)
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        @SuppressLint("FullScreenIntentPolicy") // false-positive, checked above
+        val notification =
+            NotificationCompat.Builder(context, notificationChannelManager.actionsChannelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.go_home_notification_text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+                .setAutoCancel(true)
+                .build()
+
+        notificationManager.notify(GoHomeActivity.NOTIFICATION_ID, notification)
     }
 
     @Suppress("DEPRECATION")
@@ -109,6 +141,14 @@ class SystemRepositoryImpl(
             null
         }
 
+    override fun getFullScreenIntentSettingsIntent(): Intent? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return null
+        return Intent(
+            Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+            "package:${context.packageName}".toUri()
+        )
+    }
+
     override fun refreshAdminState() {
         _isAdminActive.value = devicePolicyManager.isAdminActive
     }
@@ -119,6 +159,10 @@ class SystemRepositoryImpl(
 
     override fun refreshNotificationPermissionState() {
         _canSendNotifications.value = checkNotificationsPermission()
+    }
+
+    override fun refreshFullScreenIntentPermissionState() {
+        _canUseFullScreenIntent.value = checkFullScreenIntentPermission()
     }
 
     override suspend fun markNotificationPermissionRequested() {
@@ -136,6 +180,11 @@ class SystemRepositoryImpl(
             context,
             Manifest.permission.POST_NOTIFICATIONS,
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun checkFullScreenIntentPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true
+        return notificationManager?.canUseFullScreenIntent() == true
     }
 
     private val DevicePolicyManager?.isAdminActive: Boolean
