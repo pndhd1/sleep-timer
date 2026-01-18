@@ -9,8 +9,8 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-val keystoreProperties = loadProperties("keystore.properties")
-val yandexProperties = loadProperties("yandex.properties")
+val keystoreProperties = loadProperties("properties/keystore.properties")
+val yandexProperties = loadProperties("properties/yandex.properties")
 
 fun getKeystoreProperty(envKey: String, propertyKey: String): String? {
     return System.getenv(envKey) ?: keystoreProperties.getProperty(propertyKey)
