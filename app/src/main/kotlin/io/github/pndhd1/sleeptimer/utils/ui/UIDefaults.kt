@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
 object UIDefaults {
 
-    val SystemBarsBackgroundColor get() = Color.Black.copy(alpha = 0.5f)
+    val SystemBarsBackgroundColor
+        @Composable
+        get() = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.8f)
 
     val defaultInsets: WindowInsets
         @Composable
