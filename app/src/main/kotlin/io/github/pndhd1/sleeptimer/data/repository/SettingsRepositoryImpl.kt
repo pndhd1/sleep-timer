@@ -119,23 +119,6 @@ class SettingsRepositoryImpl(
             }
         }
     }
-
-    override suspend fun resetToDefaults() {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                remove(DefaultDurationSecondsKey)
-                remove(PresetSecondsKey)
-                remove(ExtendDurationSecondsKey)
-                remove(ShowNotificationKey)
-                remove(FadeOutEnabledKey)
-                remove(FadeStartBeforeSecondsKey)
-                remove(FadeOutDurationSecondsKey)
-                remove(FadeTargetVolumePercentKey)
-                remove(GoHomeOnExpireKey)
-                remove(StopMediaOnExpireKey)
-            }
-        }
-    }
 }
 
 private fun Preferences.toDomain() = TimerSettings(
@@ -148,7 +131,8 @@ private fun Preferences.toDomain() = TimerSettings(
         enabled = get(FadeOutEnabledKey) ?: Defaults.DefaultFadeOutEnabled,
         startBefore = get(FadeStartBeforeSecondsKey)?.seconds ?: Defaults.DefaultFadeStartBefore,
         duration = get(FadeOutDurationSecondsKey)?.seconds ?: Defaults.DefaultFadeOutDuration,
-        targetVolumePercent = get(FadeTargetVolumePercentKey) ?: Defaults.DefaultFadeTargetVolumePercent,
+        targetVolumePercent = get(FadeTargetVolumePercentKey)
+            ?: Defaults.DefaultFadeTargetVolumePercent,
     ),
     goHomeOnExpire = get(GoHomeOnExpireKey) ?: Defaults.DefaultGoHomeOnExpire,
     stopMediaOnExpire = get(StopMediaOnExpireKey) ?: Defaults.DefaultStopMediaOnExpire,

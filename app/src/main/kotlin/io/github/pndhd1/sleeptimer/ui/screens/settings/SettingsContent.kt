@@ -99,10 +99,7 @@ fun SettingsContent(
 
     when (val currentState = state) {
         is SettingsState.Loading -> LoadingContent(modifier = layoutModifier)
-        is SettingsState.Error -> ErrorContent(
-            onResetClick = component::onResetSettings,
-            modifier = layoutModifier,
-        )
+        is SettingsState.Error -> ErrorContent(modifier = layoutModifier)
 
         is SettingsState.Loaded -> SettingsLayout(
             state = currentState,
@@ -138,7 +135,6 @@ private fun LoadingContent(
 
 @Composable
 private fun ErrorContent(
-    onResetClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -156,10 +152,6 @@ private fun ErrorContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(modifier = Modifier.height(24.dp))
-        OutlinedButton(onClick = onResetClick) {
-            Text(stringResource(R.string.settings_reset))
-        }
     }
 }
 

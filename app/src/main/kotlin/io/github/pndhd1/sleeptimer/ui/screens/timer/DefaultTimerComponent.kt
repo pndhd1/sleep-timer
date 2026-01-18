@@ -26,6 +26,7 @@ import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.DefaultPermission
 import io.github.pndhd1.sleeptimer.ui.screens.timer.permission.PermissionType
 import io.github.pndhd1.sleeptimer.ui.services.TimerNotificationService
 import io.github.pndhd1.sleeptimer.utils.componentScope
+import io.github.pndhd1.sleeptimer.utils.exceptions.FatalException
 import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import io.github.pndhd1.sleeptimer.utils.toStateFlow
@@ -163,7 +164,7 @@ class DefaultTimerComponent(
     }
 
     private fun handleError(throwable: Throwable) {
-        Firebase.crashlytics.recordException(throwable)
+        Firebase.crashlytics.recordException(FatalException("Timer error", throwable))
         nav.activate(SlotConfig.Error)
     }
 }

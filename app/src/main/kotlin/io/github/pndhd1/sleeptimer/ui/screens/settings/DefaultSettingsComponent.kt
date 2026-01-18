@@ -9,6 +9,7 @@ import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
 import io.github.pndhd1.sleeptimer.utils.componentScope
+import io.github.pndhd1.sleeptimer.utils.exceptions.FatalException
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -153,14 +154,6 @@ class DefaultSettingsComponent(
         }
     }
 
-    override fun onResetSettings() {
-        _state.value = SettingsState.Loading
-        scope.launch {
-            runCatchingSuspend { settingsRepository.resetToDefaults() }
-            loadSettings()
-        }
-    }
-
     override fun onAboutClick() {
         onNavigateToAbout()
     }
@@ -178,7 +171,7 @@ class DefaultSettingsComponent(
         scope.launch {
             runCatchingSuspend { block() }
                 .onFailure {
-                    Firebase.crashlytics.recordException(it)
+                    Firebase.crashlytics.recordException(FatalException("Settings error", it))
                     _state.value = SettingsState.Error
                 }
         }

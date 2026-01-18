@@ -18,5 +18,4 @@ interface SettingsRepository {
     suspend fun updateFadeTargetVolumePercent(percent: Int)
     suspend fun updateGoHomeOnExpire(enabled: Boolean)
     suspend fun updateStopMediaOnExpire(enabled: Boolean)
-    suspend fun resetToDefaults()
 }

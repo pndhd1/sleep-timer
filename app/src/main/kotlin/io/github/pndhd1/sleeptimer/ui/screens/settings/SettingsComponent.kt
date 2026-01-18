@@ -21,7 +21,6 @@ interface SettingsComponent {
     fun onFadeTargetVolumePercentChanged(percent: Int)
     fun onGoHomeOnExpireChanged(enabled: Boolean)
     fun onStopMediaOnExpireChanged(enabled: Boolean)
-    fun onResetSettings()
     fun onAboutClick()
 }
 

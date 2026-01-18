@@ -21,6 +21,5 @@ class PreviewSettingsComponent(
     override fun onFadeTargetVolumePercentChanged(percent: Int) = Unit
     override fun onGoHomeOnExpireChanged(enabled: Boolean) = Unit
     override fun onStopMediaOnExpireChanged(enabled: Boolean) = Unit
-    override fun onResetSettings() = Unit
     override fun onAboutClick() = Unit
 }
