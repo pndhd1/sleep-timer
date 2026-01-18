@@ -41,12 +41,13 @@ class AudioFadeService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         if (intent?.action == ACTION_START_FADE) {
             val fadeDurationSeconds = intent.getLongExtra(EXTRA_FADE_DURATION_SECONDS, 3L)
-            startForegroundAndFade(fadeDurationSeconds)
+            val targetVolumePercent = intent.getIntExtra(EXTRA_TARGET_VOLUME_PERCENT, 0)
+            startForegroundAndFade(fadeDurationSeconds, targetVolumePercent)
         }
         return START_NOT_STICKY
     }
 
-    private fun startForegroundAndFade(durationSeconds: Long) {
+    private fun startForegroundAndFade(durationSeconds: Long, targetVolumePercent: Int) {
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
@@ -58,10 +59,10 @@ class AudioFadeService : LifecycleService() {
             }
         )
 
-        startFadeJob(durationSeconds.seconds)
+        startFadeJob(durationSeconds.seconds, targetVolumePercent)
     }
 
-    private fun startFadeJob(totalDuration: kotlin.time.Duration) {
+    private fun startFadeJob(totalDuration: kotlin.time.Duration, targetVolumePercent: Int) {
         fadeJob?.cancel()
 
         val am = audioManager ?: run {
@@ -69,9 +70,12 @@ class AudioFadeService : LifecycleService() {
             return
         }
 
+        val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val originalVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val targetVolume = (maxVolume * targetVolumePercent / 100).coerceAtLeast(0)
 
-        if (originalVolume <= 1) {
+        // If current volume is already at or below target, nothing to do
+        if (originalVolume <= targetVolume) {
             stopSelf()
             return
         }
@@ -79,14 +83,14 @@ class AudioFadeService : LifecycleService() {
         fadeJob = lifecycleScope.launch {
             val stepCount = (totalDuration.inWholeMilliseconds / FADE_STEP_INTERVAL_MS).toInt()
                 .coerceAtLeast(1)
-            val volumeDecrement = (originalVolume - 1).toFloat() / stepCount
+            val volumeDecrement = (originalVolume - targetVolume).toFloat() / stepCount
             var currentVolume = originalVolume.toFloat()
 
             repeat(stepCount) {
                 if (!isActive) return@launch
 
                 delay(FADE_STEP_INTERVAL_MS.milliseconds)
-                currentVolume = (currentVolume - volumeDecrement).coerceAtLeast(1f)
+                currentVolume = (currentVolume - volumeDecrement).coerceAtLeast(targetVolume.toFloat())
 
                 am.setStreamVolume(
                     AudioManager.STREAM_MUSIC,
@@ -95,7 +99,7 @@ class AudioFadeService : LifecycleService() {
                 )
             }
 
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, 1, 0)
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
             stopSelf()
         }
     }
@@ -129,12 +133,14 @@ class AudioFadeService : LifecycleService() {
         private const val NOTIFICATION_ID = 2
         private const val ACTION_START_FADE = "io.github.pndhd1.sleeptimer.ACTION_START_FADE"
         private const val EXTRA_FADE_DURATION_SECONDS = "fade_duration_seconds"
+        private const val EXTRA_TARGET_VOLUME_PERCENT = "target_volume_percent"
         private const val FADE_STEP_INTERVAL_MS = 100L
 
-        fun start(context: Context, fadeDurationSeconds: Long) {
+        fun start(context: Context, fadeDurationSeconds: Long, targetVolumePercent: Int = 0) {
             val intent = Intent(context, AudioFadeService::class.java).apply {
                 action = ACTION_START_FADE
                 putExtra(EXTRA_FADE_DURATION_SECONDS, fadeDurationSeconds)
+                putExtra(EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)

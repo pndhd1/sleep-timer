@@ -52,13 +52,17 @@ private inline val ExtendDurationSliderMin get() = 1.minutes
 private inline val ExtendDurationSliderMax get() = 30.minutes
 private inline val ExtendDurationSliderStep get() = 30.seconds
 
-private inline val FadeStartBeforeSliderMin get() = 30.seconds
+private inline val FadeStartBeforeSliderMin get() = 15.seconds
 private inline val FadeStartBeforeSliderMax get() = 5.minutes
 private inline val FadeStartBeforeSliderStep get() = 15.seconds
 
 private inline val FadeDurationSliderMin get() = 1.seconds
 private inline val FadeDurationSliderMax get() = 1.minutes
 private inline val FadeDurationSliderStep get() = 1.seconds
+
+private const val TargetVolumeSliderMin = 0
+private const val TargetVolumeSliderMax = 100
+private const val TargetVolumeSliderSteps = 9
 
 private const val PresetAnimationDurationMillis = 200
 
@@ -102,20 +106,11 @@ fun SettingsContent(
 
         is SettingsState.Loaded -> SettingsLayout(
             state = currentState,
+            component = component,
             bannerState = bannerState,
-            onDefaultDurationChanged = component::onDefaultDurationChanged,
-            onExtendDurationChanged = component::onExtendDurationChanged,
-            onPresetAdded = component::onPresetAdded,
-            onPresetRemoved = component::onPresetRemoved,
-            onShowNotificationChanged = component::onShowNotificationChanged,
             onRequestNotificationPermission = {
                 component.getNotificationPermission()?.let(permissionLauncher::launch)
             },
-            onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
-            onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
-            onFadeOutDurationChanged = component::onFadeOutDurationChanged,
-            onGoHomeOnExpireChanged = component::onGoHomeOnExpireChanged,
-            onAboutClick = component::onAboutClick,
             modifier = layoutModifier,
         )
     }
@@ -171,18 +166,9 @@ private fun ErrorContent(
 @Composable
 private fun SettingsLayout(
     state: SettingsState.Loaded,
+    component: SettingsComponent,
     bannerState: BottomNavAdBannerState,
-    onDefaultDurationChanged: (Duration) -> Unit,
-    onExtendDurationChanged: (Duration) -> Unit,
-    onPresetAdded: (Duration) -> Unit,
-    onPresetRemoved: (Duration) -> Unit,
-    onShowNotificationChanged: (Boolean) -> Unit,
     onRequestNotificationPermission: () -> Unit,
-    onFadeOutEnabledChanged: (Boolean) -> Unit,
-    onFadeOutStartBeforeChanged: (Duration) -> Unit,
-    onFadeOutDurationChanged: (Duration) -> Unit,
-    onGoHomeOnExpireChanged: (Boolean) -> Unit,
-    onAboutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -211,46 +197,53 @@ private fun SettingsLayout(
             item {
                 DefaultDurationCard(
                     duration = state.defaultDuration,
-                    onDurationChanged = onDefaultDurationChanged,
+                    onDurationChanged = component::onDefaultDurationChanged,
                 )
             }
             item {
                 ExtendDurationCard(
                     duration = state.extendDuration,
-                    onDurationChanged = onExtendDurationChanged,
+                    onDurationChanged = component::onExtendDurationChanged,
                 )
             }
             item {
                 PresetsCard(
                     presets = state.presets,
-                    onPresetAdded = onPresetAdded,
-                    onPresetRemoved = onPresetRemoved,
+                    onPresetAdded = component::onPresetAdded,
+                    onPresetRemoved = component::onPresetRemoved,
                 )
             }
             item {
                 ShowNotificationCard(
                     showNotification = state.showNotification,
                     hasPermission = state.hasNotificationPermission,
-                    onShowNotificationChanged = onShowNotificationChanged,
+                    onShowNotificationChanged = component::onShowNotificationChanged,
                     onRequestPermission = onRequestNotificationPermission,
                 )
             }
             item {
                 FadeOutCard(
                     fadeOut = state.fadeOut,
-                    onFadeOutEnabledChanged = onFadeOutEnabledChanged,
-                    onFadeOutStartBeforeChanged = onFadeOutStartBeforeChanged,
-                    onFadeOutDurationChanged = onFadeOutDurationChanged,
+                    onFadeOutEnabledChanged = component::onFadeOutEnabledChanged,
+                    onFadeOutStartBeforeChanged = component::onFadeOutStartBeforeChanged,
+                    onFadeOutDurationChanged = component::onFadeOutDurationChanged,
+                    onFadeTargetVolumePercentChanged = component::onFadeTargetVolumePercentChanged,
+                )
+            }
+            item {
+                StopMediaOnExpireCard(
+                    enabled = state.stopMediaOnExpire,
+                    onEnabledChanged = component::onStopMediaOnExpireChanged,
                 )
             }
             item {
                 GoHomeOnExpireCard(
                     enabled = state.goHomeOnExpire,
-                    onEnabledChanged = onGoHomeOnExpireChanged,
+                    onEnabledChanged = component::onGoHomeOnExpireChanged,
                 )
             }
             item {
-                AboutCard(onClick = onAboutClick)
+                AboutCard(onClick = component::onAboutClick)
             }
             item {
                 Spacer(
@@ -309,47 +302,26 @@ private fun AboutCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    SettingsCard(
+        title = stringResource(R.string.settings_about_title),
+        description = stringResource(R.string.settings_about_description),
+        modifier = modifier,
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_info),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = stringResource(R.string.settings_about_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(R.string.settings_about_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+        startContent = {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_info),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        endContent = {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -463,6 +435,7 @@ private fun FadeOutCard(
     onFadeOutEnabledChanged: (Boolean) -> Unit,
     onFadeOutStartBeforeChanged: (Duration) -> Unit,
     onFadeOutDurationChanged: (Duration) -> Unit,
+    onFadeTargetVolumePercentChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingsCard(
@@ -514,6 +487,21 @@ private fun FadeOutCard(
                         dialogMinDuration = FadeDurationSliderMin,
                         dialogMaxDuration = FadeDurationSliderMax,
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = stringResource(R.string.settings_fade_target_volume_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    PercentSlider(
+                        percent = fadeOut.targetVolumePercent,
+                        onPercentChanged = onFadeTargetVolumePercentChanged,
+                    )
                 }
             }
         },
@@ -521,48 +509,144 @@ private fun FadeOutCard(
 }
 
 @Composable
+private fun StopMediaOnExpireCard(
+    enabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsCard(
+        title = stringResource(R.string.settings_stop_media_title),
+        description = stringResource(R.string.settings_stop_media_description),
+        modifier = modifier,
+        endContent = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = onEnabledChanged,
+            )
+        },
+    )
+}
+
+@Composable
+private fun PercentSlider(
+    percent: Int,
+    onPercentChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var sliderValue by remember(percent) {
+        mutableFloatStateOf(percent.toFloat())
+    }
+
+    Column(modifier = modifier) {
+        Text(
+            text = "${sliderValue.toInt()}%",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Slider(
+            value = sliderValue,
+            onValueChange = { sliderValue = round(it) },
+            onValueChangeFinished = { onPercentChanged(sliderValue.toInt()) },
+            valueRange = TargetVolumeSliderMin.toFloat()..TargetVolumeSliderMax.toFloat(),
+            steps = TargetVolumeSliderSteps,
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = "$TargetVolumeSliderMin%",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "$TargetVolumeSliderMax%",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
 private fun SettingsCard(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    startContent: @Composable (() -> Unit)? = null,
     endContent: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable (ColumnScope.() -> Unit)? = null,
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = if (endContent != null) Modifier.weight(1f) else Modifier) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
+    val cardModifier = modifier.fillMaxWidth()
+    val cardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+    if (onClick != null) {
+        Card(
+            onClick = onClick,
+            modifier = cardModifier,
+            colors = cardColors,
+        ) {
+            SettingsCardContent(title, description, startContent, endContent, content)
+        }
+    } else {
+        Card(
+            modifier = cardModifier,
+            colors = cardColors,
+        ) {
+            SettingsCardContent(title, description, startContent, endContent, content)
+        }
+    }
+}
 
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                endContent?.invoke(this)
+@Composable
+private fun SettingsCardContent(
+    title: String,
+    description: String,
+    startContent: @Composable (() -> Unit)?,
+    endContent: @Composable (RowScope.() -> Unit)?,
+    content: @Composable (ColumnScope.() -> Unit)?,
+) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (startContent != null) {
+                startContent()
+                Spacer(modifier = Modifier.width(16.dp))
             }
 
-            if (content != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                content()
+            Column(modifier = if (endContent != null || startContent != null) Modifier.weight(1f) else Modifier) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+
+            endContent?.invoke(this)
+        }
+
+        if (content != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            content()
         }
     }
 }
@@ -862,7 +946,7 @@ private fun SettingsContentPreview(
 
 @Preview(showBackground = true, heightDp = 1500)
 @Composable
-private fun SettingsContentPreview() {
+private fun SettingsContentLoadedPreview() {
     val state = SettingsState.Loaded(
         defaultDuration = 30.minutes,
         extendDuration = 5.minutes,
@@ -873,10 +957,17 @@ private fun SettingsContentPreview() {
             enabled = true,
             startBefore = 1.minutes,
             duration = 3.seconds,
+            targetVolumePercent = 0,
         ),
         goHomeOnExpire = false,
+        stopMediaOnExpire = false,
     )
-    SettingsContentPreview(state)
+    SleepTimerTheme {
+        SettingsContent(
+            component = PreviewSettingsComponent(state),
+            bannerState = rememberBottomNavAdBannerState(),
+        )
+    }
 }
 
 // endregion

@@ -50,6 +50,7 @@ class DefaultSettingsComponent(
                 hasNotificationPermission = systemRepository.canSendNotifications.value,
                 fadeOut = settings.fadeOut,
                 goHomeOnExpire = settings.goHomeOnExpire,
+                stopMediaOnExpire = settings.stopMediaOnExpire,
             )
         }
     }
@@ -131,10 +132,24 @@ class DefaultSettingsComponent(
         }
     }
 
+    override fun onFadeTargetVolumePercentChanged(percent: Int) {
+        updateLoadedState { it.copy(fadeOut = it.fadeOut.copy(targetVolumePercent = percent)) }
+        launchWithErrorHandling {
+            settingsRepository.updateFadeTargetVolumePercent(percent)
+        }
+    }
+
     override fun onGoHomeOnExpireChanged(enabled: Boolean) {
         updateLoadedState { it.copy(goHomeOnExpire = enabled) }
         launchWithErrorHandling {
             settingsRepository.updateGoHomeOnExpire(enabled)
+        }
+    }
+
+    override fun onStopMediaOnExpireChanged(enabled: Boolean) {
+        updateLoadedState { it.copy(stopMediaOnExpire = enabled) }
+        launchWithErrorHandling {
+            settingsRepository.updateStopMediaOnExpire(enabled)
         }
     }
 

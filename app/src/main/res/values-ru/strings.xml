@@ -1,8 +1,12 @@
 <resources>
+    <!-- App -->
     <string name="app_name">Таймер сна</string>
+
+    <!-- Tabs -->
     <string name="tab_timer">Таймер</string>
     <string name="tab_settings">Настройки</string>
 
+    <!-- Labels -->
     <string name="label_hours">Часы</string>
     <string name="label_minutes">Минуты</string>
     <string name="label_seconds">Секунды</string>
@@ -10,17 +14,24 @@
     <string name="label_minutes_short">М</string>
     <string name="label_seconds_short">С</string>
 
+    <!-- Presets -->
     <string name="preset_minutes">%d мин</string>
     <string name="preset_hours">%d ч</string>
     <string name="preset_seconds">%d сек</string>
 
+    <!-- Buttons -->
     <string name="button_start">Старт</string>
     <string name="button_stop">Стоп</string>
     <string name="button_reset">Сброс</string>
 
+    <!-- Dialogs -->
+    <string name="dialog_ok">OK</string>
+
+    <!-- Errors -->
     <string name="error_title">Что-то пошло не так</string>
     <string name="error_message">Не удалось загрузить таймер. Попробуйте перезапустить приложение.</string>
 
+    <!-- Permissions -->
     <string name="permission_grant_button">Предоставить разрешение</string>
     <string name="permission_device_admin_title">Разрешение администратора</string>
     <string name="permission_device_admin_description">Таймеру сна необходимо разрешение администратора устройства для блокировки экрана по истечении таймера.</string>
@@ -30,55 +41,74 @@
     <string name="permission_notification_title">Разрешение на уведомления</string>
     <string name="permission_notification_description">Разрешите уведомления, чтобы видеть прогресс таймера и элементы управления. Это необязательно — таймер будет работать и без него.</string>
 
+    <!-- Notifications -->
     <string name="notification_channel_name">Таймер</string>
     <string name="notification_channel_description">Показывает прогресс таймера и элементы управления</string>
     <string name="notification_title">Таймер сна</string>
     <string name="notification_action_stop">Стоп</string>
     <string name="notification_action_extend">+%d мин</string>
 
-    <string name="settings_default_duration_title">Длительность по умолчанию</string>
-    <string name="settings_default_duration_description">Длительность при запуске нового таймера</string>
-    <string name="settings_extend_duration_title">Время продления</string>
-    <string name="settings_extend_duration_description">Время, добавляемое при продлении активного таймера</string>
-    <string name="settings_presets_title">Быстрые пресеты</string>
-    <string name="settings_presets_description">Кнопки для быстрой установки длительности таймера</string>
-    <string name="settings_duration_min">%d мин</string>
-    <string name="settings_add_preset">Добавить пресет</string>
-    <string name="settings_remove_preset">Удалить пресет</string>
-    <string name="settings_add_preset_title">Добавить пресет</string>
-    <string name="settings_add_preset_description">Введите длительность в минутах</string>
-    <string name="settings_minutes_suffix">мин</string>
-    <string name="settings_add">Добавить</string>
-    <string name="settings_cancel">Отмена</string>
-    <string name="dialog_ok">OK</string>
-    <string name="settings_apply">Применить</string>
-    <string name="settings_reset">Сбросить настройки</string>
-    <string name="settings_edit_duration_title">Установить время</string>
-    <string name="settings_min_duration_error">Минимум: %s</string>
-    <string name="settings_max_duration_error">Максимум: %s</string>
-    <string name="settings_show_notification_title">Показывать уведомление</string>
-    <string name="settings_show_notification_description">Отображать прогресс таймера в уведомлении. Изменения применятся при следующем запуске таймера.</string>
-    <string name="settings_notification_permission_title">Требуется разрешение</string>
-    <string name="settings_notification_permission_message">Для показа уведомлений включите разрешение в настройках приложения.</string>
-    <string name="settings_open_app_settings">Открыть настройки</string>
-    <string name="settings_permission_unavailable_title">Разрешение недоступно</string>
-    <string name="settings_permission_unavailable_message">Не удалось запросить разрешение. Пожалуйста, предоставьте его вручную в настройках приложения.</string>
-    <string name="settings_duration_sec">%d сек</string>
-    <string name="settings_fade_out_title">Затухание звука</string>
-    <string name="settings_fade_out_description">Плавно уменьшать громкость медиа перед окончанием таймера. Изменения применятся при следующем запуске таймера.</string>
-    <string name="settings_fade_start_before_label">Начать затухание до окончания таймера</string>
-    <string name="settings_fade_duration_label">Длительность затухания</string>
-
-    <string name="settings_go_home_title">Закрывать приложение</string>
-    <string name="settings_go_home_description">Переход на домашний экран при срабатывании таймера, закрывая текущее приложение</string>
-
+    <!-- Fade Notifications -->
     <string name="fade_notification_channel_name">Затухание звука</string>
     <string name="fade_notification_channel_description">Показывается при затухании звука</string>
     <string name="fade_notification_title">Затухание звука</string>
     <string name="fade_notification_text">Громкость уменьшается</string>
 
+    <!-- Settings: General -->
+    <string name="settings_apply">Применить</string>
+    <string name="settings_cancel">Отмена</string>
+    <string name="settings_reset">Сбросить настройки</string>
+    <string name="settings_open_app_settings">Открыть настройки</string>
+
+    <!-- Settings: Duration -->
+    <string name="settings_default_duration_title">Длительность по умолчанию</string>
+    <string name="settings_default_duration_description">Длительность при запуске нового таймера</string>
+    <string name="settings_extend_duration_title">Время продления</string>
+    <string name="settings_extend_duration_description">Время, добавляемое при продлении активного таймера</string>
+    <string name="settings_edit_duration_title">Установить время</string>
+    <string name="settings_duration_min">%d мин</string>
+    <string name="settings_duration_sec">%d сек</string>
+    <string name="settings_minutes_suffix">мин</string>
+    <string name="settings_min_duration_error">Минимум: %s</string>
+    <string name="settings_max_duration_error">Максимум: %s</string>
+
+    <!-- Settings: Presets -->
+    <string name="settings_presets_title">Быстрые пресеты</string>
+    <string name="settings_presets_description">Кнопки для быстрой установки длительности таймера</string>
+    <string name="settings_add_preset">Добавить пресет</string>
+    <string name="settings_add_preset_title">Добавить пресет</string>
+    <string name="settings_add_preset_description">Введите длительность в минутах</string>
+    <string name="settings_remove_preset">Удалить пресет</string>
+    <string name="settings_add">Добавить</string>
+
+    <!-- Settings: Notification -->
+    <string name="settings_show_notification_title">Показывать уведомление</string>
+    <string name="settings_show_notification_description">Отображать прогресс таймера в уведомлении. Изменения применятся при следующем запуске таймера.</string>
+    <string name="settings_notification_permission_title">Требуется разрешение</string>
+    <string name="settings_notification_permission_message">Для показа уведомлений включите разрешение в настройках приложения.</string>
+    <string name="settings_permission_unavailable_title">Разрешение недоступно</string>
+    <string name="settings_permission_unavailable_message">Не удалось запросить разрешение. Пожалуйста, предоставьте его вручную в настройках приложения.</string>
+
+    <!-- Settings: Fade Out -->
+    <string name="settings_fade_out_title">Затухание звука</string>
+    <string name="settings_fade_out_description">Плавно уменьшать громкость медиа перед окончанием таймера. Изменения применятся при следующем запуске таймера.</string>
+    <string name="settings_fade_start_before_label">Начать затухание до окончания таймера</string>
+    <string name="settings_fade_duration_label">Длительность затухания</string>
+    <string name="settings_fade_target_volume_label">Целевой уровень громкости</string>
+
+    <!-- Settings: Stop Media -->
+    <string name="settings_stop_media_title">Попытка остановки медиа</string>
+    <string name="settings_stop_media_description">Попытка остановить воспроизведение при срабатывании таймера. Может не работать со всеми приложениями.</string>
+
+    <!-- Settings: Go Home -->
+    <string name="settings_go_home_title">Закрывать приложение</string>
+    <string name="settings_go_home_description">Переход на домашний экран при срабатывании таймера, закрывая текущее приложение</string>
+
+    <!-- Settings: About -->
     <string name="settings_about_title">О приложении</string>
     <string name="settings_about_description">Версия, лицензии и исходный код</string>
+
+    <!-- About Screen -->
     <string name="about_title">О приложении</string>
     <string name="about_back">Назад</string>
     <string name="about_version">Версия %s</string>

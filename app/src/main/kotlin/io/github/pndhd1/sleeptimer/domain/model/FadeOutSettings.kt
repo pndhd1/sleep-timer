@@ -6,4 +6,5 @@ data class FadeOutSettings(
     val enabled: Boolean,
     val startBefore: Duration,
     val duration: Duration,
+    val targetVolumePercent: Int,
 )

@@ -23,7 +23,8 @@ class TimerAlarmReceiver : BroadcastReceiver() {
             }
             ACTION_FADE_START -> {
                 val fadeDurationSeconds = intent.getLongExtra(EXTRA_FADE_DURATION_SECONDS, 3L)
-                AudioFadeService.start(context, fadeDurationSeconds)
+                val targetVolumePercent = intent.getIntExtra(EXTRA_TARGET_VOLUME_PERCENT, 0)
+                AudioFadeService.start(context, fadeDurationSeconds, targetVolumePercent)
             }
         }
     }
@@ -32,5 +33,6 @@ class TimerAlarmReceiver : BroadcastReceiver() {
         const val ACTION_TIMER_EXPIRED = "io.github.pndhd1.sleeptimer.ACTION_TIMER_EXPIRED"
         const val ACTION_FADE_START = "io.github.pndhd1.sleeptimer.ACTION_FADE_START"
         const val EXTRA_FADE_DURATION_SECONDS = "fade_duration_seconds"
+        const val EXTRA_TARGET_VOLUME_PERCENT = "target_volume_percent"
     }
 }

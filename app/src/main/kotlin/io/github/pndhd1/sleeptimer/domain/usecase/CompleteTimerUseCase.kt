@@ -15,6 +15,9 @@ class CompleteTimerUseCase(
 
     suspend operator fun invoke() {
         val settings = settingsRepository.timerSettings.first()
+        if (settings.stopMediaOnExpire) {
+            systemRepository.requestAudioFocusToStopMedia()
+        }
         if (settings.goHomeOnExpire) {
             systemRepository.goHome()
         }

@@ -1,8 +1,12 @@
 <resources>
+    <!-- App -->
     <string name="app_name">Sleep Timer</string>
+
+    <!-- Tabs -->
     <string name="tab_timer">Timer</string>
     <string name="tab_settings">Settings</string>
 
+    <!-- Labels -->
     <string name="label_hours">Hours</string>
     <string name="label_minutes">Minutes</string>
     <string name="label_seconds">Seconds</string>
@@ -10,17 +14,24 @@
     <string name="label_minutes_short">M</string>
     <string name="label_seconds_short">S</string>
 
+    <!-- Presets -->
     <string name="preset_minutes">%d min</string>
     <string name="preset_hours">%d h</string>
     <string name="preset_seconds">%d sec</string>
 
+    <!-- Buttons -->
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="button_reset">Reset</string>
 
+    <!-- Dialogs -->
+    <string name="dialog_ok">OK</string>
+
+    <!-- Errors -->
     <string name="error_title">Something went wrong</string>
     <string name="error_message">Failed to load timer. Please try restart.</string>
 
+    <!-- Permissions -->
     <string name="permission_grant_button">Grant Permission</string>
     <string name="permission_device_admin_title">Device Admin Permission</string>
     <string name="permission_device_admin_description">Sleep Timer needs device administrator permission to lock your screen when the timer expires.</string>
@@ -29,55 +40,75 @@
     <string name="permission_exact_alarm_description">Sleep Timer needs permission to schedule exact alarms so the timer works precisely.</string>
     <string name="permission_notification_title">Notification Permission</string>
     <string name="permission_notification_description">Allow notifications to see timer progress and controls. This is optional — the timer will work without it.</string>
+
+    <!-- Notifications -->
     <string name="notification_channel_name">Timer</string>
     <string name="notification_channel_description">Shows timer progress and controls</string>
     <string name="notification_title">Sleep Timer</string>
     <string name="notification_action_stop">Stop</string>
     <string name="notification_action_extend">+%d min</string>
 
-    <string name="settings_default_duration_title">Default Timer Duration</string>
-    <string name="settings_default_duration_description">Duration used when starting a new timer</string>
-    <string name="settings_extend_duration_title">Extend Duration</string>
-    <string name="settings_extend_duration_description">Duration added when extending an active timer</string>
-    <string name="settings_presets_title">Quick Presets</string>
-    <string name="settings_presets_description">Shortcuts for quickly setting timer duration</string>
-    <string name="settings_duration_min">%d min</string>
-    <string name="settings_add_preset">Add preset</string>
-    <string name="settings_remove_preset">Remove preset</string>
-    <string name="settings_add_preset_title">Add Preset</string>
-    <string name="settings_add_preset_description">Enter duration in minutes</string>
-    <string name="settings_minutes_suffix">min</string>
-    <string name="settings_add">Add</string>
-    <string name="settings_cancel">Cancel</string>
-    <string name="dialog_ok">OK</string>
-    <string name="settings_apply">Apply</string>
-    <string name="settings_reset">Reset Settings</string>
-    <string name="settings_edit_duration_title">Set Duration</string>
-    <string name="settings_min_duration_error">Minimum: %s</string>
-    <string name="settings_max_duration_error">Maximum: %s</string>
-    <string name="settings_show_notification_title">Show Notification</string>
-    <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
-    <string name="settings_notification_permission_title">Notification Permission Required</string>
-    <string name="settings_notification_permission_message">To show notifications, please enable the permission in app settings.</string>
-    <string name="settings_open_app_settings">Open Settings</string>
-    <string name="settings_permission_unavailable_title">Permission Unavailable</string>
-    <string name="settings_permission_unavailable_message">Unable to request permission. Please grant it manually in app settings.</string>
-    <string name="settings_duration_sec">%d sec</string>
-    <string name="settings_fade_out_title">Fade Out Audio</string>
-    <string name="settings_fade_out_description">Gradually reduce media volume before timer ends. Changes apply on next timer start.</string>
-    <string name="settings_fade_start_before_label">Start fading before timer ends</string>
-    <string name="settings_fade_duration_label">Fade duration</string>
-
-    <string name="settings_go_home_title">Close Current App</string>
-    <string name="settings_go_home_description">Return to home screen when timer expires, closing any running app</string>
-
+    <!-- Fade Notifications -->
     <string name="fade_notification_channel_name">Audio Fade</string>
     <string name="fade_notification_channel_description">Shows when audio is fading out</string>
     <string name="fade_notification_title">Fading Audio</string>
     <string name="fade_notification_text">Volume is decreasing</string>
 
+    <!-- Settings: General -->
+    <string name="settings_apply">Apply</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="settings_reset">Reset Settings</string>
+    <string name="settings_open_app_settings">Open Settings</string>
+
+    <!-- Settings: Duration -->
+    <string name="settings_default_duration_title">Default Timer Duration</string>
+    <string name="settings_default_duration_description">Duration used when starting a new timer</string>
+    <string name="settings_extend_duration_title">Extend Duration</string>
+    <string name="settings_extend_duration_description">Duration added when extending an active timer</string>
+    <string name="settings_edit_duration_title">Set Duration</string>
+    <string name="settings_duration_min">%d min</string>
+    <string name="settings_duration_sec">%d sec</string>
+    <string name="settings_minutes_suffix">min</string>
+    <string name="settings_min_duration_error">Minimum: %s</string>
+    <string name="settings_max_duration_error">Maximum: %s</string>
+
+    <!-- Settings: Presets -->
+    <string name="settings_presets_title">Quick Presets</string>
+    <string name="settings_presets_description">Shortcuts for quickly setting timer duration</string>
+    <string name="settings_add_preset">Add preset</string>
+    <string name="settings_add_preset_title">Add Preset</string>
+    <string name="settings_add_preset_description">Enter duration in minutes</string>
+    <string name="settings_remove_preset">Remove preset</string>
+    <string name="settings_add">Add</string>
+
+    <!-- Settings: Notification -->
+    <string name="settings_show_notification_title">Show Notification</string>
+    <string name="settings_show_notification_description">Display timer progress in notification. Changes apply on next timer start.</string>
+    <string name="settings_notification_permission_title">Notification Permission Required</string>
+    <string name="settings_notification_permission_message">To show notifications, please enable the permission in app settings.</string>
+    <string name="settings_permission_unavailable_title">Permission Unavailable</string>
+    <string name="settings_permission_unavailable_message">Unable to request permission. Please grant it manually in app settings.</string>
+
+    <!-- Settings: Fade Out -->
+    <string name="settings_fade_out_title">Fade Out Audio</string>
+    <string name="settings_fade_out_description">Gradually reduce media volume before timer ends. Changes apply on next timer start.</string>
+    <string name="settings_fade_start_before_label">Start fading before timer ends</string>
+    <string name="settings_fade_duration_label">Fade duration</string>
+    <string name="settings_fade_target_volume_label">Target volume level</string>
+
+    <!-- Settings: Stop Media -->
+    <string name="settings_stop_media_title">Try to Stop Media</string>
+    <string name="settings_stop_media_description">Attempt to stop playing media when timer expires. May not work with all apps.</string>
+
+    <!-- Settings: Go Home -->
+    <string name="settings_go_home_title">Close Current App</string>
+    <string name="settings_go_home_description">Return to home screen when timer expires, closing any running app</string>
+
+    <!-- Settings: About -->
     <string name="settings_about_title">About</string>
     <string name="settings_about_description">Version, licenses, and source code</string>
+
+    <!-- About Screen -->
     <string name="about_title">About</string>
     <string name="about_back">Back</string>
     <string name="about_version">Version %s</string>

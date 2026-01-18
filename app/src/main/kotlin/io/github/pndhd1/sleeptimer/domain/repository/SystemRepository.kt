@@ -12,6 +12,7 @@ interface SystemRepository {
 
     fun lockScreen()
     fun goHome()
+    fun requestAudioFocusToStopMedia()
 
     fun getAdminActivationIntent(): Intent
     fun getAlarmPermissionIntent(): Intent?

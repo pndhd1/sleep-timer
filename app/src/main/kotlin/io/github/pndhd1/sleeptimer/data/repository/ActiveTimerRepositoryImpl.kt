@@ -149,24 +149,26 @@ class ActiveTimerRepositoryImpl(
         val actualFadeDuration = minOf(fadeOutSettings.duration, timeFromFadeToEnd)
 
         if (startImmediately) {
-            triggerFadeBroadcast(actualFadeDuration)
+            triggerFadeBroadcast(actualFadeDuration, fadeOutSettings.targetVolumePercent)
         } else {
-            scheduleFadeAlarm(fadeStartTime, actualFadeDuration)
+            scheduleFadeAlarm(fadeStartTime, actualFadeDuration, fadeOutSettings.targetVolumePercent)
         }
     }
 
-    private fun triggerFadeBroadcast(fadeDuration: Duration) {
+    private fun triggerFadeBroadcast(fadeDuration: Duration, targetVolumePercent: Int) {
         val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
             action = TimerAlarmReceiver.ACTION_FADE_START
             putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
+            putExtra(TimerAlarmReceiver.EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
         }
         context.sendBroadcast(intent)
     }
 
-    private fun scheduleFadeAlarm(fadeStartTime: Instant, fadeDuration: Duration) {
+    private fun scheduleFadeAlarm(fadeStartTime: Instant, fadeDuration: Duration, targetVolumePercent: Int) {
         val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
             action = TimerAlarmReceiver.ACTION_FADE_START
             putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
+            putExtra(TimerAlarmReceiver.EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,

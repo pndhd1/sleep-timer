@@ -6,6 +6,9 @@ import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
@@ -36,6 +39,7 @@ class SystemRepositoryImpl(
 
     private val devicePolicyManager: DevicePolicyManager? = context.getSystemService()
     private val alarmManager: AlarmManager? = context.getSystemService()
+    private val audioManager: AudioManager? = context.getSystemService()
 
     private val componentName = DeviceAdminReceiverImpl.getComponentName(context)
 
@@ -61,6 +65,28 @@ class SystemRepositoryImpl(
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(homeIntent)
+    }
+
+    @Suppress("DEPRECATION")
+    override fun requestAudioFocusToStopMedia() {
+        val am = audioManager ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .build()
+            am.requestAudioFocus(focusRequest)
+        } else {
+            am.requestAudioFocus(
+                { /* no-op listener */ },
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN,
+            )
+        }
     }
 
     override fun getAdminActivationIntent() =

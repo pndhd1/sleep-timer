@@ -27,7 +27,9 @@ private val ShowNotificationKey = booleanPreferencesKey("show_notification")
 private val FadeOutEnabledKey = booleanPreferencesKey("fade_out_enabled")
 private val FadeStartBeforeSecondsKey = intPreferencesKey("fade_start_before_seconds")
 private val FadeOutDurationSecondsKey = intPreferencesKey("fade_out_duration_seconds")
+private val FadeTargetVolumePercentKey = intPreferencesKey("fade_target_volume_percent")
 private val GoHomeOnExpireKey = booleanPreferencesKey("go_home_on_expire")
+private val StopMediaOnExpireKey = booleanPreferencesKey("stop_media_on_expire")
 
 @Inject
 @SingleIn(AppScope::class)
@@ -94,10 +96,26 @@ class SettingsRepositoryImpl(
         }
     }
 
+    override suspend fun updateFadeTargetVolumePercent(percent: Int) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[FadeTargetVolumePercentKey] = percent.coerceIn(0, 100)
+            }
+        }
+    }
+
     override suspend fun updateGoHomeOnExpire(enabled: Boolean) {
         preferences.updateData { current ->
             current.toMutablePreferences().apply {
                 this[GoHomeOnExpireKey] = enabled
+            }
+        }
+    }
+
+    override suspend fun updateStopMediaOnExpire(enabled: Boolean) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[StopMediaOnExpireKey] = enabled
             }
         }
     }
@@ -112,7 +130,9 @@ class SettingsRepositoryImpl(
                 remove(FadeOutEnabledKey)
                 remove(FadeStartBeforeSecondsKey)
                 remove(FadeOutDurationSecondsKey)
+                remove(FadeTargetVolumePercentKey)
                 remove(GoHomeOnExpireKey)
+                remove(StopMediaOnExpireKey)
             }
         }
     }
@@ -128,6 +148,8 @@ private fun Preferences.toDomain() = TimerSettings(
         enabled = get(FadeOutEnabledKey) ?: Defaults.DefaultFadeOutEnabled,
         startBefore = get(FadeStartBeforeSecondsKey)?.seconds ?: Defaults.DefaultFadeStartBefore,
         duration = get(FadeOutDurationSecondsKey)?.seconds ?: Defaults.DefaultFadeOutDuration,
+        targetVolumePercent = get(FadeTargetVolumePercentKey) ?: Defaults.DefaultFadeTargetVolumePercent,
     ),
     goHomeOnExpire = get(GoHomeOnExpireKey) ?: Defaults.DefaultGoHomeOnExpire,
+    stopMediaOnExpire = get(StopMediaOnExpireKey) ?: Defaults.DefaultStopMediaOnExpire,
 )

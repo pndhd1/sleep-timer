@@ -18,7 +18,9 @@ class PreviewSettingsComponent(
     override fun onFadeOutEnabledChanged(enabled: Boolean) = Unit
     override fun onFadeOutStartBeforeChanged(duration: Duration) = Unit
     override fun onFadeOutDurationChanged(duration: Duration) = Unit
+    override fun onFadeTargetVolumePercentChanged(percent: Int) = Unit
     override fun onGoHomeOnExpireChanged(enabled: Boolean) = Unit
+    override fun onStopMediaOnExpireChanged(enabled: Boolean) = Unit
     override fun onResetSettings() = Unit
     override fun onAboutClick() = Unit
 }

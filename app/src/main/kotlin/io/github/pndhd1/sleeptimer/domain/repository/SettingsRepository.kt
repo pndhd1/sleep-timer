@@ -15,6 +15,8 @@ interface SettingsRepository {
     suspend fun updateFadeOutEnabled(enabled: Boolean)
     suspend fun updateFadeStartBefore(duration: Duration)
     suspend fun updateFadeOutDuration(duration: Duration)
+    suspend fun updateFadeTargetVolumePercent(percent: Int)
     suspend fun updateGoHomeOnExpire(enabled: Boolean)
+    suspend fun updateStopMediaOnExpire(enabled: Boolean)
     suspend fun resetToDefaults()
 }
