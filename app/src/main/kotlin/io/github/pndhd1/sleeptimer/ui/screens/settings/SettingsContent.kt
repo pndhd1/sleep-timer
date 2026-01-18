@@ -122,7 +122,12 @@ fun SettingsContent(
                 component.getNotificationPermission()?.let(permissionLauncher::launch)
             },
             onRequestFullScreenIntentPermission = {
-                // First check if channel is disabled
+                // First check notification permission
+                if (!currentState.hasNotificationPermission) {
+                    component.getNotificationPermission()?.let(permissionLauncher::launch)
+                    return@SettingsLayout
+                }
+                // Then check if channel is disabled
                 if (!currentState.isActionsChannelEnabled) {
                     showChannelSettingsDialog = true
                     return@SettingsLayout
@@ -327,7 +332,9 @@ private fun SettingsLayout(
             item {
                 GoHomeOnExpireCard(
                     enabled = state.goHomeOnExpire,
-                    hasPermission = state.hasFullScreenIntentPermission && state.isActionsChannelEnabled,
+                    hasPermission = state.hasNotificationPermission &&
+                        state.isActionsChannelEnabled &&
+                        state.hasFullScreenIntentPermission,
                     onEnabledChanged = component::onGoHomeOnExpireChanged,
                     onRequestPermission = onRequestFullScreenIntentPermission,
                 )
