@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
@@ -22,6 +23,8 @@ import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.isPortrait
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
 import kotlinx.coroutines.launch
@@ -53,13 +56,20 @@ fun AboutContent(
                             )
                         }
                     },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = if (!isPortrait()) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            Color.Unspecified
+                        }
+                    ),
                     scrollBehavior = scrollBehavior,
                 )
             },
             // Insets are handled by the content
             contentWindowInsets = WindowInsets(0),
         ) { innerPadding ->
-            val contentInsets = WindowInsets.safeDrawing
+            val contentInsets = UIDefaults.defaultInsets
                 .only(WindowInsetsSides.Horizontal)
                 .add(WindowInsets(left = 20.dp, right = 20.dp))
             Box(modifier = Modifier.fillMaxSize()) {
@@ -104,7 +114,7 @@ fun AboutContent(
                                         text = stringResource(R.string.about_licenses_title),
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.windowInsetsPadding(
-                                            WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+                                            UIDefaults.defaultInsets.only(WindowInsetsSides.Horizontal)
                                         )
                                     )
                                 }

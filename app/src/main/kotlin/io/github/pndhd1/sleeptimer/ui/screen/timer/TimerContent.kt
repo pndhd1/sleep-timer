@@ -24,9 +24,10 @@ import io.github.pndhd1.sleeptimer.ui.screen.timer.config.TimerConfigState
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.utils.AdStickySizeInset
 import io.github.pndhd1.sleeptimer.utils.Defaults
+import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -37,66 +38,76 @@ fun TimerContent(
     bottomInsetCompensation: Dp = 0.dp,
 ) {
     val slot by component.slot.collectAsStateWithLifecycle()
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-    ) {
-        Crossfade(
-            targetState = slot?.child?.instance,
+    Box(modifier) {
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End)),
-        ) { child ->
-            when (child) {
-                is TimerComponent.Child.Permission -> {
-                    PermissionContent(
-                        component = child.component,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface),
+        ) {
+            Crossfade(
+                targetState = slot?.child?.instance,
+                modifier = Modifier
+                    .weight(1f)
+                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End)),
+            ) { child ->
+                when (child) {
+                    is TimerComponent.Child.Permission -> {
+                        PermissionContent(
+                            component = child.component,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
 
-                is TimerComponent.Child.Config -> {
-                    TimerConfigContent(
-                        component = child.component,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                    is TimerComponent.Child.Config -> {
+                        TimerConfigContent(
+                            component = child.component,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
 
-                is TimerComponent.Child.Active -> {
-                    ActiveTimerContent(
-                        component = child.component,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                    is TimerComponent.Child.Active -> {
+                        ActiveTimerContent(
+                            component = child.component,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
 
-                is TimerComponent.Child.Error -> ErrorScreen(modifier = Modifier.fillMaxSize())
-                null -> LoadingContent(modifier = Modifier.fillMaxSize())
+                    is TimerComponent.Child.Error -> ErrorLayout(modifier = Modifier.fillMaxSize())
+                    null -> LoadingLayout(modifier = Modifier.fillMaxSize())
+                }
+            }
+
+
+            Box(contentAlignment = Alignment.BottomCenter) {
+                val imePadding = WindowInsets.ime.asPaddingValues()
+                val resultPadding = PaddingValues(
+                    start = imePadding.calculateStartPadding(LocalLayoutDirection.current),
+                    end = imePadding.calculateEndPadding(LocalLayoutDirection.current),
+                    top = imePadding.calculateTopPadding(),
+                    bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation)
+                        .coerceAtLeast(0.dp),
+                )
+
+                Spacer(Modifier.padding(resultPadding))
+
+                // We are adding ad banner inset here directly without checking BottomNavAdBannerState.visible
+                // to avoid UI jump when banner visibility changes
+                AdStickySizeInset()
             }
         }
 
-
-        Box(contentAlignment = Alignment.BottomCenter) {
-            val imePadding = WindowInsets.ime.asPaddingValues()
-            val resultPadding = PaddingValues(
-                start = imePadding.calculateStartPadding(LocalLayoutDirection.current),
-                end = imePadding.calculateEndPadding(LocalLayoutDirection.current),
-                top = imePadding.calculateTopPadding(),
-                bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation)
-                    .coerceAtLeast(0.dp),
-            )
-
-            Spacer(Modifier.padding(resultPadding))
-
-            // We are adding ad banner inset here directly without checking BottomNavAdBannerState.visible
-            // to avoid UI jump when banner visibility changes
-            AdStickySizeInset()
-        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .windowInsetsEndWidth(WindowInsets.navigationBars)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+        )
     }
 }
 
 @Composable
-private fun LoadingContent(
+private fun LoadingLayout(
     modifier: Modifier = Modifier,
 ) {
     Box(

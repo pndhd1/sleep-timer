@@ -17,7 +17,7 @@ import io.github.pndhd1.sleeptimer.ui.screen.about.AboutContent
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.BottomNavContent
 import io.github.pndhd1.sleeptimer.ui.screen.root.RootComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screen.root.RootComponent.State
-import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.GdprConsentDialog
 
 @OptIn(ExperimentalDecomposeApi::class)
@@ -30,7 +30,7 @@ fun RootContent(
     val state by component.state.collectAsStateWithLifecycle()
 
     when (val currentState = state) {
-        is State.Error -> ErrorScreen(
+        is State.Error -> ErrorLayout(
             modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),

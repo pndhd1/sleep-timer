@@ -34,11 +34,12 @@ import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.BottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.ui.widgets.ErrorScreen
+import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
@@ -106,46 +107,57 @@ fun SettingsContent(
         },
     )
 
-    val layoutModifier = modifier
-        .background(MaterialTheme.colorScheme.surface)
-        .fillMaxSize()
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (val currentState = state) {
+            is SettingsState.Loading -> LoadingLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End))
 
-    when (val currentState = state) {
-        is SettingsState.Loading -> LoadingContent(
-            modifier = layoutModifier.windowInsetsPadding(
-                WindowInsets.safeDrawing.only(WindowInsetsSides.End)
             )
 
-        )
-
-        is SettingsState.Error -> ErrorScreen(
-            modifier = layoutModifier.windowInsetsPadding(
-                WindowInsets.safeDrawing.only(WindowInsetsSides.End)
+            is SettingsState.Error -> ErrorLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End))
             )
-        )
 
-        is SettingsState.Loaded -> SettingsLayout(
-            state = currentState,
-            component = component,
-            bannerState = bannerState,
-            onRequestNotificationPermission = {
-                component.getNotificationPermission()?.let(permissionLauncher::launch)
-            },
-            onRequestFullScreenIntentPermission = {
-                // First check notification permission
-                if (!currentState.hasNotificationPermission) {
+            is SettingsState.Loaded -> SettingsLayout(
+                state = currentState,
+                component = component,
+                bannerState = bannerState,
+                onRequestNotificationPermission = {
                     component.getNotificationPermission()?.let(permissionLauncher::launch)
-                    return@SettingsLayout
-                }
-                // Then check if channel is disabled
-                if (!currentState.isActionsChannelEnabled) {
-                    showChannelSettingsDialog = true
-                    return@SettingsLayout
-                }
-                // Then check full-screen intent permission
-                showFullScreenIntentSettingsDialog = true
-            },
-            modifier = layoutModifier,
+                },
+                onRequestFullScreenIntentPermission = {
+                    // First check notification permission
+                    if (!currentState.hasNotificationPermission) {
+                        component.getNotificationPermission()?.let(permissionLauncher::launch)
+                        return@SettingsLayout
+                    }
+                    // Then check if channel is disabled
+                    if (!currentState.isActionsChannelEnabled) {
+                        showChannelSettingsDialog = true
+                        return@SettingsLayout
+                    }
+                    // Then check full-screen intent permission
+                    showFullScreenIntentSettingsDialog = true
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .windowInsetsEndWidth(WindowInsets.navigationBars)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow),
         )
     }
 
@@ -254,7 +266,7 @@ private fun FullScreenIntentSettingsDialog(
 }
 
 @Composable
-private fun LoadingContent(
+private fun LoadingLayout(
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -278,7 +290,7 @@ private fun SettingsLayout(
     Box(modifier = modifier) {
         LazyColumn(
             state = listState,
-            contentPadding = WindowInsets.safeDrawing.only(WindowInsetsSides.End)
+            contentPadding = UIDefaults.defaultInsets.only(WindowInsetsSides.End)
                 .add(
                     WindowInsets(
                         left = 16.dp,
@@ -363,15 +375,31 @@ private fun SettingsLayout(
             }
         }
 
-        VisibilityCrossfade(
-            isVisible = listState.canScrollBackward,
-            modifier = Modifier.align(Alignment.TopCenter),
-        ) {
+        if (isPortrait()) {
+            VisibilityCrossfade(
+                isVisible = listState.canScrollBackward,
+                modifier = Modifier.align(Alignment.TopCenter),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .windowInsetsTopHeight(UIDefaults.defaultInsets)
+                        .fillMaxWidth()
+                        .background(SystemBarsBackgroundColor)
+                )
+            }
+        } else {
+            val color by animateColorAsState(
+                if (!listState.canScrollBackward) {
+                    MaterialTheme.colorScheme.surfaceContainerLow
+                } else {
+                    SystemBarsBackgroundColor
+                }
+            )
             Box(
                 modifier = Modifier
                     .windowInsetsTopHeight(UIDefaults.defaultInsets)
                     .fillMaxWidth()
-                    .background(SystemBarsBackgroundColor)
+                    .background(color)
             )
         }
 

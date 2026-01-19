@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import io.github.pndhd1.sleeptimer.R
 
 @Composable
-fun ErrorScreen(
+fun ErrorLayout(
     modifier: Modifier = Modifier,
 ) {
     Column(

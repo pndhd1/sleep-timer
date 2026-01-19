@@ -117,7 +117,7 @@ fun BottomNavContent(
                             state = bannerState,
                             modifier = if (!isPortrait) {
                                 val symmetricPadding = with(density) {
-                                    val inset = WindowInsets.safeDrawing
+                                    val inset = UIDefaults.defaultInsets
                                     maxOf(
                                         inset.getLeft(density, layoutDirection),
                                         inset.getRight(density, layoutDirection)
