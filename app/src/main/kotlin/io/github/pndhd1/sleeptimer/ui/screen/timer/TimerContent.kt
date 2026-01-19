@@ -44,7 +44,9 @@ fun TimerContent(
     ) {
         Crossfade(
             targetState = slot?.child?.instance,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End)),
         ) { child ->
             when (child) {
                 is TimerComponent.Child.Permission -> {

@@ -110,7 +110,16 @@ fun BottomNavContent(
                 }
 
                 Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    BottomNavAdBanner(state = bannerState)
+                    BottomNavAdBanner(
+                        state = bannerState,
+                        modifier = if (!isPortrait) {
+                            Modifier.windowInsetsPadding(
+                                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+                            )
+                        } else {
+                            Modifier
+                        }
+                    )
                     if (!isPortrait) {
                         Box(
                             Modifier

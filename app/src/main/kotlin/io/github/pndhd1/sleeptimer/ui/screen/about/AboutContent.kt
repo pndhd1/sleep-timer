@@ -2,7 +2,6 @@ package io.github.pndhd1.sleeptimer.ui.screen.about
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
@@ -27,8 +26,6 @@ import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
 import kotlinx.coroutines.launch
 
-private const val LicensesScrollOffset = 800f
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutContent(
@@ -42,85 +39,108 @@ fun AboutContent(
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        contentWindowInsets = WindowInsets(0),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.about_title)) },
-                navigationIcon = {
-                    IconButton(onClick = component::onBackClick) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_back),
-                            contentDescription = stringResource(R.string.about_back),
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            LibrariesContainer(
-                libraries = libraries,
-                modifier = Modifier
-                    .padding(top = innerPadding.calculateTopPadding())
-                    .fillMaxSize(),
-                lazyListState = listState,
-                contentPadding = WindowInsets.navigationBars.asPaddingValues(),
-                padding = LibraryDefaults.libraryPadding(
-                    contentPadding = WindowInsets.safeContent
-                        .only(WindowInsetsSides.Horizontal)
-                        .union(WindowInsets(top = 16.dp, bottom = 16.dp))
-                        .asPaddingValues()
-                ),
-                header = {
-                    item {
-                        AppInfoSection(
-                            appVersion = state.appVersion,
-                            onGithubClick = {
-                                try {
-                                    uriHandler.openUri(state.githubUrl)
-                                } catch (_: Exception) {
-                                    // Ignore
-                                }
-                            },
-                        )
-                        HorizontalDivider()
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    scope.launch {
-                                        listState.animateScrollBy(LicensesScrollOffset)
-                                    }
-                                }
-                                .padding(vertical = 16.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.about_licenses_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.windowInsetsPadding(
-                                    WindowInsets.safeContent.only(WindowInsetsSides.Horizontal)
-                                )
+    Box(modifier = modifier) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.about_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = component::onBackClick) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(R.string.about_back),
                             )
                         }
-                    }
-                },
-            )
-
-            VisibilityCrossfade(
-                isVisible = listState.canScrollForward,
-                modifier = Modifier.align(Alignment.BottomCenter),
-            ) {
-                Box(
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            // Insets are handled by the content
+            contentWindowInsets = WindowInsets(0),
+        ) { innerPadding ->
+            val contentInsets = WindowInsets.safeDrawing
+                .only(WindowInsetsSides.Horizontal)
+                .add(WindowInsets(left = 20.dp, right = 20.dp))
+            Box(modifier = Modifier.fillMaxSize()) {
+                LibrariesContainer(
+                    libraries = libraries,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                        .background(SystemBarsBackgroundColor),
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    lazyListState = listState,
+                    contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+                        .add(WindowInsets(bottom = 12.dp))
+                        .asPaddingValues(),
+                    padding = LibraryDefaults.libraryPadding(
+                        contentPadding = contentInsets
+                            .add(WindowInsets(top = 12.dp, bottom = 12.dp))
+                            .asPaddingValues()
+                    ),
+                    header = {
+                        item {
+                            Column {
+                                AppInfoSection(
+                                    appVersion = state.appVersion,
+                                    onGithubClick = {
+                                        try {
+                                            uriHandler.openUri(state.githubUrl)
+                                        } catch (_: Exception) {
+                                            // Ignore
+                                        }
+                                    },
+                                )
+                                HorizontalDivider()
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            scope.launch { listState.animateScrollToItem(1) }
+                                        }
+                                        .windowInsetsPadding(contentInsets)
+                                        .padding(vertical = 12.dp),
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.about_licenses_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.windowInsetsPadding(
+                                            WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    },
                 )
             }
         }
+
+        VisibilityCrossfade(
+            isVisible = listState.canScrollForward,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                    .background(SystemBarsBackgroundColor),
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .windowInsetsStartWidth(WindowInsets.navigationBars)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .windowInsetsEndWidth(WindowInsets.navigationBars)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+        )
     }
 }
 

@@ -111,8 +111,18 @@ fun SettingsContent(
         .fillMaxSize()
 
     when (val currentState = state) {
-        is SettingsState.Loading -> LoadingContent(modifier = layoutModifier)
-        is SettingsState.Error -> ErrorScreen(modifier = layoutModifier)
+        is SettingsState.Loading -> LoadingContent(
+            modifier = layoutModifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.End)
+            )
+
+        )
+
+        is SettingsState.Error -> ErrorScreen(
+            modifier = layoutModifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.End)
+            )
+        )
 
         is SettingsState.Loaded -> SettingsLayout(
             state = currentState,
@@ -268,18 +278,22 @@ private fun SettingsLayout(
     Box(modifier = modifier) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                bottom = run {
-                    val bannerSize = bannerState.bannerSize
-                    if (bannerState.isBannerVisible && bannerSize != null) {
-                        bannerSize.height.dp
-                    } else {
-                        0.dp
-                    }
-                },
-            ),
+            contentPadding = WindowInsets.safeDrawing.only(WindowInsetsSides.End)
+                .add(
+                    WindowInsets(
+                        left = 16.dp,
+                        right = 16.dp,
+                        bottom = run {
+                            val bannerSize = bannerState.bannerSize
+                            if (bannerState.isBannerVisible && bannerSize != null) {
+                                bannerSize.height.dp
+                            } else {
+                                0.dp
+                            }
+                        },
+                    )
+                )
+                .asPaddingValues(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
