@@ -11,10 +11,10 @@ object BuildConfig {
     val Java = JavaVersion.VERSION_11
     val Jvm = JvmTarget.JVM_11
 
-    const val VersionCode = 3
+    const val VersionCode = 1
 
-    const val MajorVersion = 1
-    const val MinorVersion = 1
-    const val PatchVersion = 0
+    const val MajorVersion = 0
+    const val MinorVersion = 0
+    const val PatchVersion = 1
     const val VersionName = "$MajorVersion.$MinorVersion.$PatchVersion"
 }
