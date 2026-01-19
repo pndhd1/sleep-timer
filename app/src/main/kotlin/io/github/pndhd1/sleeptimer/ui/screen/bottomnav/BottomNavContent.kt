@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +45,7 @@ fun BottomNavContent(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
     val stack by component.stack.collectAsStateWithLifecycle()
     val isPortrait = isPortrait()
     val bannerState = rememberBottomNavAdBannerState()
@@ -110,16 +112,23 @@ fun BottomNavContent(
                 }
 
                 Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    BottomNavAdBanner(
-                        state = bannerState,
-                        modifier = if (!isPortrait) {
-                            Modifier.windowInsetsPadding(
-                                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
-                            )
-                        } else {
-                            Modifier
-                        }
-                    )
+                    Box(Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)) {
+                        BottomNavAdBanner(
+                            state = bannerState,
+                            modifier = if (!isPortrait) {
+                                val symmetricPadding = with(density) {
+                                    val inset = WindowInsets.safeDrawing
+                                    maxOf(
+                                        inset.getLeft(density, layoutDirection),
+                                        inset.getRight(density, layoutDirection)
+                                    ).toDp()
+                                }
+                                Modifier.padding(horizontal = symmetricPadding)
+                            } else {
+                                Modifier
+                            }
+                        )
+                    }
                     if (!isPortrait) {
                         Box(
                             Modifier
