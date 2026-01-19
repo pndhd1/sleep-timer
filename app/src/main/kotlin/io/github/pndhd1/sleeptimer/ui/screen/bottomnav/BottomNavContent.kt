@@ -1,6 +1,5 @@
 package io.github.pndhd1.sleeptimer.ui.screen.bottomnav
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -111,40 +110,24 @@ fun BottomNavContent(
                     }
                 }
 
-                Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    Box(Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)) {
-                        BottomNavAdBanner(
-                            state = bannerState,
-                            modifier = if (!isPortrait) {
-                                val symmetricPadding = with(density) {
-                                    val inset = UIDefaults.defaultInsets
-                                    maxOf(
-                                        inset.getLeft(density, layoutDirection),
-                                        inset.getRight(density, layoutDirection)
-                                    ).toDp()
-                                }
-                                Modifier.padding(horizontal = symmetricPadding)
-                            } else {
-                                Modifier
-                            }
-                        )
+                BottomNavAdBanner(
+                    state = bannerState,
+                    modifier = if (!isPortrait) {
+                        val inset = UIDefaults.defaultInsets
+                        val symmetricPadding = with(density) {
+                            maxOf(
+                                inset.getLeft(density, layoutDirection),
+                                inset.getRight(density, layoutDirection)
+                            ).toDp()
+                        }
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = symmetricPadding)
+                            .windowInsetsPadding(inset.only(WindowInsetsSides.Bottom))
+                    } else {
+                        Modifier.align(Alignment.BottomCenter)
                     }
-                    if (!isPortrait) {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .windowInsetsBottomHeight(UIDefaults.defaultInsets)
-                                .let {
-                                    if (bannerState.isBannerVisible) {
-                                        it.background(MaterialTheme.colorScheme.surfaceContainerLow)
-                                    } else {
-                                        it
-                                    }
-                                }
-
-                        )
-                    }
-                }
+                )
             }
         }
     }

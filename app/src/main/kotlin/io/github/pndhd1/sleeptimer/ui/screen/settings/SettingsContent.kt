@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -291,20 +292,7 @@ private fun SettingsLayout(
         LazyColumn(
             state = listState,
             contentPadding = UIDefaults.defaultInsets.only(WindowInsetsSides.End)
-                .add(
-                    WindowInsets(
-                        left = 16.dp,
-                        right = 16.dp,
-                        bottom = run {
-                            val bannerSize = bannerState.bannerSize
-                            if (bannerState.isBannerVisible && bannerSize != null) {
-                                bannerSize.height.dp
-                            } else {
-                                0.dp
-                            }
-                        },
-                    )
-                )
+                .add(bannerState.bottomInset())
                 .asPaddingValues(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -409,9 +397,12 @@ private fun SettingsLayout(
         ) {
             Box(
                 modifier = Modifier
-                    .windowInsetsBottomHeight(UIDefaults.defaultInsets)
+                    .windowInsetsBottomHeight(UIDefaults.defaultInsets.add(bannerState.bottomInset()))
                     .fillMaxWidth()
                     .background(SystemBarsBackgroundColor)
+                    .clickable(interactionSource = null, indication = null) {
+                        // Intercept clicks under banner
+                    }
             )
         }
     }
@@ -1070,6 +1061,18 @@ private fun PresetChips(
         }
     }
 }
+
+@Stable
+private fun BottomNavAdBannerState.bottomInset(): WindowInsets = WindowInsets(
+    bottom = run {
+        val bannerSize = bannerSize
+        if (isBannerVisible && bannerSize != null) {
+            bannerSize.height.dp
+        } else {
+            0.dp
+        }
+    },
+)
 
 // region Preview
 
