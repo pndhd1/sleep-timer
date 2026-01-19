@@ -24,6 +24,8 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.isPortrait
+import io.github.pndhd1.sleeptimer.utils.ui.LocalNavigationMode
+import io.github.pndhd1.sleeptimer.utils.ui.NavigationMode
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
 import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
 import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
@@ -57,7 +59,7 @@ fun AboutContent(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (!isPortrait()) {
+                        containerColor = if (!isPortrait() && LocalNavigationMode.current == NavigationMode.Buttons) {
                             MaterialTheme.colorScheme.surfaceContainer
                         } else {
                             Color.Unspecified
