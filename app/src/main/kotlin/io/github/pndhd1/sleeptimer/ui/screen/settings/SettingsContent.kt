@@ -293,6 +293,7 @@ private fun SettingsLayout(
             state = listState,
             contentPadding = UIDefaults.defaultInsets.only(WindowInsetsSides.End)
                 .add(bannerState.bottomInset())
+                .add(WindowInsets(left = 16.dp, right = 16.dp))
                 .asPaddingValues(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
