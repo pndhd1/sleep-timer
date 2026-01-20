@@ -17,8 +17,9 @@ interface RootComponent : BackHandlerOwner {
     fun onGdprConsentResult(accepted: Boolean)
 
     sealed interface State {
-        data class Root(val showGdprDialog: Boolean) : State
-        data object Error : State
+        data object Loading : State
+        data object Root : State
+        data object GdprConsent : State
     }
 
     sealed interface Child {

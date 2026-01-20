@@ -3,7 +3,6 @@ package io.github.pndhd1.sleeptimer.ui.screen.timer
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
+import io.github.pndhd1.sleeptimer.ui.widgets.LoadingLayout
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.ui.SolidInsetsBackground
 import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
@@ -92,18 +92,6 @@ fun TimerContent(
                 .fillMaxWidth()
                 .windowInsetsBottomHeight(WindowInsets.appBottomNavigationBar)
         )
-    }
-}
-
-@Composable
-private fun LoadingLayout(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 

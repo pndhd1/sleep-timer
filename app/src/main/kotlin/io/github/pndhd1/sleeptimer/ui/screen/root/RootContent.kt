@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screen.root
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -17,8 +18,8 @@ import io.github.pndhd1.sleeptimer.ui.screen.about.AboutContent
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.BottomNavContent
 import io.github.pndhd1.sleeptimer.ui.screen.root.RootComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screen.root.RootComponent.State
-import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.GdprConsentDialog
+import io.github.pndhd1.sleeptimer.ui.widgets.LoadingLayout
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -29,41 +30,43 @@ fun RootContent(
     val stack by component.stack.collectAsStateWithLifecycle()
     val state by component.state.collectAsStateWithLifecycle()
 
-    when (val currentState = state) {
-        is State.Error -> ErrorLayout(
+    when (state) {
+        is State.Loading -> LoadingLayout(
             modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         )
 
-        is State.Root -> {
-            Children(
-                stack = stack,
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                animation = predictiveBackAnimation(
-                    backHandler = component.backHandler,
-                    fallbackAnimation = stackAnimation(fade()),
-                    onBack = component::onBackClicked,
-                    selector = { backEvent, _, _ -> androidPredictiveBackAnimatableV1(backEvent) }
-                ),
-            ) { child ->
-                when (val instance = child.instance) {
-                    is Child.BottomNav -> BottomNavContent(
-                        component = instance.component,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+        is State.GdprConsent -> Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
+            GdprConsentDialog(onResult = component::onGdprConsentResult)
+        }
 
-                    is Child.About -> AboutContent(
-                        component = instance.component,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-            }
+        is State.Root -> Children(
+            stack = stack,
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            animation = predictiveBackAnimation(
+                backHandler = component.backHandler,
+                fallbackAnimation = stackAnimation(fade()),
+                onBack = component::onBackClicked,
+                selector = { backEvent, _, _ -> androidPredictiveBackAnimatableV1(backEvent) }
+            ),
+        ) { child ->
+            when (val instance = child.instance) {
+                is Child.BottomNav -> BottomNavContent(
+                    component = instance.component,
+                    modifier = Modifier.fillMaxSize(),
+                )
 
-            if (currentState.showGdprDialog) {
-                GdprConsentDialog(onResult = component::onGdprConsentResult)
+                is Child.About -> AboutContent(
+                    component = instance.component,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }

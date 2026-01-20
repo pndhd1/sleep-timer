@@ -34,6 +34,7 @@ import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
+import io.github.pndhd1.sleeptimer.ui.widgets.LoadingLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
@@ -258,17 +259,7 @@ private fun FullScreenIntentSettingsDialog(
     )
 }
 
-@Composable
-private fun LoadingLayout(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
-    }
-}
+
 
 @Composable
 private fun SettingsLayout(

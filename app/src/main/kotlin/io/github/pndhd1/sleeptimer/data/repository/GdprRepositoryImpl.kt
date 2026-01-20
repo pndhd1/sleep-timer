@@ -48,19 +48,18 @@ class GdprRepositoryImpl(
     @OptIn(ExperimentalCoroutinesApi::class)
     override val state = flow { emit(isGdprApplicable()) }
         .flatMapLatest { isApplicable ->
-            if (isApplicable) {
-                preferences.data.map { prefs ->
-                    GdprState(
-                        dialogShown = prefs[GdprConsentDialogShownKey] ?: false,
-                        isConsentGiven = prefs[GdprUserConsentKey] ?: false,
-                    )
-                }
-            } else {
-                flowOf(
-                    GdprState(
-                        dialogShown = true,
-                        isConsentGiven = true,
-                    )
+            if (!isApplicable) return@flatMapLatest flowOf(
+                GdprState(
+                    isApplicable = false,
+                    dialogShown = true,
+                    isConsentGiven = true,
+                )
+            )
+            preferences.data.map { prefs ->
+                GdprState(
+                    isApplicable = true,
+                    dialogShown = prefs[GdprConsentDialogShownKey] ?: false,
+                    isConsentGiven = prefs[GdprUserConsentKey] ?: false,
                 )
             }
         }

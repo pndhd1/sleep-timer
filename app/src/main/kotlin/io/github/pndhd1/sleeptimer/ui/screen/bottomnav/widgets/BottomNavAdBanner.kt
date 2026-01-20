@@ -16,7 +16,6 @@ import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.common.ImpressionData
 import io.github.pndhd1.sleeptimer.BuildConfig
-import io.github.pndhd1.sleeptimer.utils.YandexAdsState
 import io.github.pndhd1.sleeptimer.utils.exceptions.AdLoadException
 
 // does not support resizing after creation
@@ -26,7 +25,7 @@ fun BottomNavAdBanner(
     modifier: Modifier = Modifier,
     onAdVisibilityChanged: (isVisible: Boolean) -> Unit = {},
 ) {
-    if (LocalInspectionMode.current || !YandexAdsState.gdprConsentInitialized.value) return
+    if (LocalInspectionMode.current) return
     AndroidView(
         factory = { context ->
             BannerAdView(context).apply {
