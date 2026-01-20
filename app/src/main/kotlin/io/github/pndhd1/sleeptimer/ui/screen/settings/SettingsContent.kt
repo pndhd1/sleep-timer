@@ -41,12 +41,7 @@ import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
-import io.github.pndhd1.sleeptimer.utils.ui.InsetsBackground
-import io.github.pndhd1.sleeptimer.utils.ui.LocalNavigationMode
-import io.github.pndhd1.sleeptimer.utils.ui.NavigationMode
-import io.github.pndhd1.sleeptimer.utils.ui.adBanner
-import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
-import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
+import io.github.pndhd1.sleeptimer.utils.ui.*
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
@@ -263,7 +258,6 @@ private fun FullScreenIntentSettingsDialog(
 }
 
 
-
 @Composable
 private fun SettingsLayout(
     state: SettingsState.Loaded,
@@ -276,7 +270,8 @@ private fun SettingsLayout(
     Box(modifier = modifier) {
         LazyColumn(
             state = listState,
-            contentPadding = WindowInsets.systemBarsForVisualComponents
+            contentPadding = WindowInsets.systemBarsForVisualComponents.only(WindowInsetsSides.Vertical)
+                .union(WindowInsets.systemBarsForVisualComponents.only(WindowInsetsSides.End))
                 .union(WindowInsets.appBottomNavigationBar)
                 .add(WindowInsets.adBanner)
                 .add(WindowInsets(16.dp, 16.dp, 16.dp, 16.dp))
