@@ -25,11 +25,8 @@ import io.github.pndhd1.sleeptimer.ui.screen.timer.config.DefaultTimerConfigComp
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.DefaultPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PermissionType
 import io.github.pndhd1.sleeptimer.ui.service.TimerNotificationService
-import io.github.pndhd1.sleeptimer.utils.componentScope
+import io.github.pndhd1.sleeptimer.utils.*
 import io.github.pndhd1.sleeptimer.utils.exceptions.FatalException
-import io.github.pndhd1.sleeptimer.utils.flowWithLifecycle
-import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
-import io.github.pndhd1.sleeptimer.utils.toStateFlow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -47,6 +44,7 @@ class DefaultTimerComponent(
     private val startTimerUseCase: StartTimerUseCase,
     private val stopTimerUseCase: StopTimerUseCase,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
+    private val splashScreenStateHolder: SplashScreenStateHolder,
 ) : TimerComponent, ComponentContext by componentContext {
 
     @AssistedFactory
@@ -75,7 +73,11 @@ class DefaultTimerComponent(
             transform = ::createSlotConfig,
         )
             .catch { handleError(it) }
-            .onEach { nav.activate(it) }
+            .onEach {
+                nav.activate(it)
+                // Hide the splash screen after the first successful load
+                splashScreenStateHolder.keepSplashScreen = false
+            }
             .flowWithLifecycle(lifecycle)
             .launchIn(scope)
     }

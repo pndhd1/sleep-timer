@@ -18,6 +18,7 @@ import io.github.pndhd1.sleeptimer.requireAppGraph
 import io.github.pndhd1.sleeptimer.ui.screen.root.DefaultRootComponent
 import io.github.pndhd1.sleeptimer.ui.screen.root.RootContent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.SplashScreenStateHolder
 import io.github.pndhd1.sleeptimer.utils.ui.LocalNavigationMode
 import io.github.pndhd1.sleeptimer.utils.ui.NavigationMode
 
@@ -26,8 +27,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     private lateinit var rootComponentFactory: DefaultRootComponent.Factory
 
+    @Inject
+    private lateinit var splashScreenStateHolder: SplashScreenStateHolder
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        requireAppGraph().inject(this)
+        installSplashScreen().apply {
+            setKeepOnScreenCondition { splashScreenStateHolder.keepSplashScreen }
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
@@ -36,7 +43,6 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
-        requireAppGraph().inject(this)
 
         val navigationMode = navigationMode()
         val rootComponent = retainedComponent(factory = rootComponentFactory::create)

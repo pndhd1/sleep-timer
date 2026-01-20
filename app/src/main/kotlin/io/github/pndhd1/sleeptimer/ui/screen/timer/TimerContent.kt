@@ -78,9 +78,12 @@ fun TimerContent(
                     }
 
                     is TimerComponent.Child.Error -> ErrorLayout(modifier = Modifier.fillMaxSize())
-                    null -> LoadingLayout(modifier = Modifier.fillMaxSize())
+
+                    null -> Unit // Loading is handled outside the Crossfade
                 }
             }
+
+            if (slot?.child?.instance == null) LoadingLayout(modifier = Modifier.fillMaxSize())
         }
 
         SolidInsetsBackground(
