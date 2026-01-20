@@ -39,8 +39,11 @@ import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
 import io.github.pndhd1.sleeptimer.utils.ui.InsetsBackground
+import io.github.pndhd1.sleeptimer.utils.ui.LocalNavigationMode
+import io.github.pndhd1.sleeptimer.utils.ui.NavigationMode
 import io.github.pndhd1.sleeptimer.utils.ui.adBanner
 import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
 import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
@@ -351,6 +354,13 @@ private fun SettingsLayout(
                 .windowInsetsBottomHeight(
                     WindowInsets.appBottomNavigationBar
                         .union(WindowInsets.systemBarsForVisualComponents)
+                        .let {
+                            if (!isPortrait() && LocalNavigationMode.current == NavigationMode.Gestures) {
+                                it.exclude(WindowInsets.systemBarsForVisualComponents)
+                            } else {
+                                it
+                            }
+                        }
                 )
                 .fillMaxWidth()
                 .clickable(interactionSource = null, indication = null) {
