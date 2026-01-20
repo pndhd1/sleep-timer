@@ -49,17 +49,6 @@ fun BottomNavContent(
     val isPortrait = isPortrait()
     val bannerState = rememberBottomNavAdBannerState()
     var timerBottomInsetCompensation by remember { mutableStateOf(0.dp) }
-    val navContent = remember {
-        movableContentOf {
-            NavContent(
-                component = component,
-                stack = stack,
-                bannerState = bannerState,
-                modifier = Modifier.fillMaxSize(),
-                timerBottomInsetCompensation = timerBottomInsetCompensation,
-            )
-        }
-    }
 
     Scaffold(
         modifier = modifier,
@@ -80,34 +69,28 @@ fun BottomNavContent(
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             Box {
-                if (!isPortrait) {
-                    Row {
-                        LeftNavigationRail(
-                            activeChild = stack.active.instance,
-                            onTimerTabClick = component::onTimerTabClick,
-                            onSettingsTabClick = component::onSettingsTabClick,
-                            modifier = Modifier.fillMaxHeight(),
-                        )
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .consumeWindowInsets(
-                                    NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
-                                ),
-                        ) {
-                            navContent()
-                        }
-                    }
-                } else {
-                    Box(
+                Row {
+                    if (!isPortrait) LeftNavigationRail(
+                        activeChild = stack.active.instance,
+                        onTimerTabClick = component::onTimerTabClick,
+                        onSettingsTabClick = component::onSettingsTabClick,
+                        modifier = Modifier.fillMaxHeight(),
+                    )
+                    NavContent(
+                        component = component,
+                        stack = stack,
+                        bannerState = bannerState,
                         modifier = Modifier
-                            .fillMaxSize()
+                            .weight(1f)
                             .consumeWindowInsets(
-                                NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
-                            )
-                    ) {
-                        navContent()
-                    }
+                                if (isPortrait) {
+                                    NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
+                                } else {
+                                    NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                                }
+                            ),
+                        timerBottomInsetCompensation = timerBottomInsetCompensation,
+                    )
                 }
 
                 BottomNavAdBanner(
