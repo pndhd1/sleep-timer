@@ -7,6 +7,7 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.ObserveLifecycleMode
@@ -98,3 +99,12 @@ fun <I> ActivityResultLauncher<I>.launchCatching(input: I, onError: () -> Unit) 
 @Stable
 fun isPortrait(configuration: Configuration = LocalConfiguration.current) =
     configuration.orientation == ORIENTATION_PORTRAIT
+
+inline fun Modifier.applyIf(
+    condition: Boolean,
+    modifier: () -> Modifier,
+) = if (condition) {
+    this.then(modifier())
+} else {
+    this
+}

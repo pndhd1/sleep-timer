@@ -1,11 +1,9 @@
 package io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -21,58 +19,42 @@ import io.github.pndhd1.sleeptimer.BuildConfig
 import io.github.pndhd1.sleeptimer.utils.YandexAdsState
 import io.github.pndhd1.sleeptimer.utils.exceptions.AdLoadException
 
+// does not support resizing after creation
 @Composable
 fun BottomNavAdBanner(
+    size: BannerAdSize,
     modifier: Modifier = Modifier,
-    state: BottomNavAdBannerState = rememberBottomNavAdBannerState(),
+    onAdVisibilityChanged: (isVisible: Boolean) -> Unit = {},
 ) {
     if (LocalInspectionMode.current || !YandexAdsState.gdprConsentInitialized.value) return
-    val context = LocalContext.current
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val adSize = YandexAdsState.stickySize(context, maxWidth.value.toInt())
-        SideEffect { state.bannerSize = adSize }
-        AndroidView(
-            factory = { context ->
-                BannerAdView(context).apply {
-                    setAdUnitId(BuildConfig.AD_BANNER_UNIT_ID)
-                    setAdSize(adSize)
-                    setBannerAdEventListener(object : BannerAdEventListener {
-                        override fun onAdFailedToLoad(error: AdRequestError) {
-                            Firebase.crashlytics.recordException(
-                                AdLoadException(error.code, error.description)
-                            )
-                        }
+    AndroidView(
+        factory = { context ->
+            BannerAdView(context).apply {
+                setAdUnitId(BuildConfig.AD_BANNER_UNIT_ID)
+                setAdSize(size)
+                setBannerAdEventListener(object : BannerAdEventListener {
+                    override fun onAdLoaded() = onAdVisibilityChanged(true)
 
-                        override fun onAdLoaded() {
-                            state.isBannerVisible = true
-                        }
+                    override fun onAdFailedToLoad(error: AdRequestError) =
+                        Firebase.crashlytics.recordException(
+                            AdLoadException(error.code, error.description)
+                        )
 
-                        override fun onAdClicked() = Unit
-                        override fun onImpression(impressionData: ImpressionData?) = Unit
-                        override fun onLeftApplication() = Unit
-                        override fun onReturnedToApplication() = Unit
+                    override fun onAdClicked() = Unit
+                    override fun onImpression(impressionData: ImpressionData?) = Unit
+                    override fun onLeftApplication() = Unit
+                    override fun onReturnedToApplication() = Unit
 
-                    })
-                    loadAd(AdRequest.Builder().build())
-                }
-            },
-            onRelease = {
-                state.isBannerVisible = false
-                it.destroy()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(adSize.height.dp),
-        )
-    }
+                })
+                loadAd(AdRequest.Builder().build())
+            }
+        },
+        onRelease = {
+            onAdVisibilityChanged(false)
+            it.destroy()
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(size.height.dp),
+    )
 }
-
-@Stable
-class BottomNavAdBannerState {
-
-    var bannerSize by mutableStateOf<BannerAdSize?>(null)
-    var isBannerVisible by mutableStateOf(false)
-}
-
-@Composable
-fun rememberBottomNavAdBannerState() = remember { BottomNavAdBannerState() }

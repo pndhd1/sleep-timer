@@ -32,19 +32,17 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
-import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.BottomNavAdBannerState
-import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
-import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
-import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
+import io.github.pndhd1.sleeptimer.utils.ui.InsetsBackground
+import io.github.pndhd1.sleeptimer.utils.ui.adBanner
+import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
@@ -77,7 +75,6 @@ private const val PresetAnimationDurationMillis = 200
 @Composable
 fun SettingsContent(
     component: SettingsComponent,
-    bannerState: BottomNavAdBannerState,
     modifier: Modifier = Modifier,
 ) {
     val state by component.state.collectAsStateWithLifecycle()
@@ -118,20 +115,23 @@ fun SettingsContent(
             is SettingsState.Loading -> LoadingLayout(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End))
+                    .windowInsetsPadding(
+                        WindowInsets.systemBarsForVisualComponents.only(WindowInsetsSides.End)
+                    )
 
             )
 
             is SettingsState.Error -> ErrorLayout(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End))
+                    .windowInsetsPadding(
+                        WindowInsets.systemBarsForVisualComponents.only(WindowInsetsSides.End)
+                    )
             )
 
             is SettingsState.Loaded -> SettingsLayout(
                 state = currentState,
                 component = component,
-                bannerState = bannerState,
                 onRequestNotificationPermission = {
                     component.getNotificationPermission()?.let(permissionLauncher::launch)
                 },
@@ -152,14 +152,6 @@ fun SettingsContent(
                 modifier = Modifier.fillMaxSize(),
             )
         }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .windowInsetsEndWidth(WindowInsets.navigationBars)
-                .background(MaterialTheme.colorScheme.surfaceContainerLow),
-        )
     }
 
     if (showPermissionSettingsDialog) {
@@ -282,7 +274,6 @@ private fun LoadingLayout(
 private fun SettingsLayout(
     state: SettingsState.Loaded,
     component: SettingsComponent,
-    bannerState: BottomNavAdBannerState,
     onRequestNotificationPermission: () -> Unit,
     onRequestFullScreenIntentPermission: () -> Unit,
     modifier: Modifier = Modifier,
@@ -291,17 +282,13 @@ private fun SettingsLayout(
     Box(modifier = modifier) {
         LazyColumn(
             state = listState,
-            contentPadding = UIDefaults.defaultInsets.only(WindowInsetsSides.End)
-                .add(bannerState.bottomInset())
-                .add(WindowInsets(left = 16.dp, right = 16.dp))
+            contentPadding = WindowInsets.systemBarsForVisualComponents
+                .union(WindowInsets.appBottomNavigationBar)
+                .add(WindowInsets.adBanner)
+                .add(WindowInsets(16.dp, 16.dp, 16.dp, 16.dp))
                 .asPaddingValues(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Spacer(
-                    modifier = Modifier.windowInsetsTopHeight(UIDefaults.defaultInsets)
-                )
-            }
             item {
                 DefaultDurationCard(
                     duration = state.defaultDuration,
@@ -357,55 +344,28 @@ private fun SettingsLayout(
             item {
                 AboutCard(onClick = component::onAboutClick)
             }
-            item {
-                Spacer(
-                    modifier = Modifier.windowInsetsBottomHeight(UIDefaults.defaultInsets)
-                )
-            }
         }
 
-        if (isPortrait()) {
-            VisibilityCrossfade(
-                isVisible = listState.canScrollBackward,
-                modifier = Modifier.align(Alignment.TopCenter),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .windowInsetsTopHeight(UIDefaults.defaultInsets)
-                        .fillMaxWidth()
-                        .background(SystemBarsBackgroundColor)
-                )
-            }
-        } else {
-            val color by animateColorAsState(
-                if (!listState.canScrollBackward) {
-                    MaterialTheme.colorScheme.surfaceContainerLow
-                } else {
-                    SystemBarsBackgroundColor
-                }
-            )
-            Box(
-                modifier = Modifier
-                    .windowInsetsTopHeight(UIDefaults.defaultInsets)
-                    .fillMaxWidth()
-                    .background(color)
-            )
-        }
+        InsetsBackground(
+            visible = listState.canScrollBackward,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .windowInsetsTopHeight(WindowInsets.systemBarsForVisualComponents)
+                .fillMaxWidth(),
+        )
 
-        VisibilityCrossfade(
-            isVisible = listState.canScrollForward,
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            Box(
-                modifier = Modifier
-                    .windowInsetsBottomHeight(UIDefaults.defaultInsets.add(bannerState.bottomInset()))
-                    .fillMaxWidth()
-                    .background(SystemBarsBackgroundColor)
-                    .clickable(interactionSource = null, indication = null) {
-                        // Intercept clicks under banner
-                    }
-            )
-        }
+        InsetsBackground(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .windowInsetsBottomHeight(
+                    WindowInsets.appBottomNavigationBar
+                        .union(WindowInsets.systemBarsForVisualComponents)
+                )
+                .fillMaxWidth()
+                .clickable(interactionSource = null, indication = null) {
+                    // Intercept clicks under banner
+                },
+        )
     }
 }
 
@@ -1063,18 +1023,6 @@ private fun PresetChips(
     }
 }
 
-@Stable
-private fun BottomNavAdBannerState.bottomInset(): WindowInsets = WindowInsets(
-    bottom = run {
-        val bannerSize = bannerSize
-        if (isBannerVisible && bannerSize != null) {
-            bannerSize.height.dp
-        } else {
-            0.dp
-        }
-    },
-)
-
 // region Preview
 
 private class SettingsStateProvider : PreviewParameterProvider<SettingsState> {
@@ -1092,12 +1040,11 @@ private fun SettingsContentPreview(
     SleepTimerTheme {
         SettingsContent(
             component = PreviewSettingsComponent(state),
-            bannerState = rememberBottomNavAdBannerState(),
         )
     }
 }
 
-@Preview(showBackground = true, heightDp = 1500)
+@Preview(showBackground = true, heightDp = 2000)
 @Composable
 private fun SettingsContentLoadedPreview() {
     val state = SettingsState.Loaded(
@@ -1120,7 +1067,6 @@ private fun SettingsContentLoadedPreview() {
     SleepTimerTheme {
         SettingsContent(
             component = PreviewSettingsComponent(state),
-            bannerState = rememberBottomNavAdBannerState(),
         )
     }
 }

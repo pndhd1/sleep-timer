@@ -9,12 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.ui.screen.timer.active.ActiveTimerContent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.active.PreviewActiveTimerComponent
@@ -25,9 +22,11 @@ import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PermissionContent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.permission.PreviewPermissionComponent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
-import io.github.pndhd1.sleeptimer.utils.AdStickySizeInset
 import io.github.pndhd1.sleeptimer.utils.Defaults
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
+import io.github.pndhd1.sleeptimer.utils.ui.SolidInsetsBackground
+import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
+import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -35,20 +34,26 @@ import kotlin.time.Duration.Companion.minutes
 fun TimerContent(
     component: TimerComponent,
     modifier: Modifier = Modifier,
-    bottomInsetCompensation: Dp = 0.dp,
 ) {
     val slot by component.slot.collectAsStateWithLifecycle()
-    Box(modifier) {
-        Column(
-            modifier = Modifier
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        Box(
+            modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface),
+                .windowInsetsPadding(
+                    WindowInsets.systemBarsForVisualComponents
+                        .union(WindowInsets.appBottomNavigationBar)
+                        .add(WindowInsets.adBannerIgnoringVisibility)
+                        .union(WindowInsets.ime)
+                ),
         ) {
             Crossfade(
                 targetState = slot?.child?.instance,
-                modifier = Modifier
-                    .weight(1f)
-                    .windowInsetsPadding(UIDefaults.defaultInsets.only(WindowInsetsSides.End)),
+                modifier = Modifier,
             ) { child ->
                 when (child) {
                     is TimerComponent.Child.Permission -> {
@@ -76,32 +81,13 @@ fun TimerContent(
                     null -> LoadingLayout(modifier = Modifier.fillMaxSize())
                 }
             }
-
-
-            Box(contentAlignment = Alignment.BottomCenter) {
-                val imePadding = WindowInsets.ime.asPaddingValues()
-                val resultPadding = PaddingValues(
-                    start = imePadding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = imePadding.calculateEndPadding(LocalLayoutDirection.current),
-                    top = imePadding.calculateTopPadding(),
-                    bottom = (imePadding.calculateBottomPadding() - bottomInsetCompensation)
-                        .coerceAtLeast(0.dp),
-                )
-
-                Spacer(Modifier.padding(resultPadding))
-
-                // We are adding ad banner inset here directly without checking BottomNavAdBannerState.visible
-                // to avoid UI jump when banner visibility changes
-                AdStickySizeInset()
-            }
         }
 
-        Box(
+        SolidInsetsBackground(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .windowInsetsEndWidth(WindowInsets.navigationBars)
-                .background(MaterialTheme.colorScheme.surfaceContainer),
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .windowInsetsBottomHeight(WindowInsets.appBottomNavigationBar)
         )
     }
 }

@@ -5,8 +5,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -14,7 +16,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -24,50 +25,54 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.ChildStack
+import com.yandex.mobile.ads.banner.BannerAdSize
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.BottomNavComponent.Child
 import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.BottomNavAdBanner
-import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.BottomNavAdBannerState
-import io.github.pndhd1.sleeptimer.ui.screen.bottomnav.widgets.rememberBottomNavAdBannerState
 import io.github.pndhd1.sleeptimer.ui.screen.settings.PreviewSettingsComponent
 import io.github.pndhd1.sleeptimer.ui.screen.settings.SettingsContent
 import io.github.pndhd1.sleeptimer.ui.screen.settings.SettingsState
 import io.github.pndhd1.sleeptimer.ui.screen.timer.PreviewTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.TimerContent
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
+import io.github.pndhd1.sleeptimer.utils.YandexAdsState
+import io.github.pndhd1.sleeptimer.utils.applyIf
 import io.github.pndhd1.sleeptimer.utils.isPortrait
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
+import io.github.pndhd1.sleeptimer.utils.ui.LocalAdBannerInsets
+import io.github.pndhd1.sleeptimer.utils.ui.LocalAdBannerInsetsIgnoringVisibility
+import io.github.pndhd1.sleeptimer.utils.ui.LocalBottomNavigationBarInsets
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BottomNavContent(
     component: BottomNavComponent,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val stack by component.stack.collectAsStateWithLifecycle()
     val isPortrait = isPortrait()
-    val bannerState = rememberBottomNavAdBannerState()
-    var timerBottomInsetCompensation by remember { mutableStateOf(0.dp) }
 
-    Scaffold(
-        modifier = modifier,
-        bottomBar = {
-            if (isPortrait) BottomNavigationBar(
-                activeChild = stack.active.instance,
-                onTimerTabClick = component::onTimerTabClick,
-                onSettingsTabClick = component::onSettingsTabClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onSizeChanged {
-                        timerBottomInsetCompensation = with(density) { it.height.toDp() }
-                    },
-            )
-        },
-        // Window insets are handled manually inside the content
-        contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+    val bottomNavInsets = remember { MutableWindowInsets() }
+    val adBannerInsets = remember { MutableWindowInsets() }
+
+    BoxWithConstraints(modifier = modifier) {
+        val constraints = this
+
+        // https://ads.yandex.com/helpcenter/en/dev/android/adaptive-sticky-banner
+        // It is recommended to recalculate the size on initialization
+        val adSize = remember(context, YandexAdsState.isInitialized) {
+            BannerAdSize.stickySize(context, constraints.maxWidth.value.toInt())
+        }
+
+        CompositionLocalProvider(
+            LocalBottomNavigationBarInsets provides bottomNavInsets,
+            LocalAdBannerInsets provides adBannerInsets,
+            LocalAdBannerInsetsIgnoringVisibility provides WindowInsets(bottom = adSize.height.dp)
+        ) {
+
             Row {
                 if (!isPortrait) LeftNavigationRail(
                     activeChild = stack.active.instance,
@@ -75,41 +80,63 @@ fun BottomNavContent(
                     onSettingsTabClick = component::onSettingsTabClick,
                     modifier = Modifier.fillMaxHeight(),
                 )
+
                 NavContent(
                     component = component,
                     stack = stack,
-                    bannerState = bannerState,
                     modifier = Modifier
                         .weight(1f)
-                        .consumeWindowInsets(
-                            if (isPortrait) {
-                                NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
-                            } else {
+                        .let {
+                            if (isPortrait) it.consumeWindowInsets(
                                 NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                            ) else {
+                                it
                             }
-                        ),
-                    timerBottomInsetCompensation = timerBottomInsetCompensation,
+                        },
                 )
             }
 
-            BottomNavAdBanner(
-                state = bannerState,
-                modifier = if (!isPortrait) {
-                    val inset = UIDefaults.defaultInsets
-                    val symmetricPadding = with(density) {
-                        maxOf(
-                            inset.getLeft(density, layoutDirection),
-                            inset.getRight(density, layoutDirection)
-                        ).toDp()
+            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                BottomNavAdBanner(
+                    size = adSize,
+                    modifier = Modifier.applyIf(!isPortrait) {
+                        val inset = WindowInsets.systemBarsForVisualComponents
+                        val symmetricPadding = with(density) {
+                            maxOf(
+                                inset.getLeft(density, layoutDirection),
+                                inset.getRight(density, layoutDirection)
+                            ).toDp()
+                        }
+                        Modifier
+                            .padding(horizontal = symmetricPadding)
+                            .windowInsetsPadding(inset.only(WindowInsetsSides.Bottom))
+                    },
+                    onAdVisibilityChanged = {
+                        adBannerInsets.insets = if (it) {
+                            WindowInsets(bottom = adSize.height.dp)
+                        } else {
+                            WindowInsets()
+                        }
+                    },
+                )
+
+                if (isPortrait) BottomNavigationBar(
+                    activeChild = stack.active.instance,
+                    onTimerTabClick = component::onTimerTabClick,
+                    onSettingsTabClick = component::onSettingsTabClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onSizeChanged {
+                            bottomNavInsets.insets = WindowInsets(
+                                bottom = with(density) { it.height.toDp() }
+                            )
+                        },
+                ) else {
+                    LaunchedEffect(bottomNavInsets) {
+                        bottomNavInsets.insets = WindowInsets()
                     }
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = symmetricPadding)
-                        .windowInsetsPadding(inset.only(WindowInsetsSides.Bottom))
-                } else {
-                    Modifier.align(Alignment.BottomCenter)
                 }
-            )
+            }
         }
     }
 }
@@ -119,8 +146,6 @@ fun BottomNavContent(
 private fun NavContent(
     component: BottomNavComponent,
     stack: ChildStack<*, Child>,
-    bannerState: BottomNavAdBannerState,
-    timerBottomInsetCompensation: Dp,
     modifier: Modifier = Modifier,
 ) {
     Children(
@@ -136,12 +161,10 @@ private fun NavContent(
         when (val instance = child.instance) {
             is Child.Timer -> TimerContent(
                 component = instance.component,
-                bottomInsetCompensation = timerBottomInsetCompensation,
             )
 
             is Child.Settings -> SettingsContent(
                 component = instance.component,
-                bannerState = bannerState,
             )
         }
     }
@@ -190,7 +213,10 @@ private fun BottomNavigationBar(
     onSettingsTabClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationBar(modifier = modifier) {
+    NavigationBar(
+        modifier = modifier,
+        containerColor = Color.Transparent
+    ) {
         NavigationBarItem(
             selected = activeChild is Child.Timer,
             onClick = onTimerTabClick,

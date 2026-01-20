@@ -1,13 +1,10 @@
 package io.github.pndhd1.sleeptimer.ui.screen.about
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,11 +21,11 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.isPortrait
+import io.github.pndhd1.sleeptimer.utils.ui.InsetsBackground
 import io.github.pndhd1.sleeptimer.utils.ui.LocalNavigationMode
 import io.github.pndhd1.sleeptimer.utils.ui.NavigationMode
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults
-import io.github.pndhd1.sleeptimer.utils.ui.UIDefaults.SystemBarsBackgroundColor
-import io.github.pndhd1.sleeptimer.utils.ui.VisibilityCrossfade
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +68,7 @@ fun AboutContent(
             // Insets are handled by the content
             contentWindowInsets = WindowInsets(0),
         ) { innerPadding ->
-            val contentInsets = UIDefaults.defaultInsets
+            val contentInsets = WindowInsets.systemBarsForVisualComponents
                 .only(WindowInsetsSides.Horizontal)
                 .add(WindowInsets(left = 20.dp, right = 20.dp))
             Box(modifier = Modifier.fillMaxSize()) {
@@ -115,9 +112,6 @@ fun AboutContent(
                                     Text(
                                         text = stringResource(R.string.about_licenses_title),
                                         style = MaterialTheme.typography.titleMedium,
-                                        modifier = Modifier.windowInsetsPadding(
-                                            UIDefaults.defaultInsets.only(WindowInsetsSides.Horizontal)
-                                        )
                                     )
                                 }
                             }
@@ -127,31 +121,38 @@ fun AboutContent(
             }
         }
 
-        VisibilityCrossfade(
-            isVisible = listState.canScrollForward,
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                    .background(SystemBarsBackgroundColor),
-            )
+        // there is a little delay before canScrollForward is correctly set
+        // so we delay collecting it to avoid flickering
+        var bottomInsetVisible by remember {
+            mutableStateOf(true)
+        }
+        LaunchedEffect(listState) {
+            delay(200)
+            snapshotFlow { listState.canScrollForward }.collect {
+                bottomInsetVisible = it
+            }
         }
 
-        Box(
+        InsetsBackground(
+            visible = bottomInsetVisible,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .windowInsetsBottomHeight(WindowInsets.navigationBars),
+        )
+        InsetsBackground(
+            color = MaterialTheme.colorScheme.surfaceContainer,
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .fillMaxHeight()
                 .windowInsetsStartWidth(WindowInsets.navigationBars)
-                .background(MaterialTheme.colorScheme.surfaceContainer),
         )
-        Box(
+        InsetsBackground(
+            color = MaterialTheme.colorScheme.surfaceContainer,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
                 .windowInsetsEndWidth(WindowInsets.navigationBars)
-                .background(MaterialTheme.colorScheme.surfaceContainer),
         )
     }
 }
