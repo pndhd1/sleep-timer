@@ -67,51 +67,49 @@ fun BottomNavContent(
         // Window insets are handled manually inside the content
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            Box {
-                Row {
-                    if (!isPortrait) LeftNavigationRail(
-                        activeChild = stack.active.instance,
-                        onTimerTabClick = component::onTimerTabClick,
-                        onSettingsTabClick = component::onSettingsTabClick,
-                        modifier = Modifier.fillMaxHeight(),
-                    )
-                    NavContent(
-                        component = component,
-                        stack = stack,
-                        bannerState = bannerState,
-                        modifier = Modifier
-                            .weight(1f)
-                            .consumeWindowInsets(
-                                if (isPortrait) {
-                                    NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
-                                } else {
-                                    NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
-                                }
-                            ),
-                        timerBottomInsetCompensation = timerBottomInsetCompensation,
-                    )
-                }
-
-                BottomNavAdBanner(
-                    state = bannerState,
-                    modifier = if (!isPortrait) {
-                        val inset = UIDefaults.defaultInsets
-                        val symmetricPadding = with(density) {
-                            maxOf(
-                                inset.getLeft(density, layoutDirection),
-                                inset.getRight(density, layoutDirection)
-                            ).toDp()
-                        }
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(horizontal = symmetricPadding)
-                            .windowInsetsPadding(inset.only(WindowInsetsSides.Bottom))
-                    } else {
-                        Modifier.align(Alignment.BottomCenter)
-                    }
+        Box(modifier = Modifier.padding(innerPadding)) {
+            Row {
+                if (!isPortrait) LeftNavigationRail(
+                    activeChild = stack.active.instance,
+                    onTimerTabClick = component::onTimerTabClick,
+                    onSettingsTabClick = component::onSettingsTabClick,
+                    modifier = Modifier.fillMaxHeight(),
+                )
+                NavContent(
+                    component = component,
+                    stack = stack,
+                    bannerState = bannerState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .consumeWindowInsets(
+                            if (isPortrait) {
+                                NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
+                            } else {
+                                NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
+                            }
+                        ),
+                    timerBottomInsetCompensation = timerBottomInsetCompensation,
                 )
             }
+
+            BottomNavAdBanner(
+                state = bannerState,
+                modifier = if (!isPortrait) {
+                    val inset = UIDefaults.defaultInsets
+                    val symmetricPadding = with(density) {
+                        maxOf(
+                            inset.getLeft(density, layoutDirection),
+                            inset.getRight(density, layoutDirection)
+                        ).toDp()
+                    }
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = symmetricPadding)
+                        .windowInsetsPadding(inset.only(WindowInsetsSides.Bottom))
+                } else {
+                    Modifier.align(Alignment.BottomCenter)
+                }
+            )
         }
     }
 }
