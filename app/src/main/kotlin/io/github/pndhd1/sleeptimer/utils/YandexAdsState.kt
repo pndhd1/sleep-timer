@@ -22,5 +22,6 @@ object YandexAdsState {
 
         // Disable Ad debug error indicator
         MobileAds.enableDebugErrorIndicator(BuildConfig.DEBUG)
+        MobileAds.enableLogging(BuildConfig.DEBUG)
     }
 }
