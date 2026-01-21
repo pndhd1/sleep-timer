@@ -1,16 +1,21 @@
 package io.github.pndhd1.sleeptimer.ui.widgets
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.pndhd1.sleeptimer.R
@@ -21,6 +26,8 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+private fun Long.toDisplayString(): String = if (this == 0L) "" else toString()
+
 @Composable
 fun DurationEditDialog(
     currentDuration: Duration,
@@ -30,9 +37,12 @@ fun DurationEditDialog(
     maxDuration: Duration = Defaults.MaxTimerDuration,
     minDuration: Duration = Defaults.MinTimerDuration,
 ) {
-    var hours by rememberSaveable { mutableStateOf(currentDuration.inWholeHours.toString()) }
-    var minutes by rememberSaveable { mutableStateOf((currentDuration.inWholeMinutes % 60).toString()) }
-    var seconds by rememberSaveable { mutableStateOf((currentDuration.inWholeSeconds % 60).toString()) }
+    var hours by rememberSaveable { mutableStateOf(currentDuration.inWholeHours.toDisplayString()) }
+    var minutes by rememberSaveable { mutableStateOf((currentDuration.inWholeMinutes % 60).toDisplayString()) }
+    var seconds by rememberSaveable { mutableStateOf((currentDuration.inWholeSeconds % 60).toDisplayString()) }
+
+    val minutesFocusRequester = remember { FocusRequester() }
+    val secondsFocusRequester = remember { FocusRequester() }
 
     val parsedHours = hours.toIntOrNull() ?: 0
     val parsedMinutes = minutes.toIntOrNull() ?: 0
@@ -57,7 +67,13 @@ fun DurationEditDialog(
                             hours = newValue.filter { it.isDigit() }.take(2)
                         },
                         label = { Text(stringResource(R.string.label_hours_short), maxLines = 1) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { minutesFocusRequester.requestFocus() },
+                        ),
                         singleLine = true,
                         modifier = Modifier.width(72.dp),
                     )
@@ -75,9 +91,17 @@ fun DurationEditDialog(
                                 maxLines = 1
                             )
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { secondsFocusRequester.requestFocus() },
+                        ),
                         singleLine = true,
-                        modifier = Modifier.width(72.dp),
+                        modifier = Modifier
+                            .width(72.dp)
+                            .focusRequester(minutesFocusRequester),
                     )
 
                     Text(":", style = MaterialTheme.typography.headlineMedium)
@@ -93,9 +117,17 @@ fun DurationEditDialog(
                                 maxLines = 1
                             )
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { if (isValid) onConfirm(totalDuration) },
+                        ),
                         singleLine = true,
-                        modifier = Modifier.width(72.dp),
+                        modifier = Modifier
+                            .width(72.dp)
+                            .focusRequester(secondsFocusRequester),
                     )
                 }
 
