@@ -24,14 +24,14 @@ class NotificationChannelManagerImpl(
 
     private val notificationManager = context.getSystemService<NotificationManager>()
 
-    override val progressChannelId: String = TIMER_CHANNEL_ID
-    override val actionsChannelId: String = ACTIONS_CHANNEL_ID
+    override val progressChannelId: String = TimerChannelId
+    override val actionsChannelId: String = ActionsChannelId
 
     override fun createChannels() {
         notificationManager ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val timerChannel = NotificationChannel(
-                TIMER_CHANNEL_ID,
+                TimerChannelId,
                 context.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
@@ -40,7 +40,7 @@ class NotificationChannelManagerImpl(
             }
 
             val actionsChannel = NotificationChannel(
-                ACTIONS_CHANNEL_ID,
+                ActionsChannelId,
                 context.getString(R.string.high_priority_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
@@ -59,7 +59,7 @@ class NotificationChannelManagerImpl(
     override fun isActionsChannelEnabled(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true
         notificationManager ?: return false
-        val channel = notificationManager.getNotificationChannel(ACTIONS_CHANNEL_ID) ?: return false
+        val channel = notificationManager.getNotificationChannel(ActionsChannelId) ?: return false
         return channel.importance != NotificationManager.IMPORTANCE_NONE
     }
 
@@ -67,7 +67,7 @@ class NotificationChannelManagerImpl(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                putExtra(Settings.EXTRA_CHANNEL_ID, ACTIONS_CHANNEL_ID)
+                putExtra(Settings.EXTRA_CHANNEL_ID, ActionsChannelId)
             }
         } else {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -77,7 +77,7 @@ class NotificationChannelManagerImpl(
     }
 
     companion object {
-        private const val TIMER_CHANNEL_ID = "timer_channel"
-        private const val ACTIONS_CHANNEL_ID = "timer_actions_channel"
+        private const val TimerChannelId = "timer_channel"
+        private const val ActionsChannelId = "timer_actions_channel"
     }
 }

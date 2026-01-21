@@ -99,6 +99,20 @@ Icon(
 
 When adding new icons, create XML vector drawable in `res/drawable/ic_*.xml`.
 
+## Code Style
+
+### Constants
+
+Use **PascalCase** for private constants and top-level vals:
+
+```kotlin
+private const val PresetAnimationDurationMillis = 200
+private const val TargetVolumeSliderMax = 100
+
+private val TimerSliderMin = 5.seconds
+private inline val DefaultDurationSliderMax get() = 90.minutes
+```
+
 ## Key Libraries
 
 - **Decompose** - Architecture and navigation

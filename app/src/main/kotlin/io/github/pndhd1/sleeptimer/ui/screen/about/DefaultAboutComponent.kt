@@ -3,7 +3,7 @@ package io.github.pndhd1.sleeptimer.ui.screen.about
 import com.arkivanov.decompose.ComponentContext
 import io.github.pndhd1.sleeptimer.BuildConfig
 
-private const val GITHUB_URL = "https://github.com/pndhd1/sleep-timer"
+private const val GithubUrl = "https://github.com/pndhd1/sleep-timer"
 
 class DefaultAboutComponent(
     componentContext: ComponentContext,
@@ -12,7 +12,7 @@ class DefaultAboutComponent(
 
     override val state = AboutState(
         appVersion = BuildConfig.VERSION_NAME,
-        githubUrl = GITHUB_URL,
+        githubUrl = GithubUrl,
     )
 
     override fun onBackClick() {

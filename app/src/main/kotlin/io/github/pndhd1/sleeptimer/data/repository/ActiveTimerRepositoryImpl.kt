@@ -26,8 +26,8 @@ import kotlin.time.Instant
 
 private val TargetTimeKey = longPreferencesKey("target_time_epoch_seconds")
 private val TotalDurationKey = longPreferencesKey("total_duration_seconds")
-private const val ALARM_REQUEST_CODE = 1001
-private const val FADE_ALARM_REQUEST_CODE = 1002
+private const val AlarmRequestCode = 1001
+private const val FadeAlarmRequestCode = 1002
 
 @Inject
 @SingleIn(AppScope::class)
@@ -90,7 +90,7 @@ class ActiveTimerRepositoryImpl(
     }
 
     private fun scheduleAlarm(targetTime: Instant) {
-        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, ALARM_REQUEST_CODE)
+        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, AlarmRequestCode)
         val triggerAtMillis = targetTime.toEpochMilliseconds()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -111,7 +111,7 @@ class ActiveTimerRepositoryImpl(
     }
 
     private fun cancelAlarm() {
-        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, ALARM_REQUEST_CODE)
+        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, AlarmRequestCode)
         alarmManager?.cancel(pendingIntent)
     }
 
@@ -151,7 +151,7 @@ class ActiveTimerRepositoryImpl(
     ) {
         val pendingIntent = AudioFadeService.createStartPendingIntent(
             context,
-            FADE_ALARM_REQUEST_CODE,
+            FadeAlarmRequestCode,
             fadeDuration.inWholeSeconds,
             targetVolumePercent
         )
@@ -177,7 +177,7 @@ class ActiveTimerRepositoryImpl(
 
     private fun cancelFadeAlarm() {
         val pendingIntent =
-            AudioFadeService.createCancelPendingIntent(context, FADE_ALARM_REQUEST_CODE)
+            AudioFadeService.createCancelPendingIntent(context, FadeAlarmRequestCode)
         alarmManager?.cancel(pendingIntent)
     }
 }

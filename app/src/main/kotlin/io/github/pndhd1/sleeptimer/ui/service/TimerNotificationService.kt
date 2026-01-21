@@ -74,9 +74,9 @@ class TimerNotificationService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
-            ACTION_START -> startNotificationUpdateJob()
-            ACTION_STOP -> stopTimer()
-            ACTION_EXTEND -> extendTimer()
+            ActionStart -> startNotificationUpdateJob()
+            ActionStop -> stopTimer()
+            ActionExtend -> extendTimer()
         }
         return START_STICKY
     }
@@ -84,7 +84,7 @@ class TimerNotificationService : LifecycleService() {
     private fun startNotificationUpdateJob() {
         ServiceCompat.startForeground(
             this,
-            NOTIFICATION_ID,
+            NotificationId,
             // Initial notification with no data; we need to foreground service ASAP
             createNotification(null),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -128,7 +128,7 @@ class TimerNotificationService : LifecycleService() {
     }
 
     private fun updateNotification(data: ActiveTimerData?) {
-        notificationManager?.notify(NOTIFICATION_ID, createNotification(data))
+        notificationManager?.notify(NotificationId, createNotification(data))
     }
 
     private suspend fun updateNotificationIfRunning() {
@@ -141,22 +141,22 @@ class TimerNotificationService : LifecycleService() {
     private fun createNotification(timerData: ActiveTimerData?): Notification {
         val contentIntent = PendingIntent.getActivity(
             this,
-            REQUEST_CODE_CONTENT,
+            RequestCodeContent,
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val stopIntent = PendingIntent.getService(
             this,
-            REQUEST_CODE_STOP,
-            Intent(this, TimerNotificationService::class.java).apply { action = ACTION_STOP },
+            RequestCodeStop,
+            Intent(this, TimerNotificationService::class.java).apply { action = ActionStop },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val extendIntent = PendingIntent.getService(
             this,
-            REQUEST_CODE_EXTEND,
-            Intent(this, TimerNotificationService::class.java).apply { action = ACTION_EXTEND },
+            RequestCodeExtend,
+            Intent(this, TimerNotificationService::class.java).apply { action = ActionExtend },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -207,17 +207,17 @@ class TimerNotificationService : LifecycleService() {
     }
 
     companion object {
-        private const val NOTIFICATION_ID = 1
-        private const val ACTION_START = "io.github.pndhd1.sleeptimer.ACTION_START_TIMER_SERVICE"
-        private const val ACTION_STOP = "io.github.pndhd1.sleeptimer.ACTION_STOP_TIMER_SERVICE"
-        private const val ACTION_EXTEND = "io.github.pndhd1.sleeptimer.ACTION_EXTEND_TIMER"
-        private const val REQUEST_CODE_CONTENT = 99
-        private const val REQUEST_CODE_STOP = 100
-        private const val REQUEST_CODE_EXTEND = 101
+        private const val NotificationId = 1
+        private const val ActionStart = "io.github.pndhd1.sleeptimer.ActionStart_TIMER_SERVICE"
+        private const val ActionStop = "io.github.pndhd1.sleeptimer.ActionStop_TIMER_SERVICE"
+        private const val ActionExtend = "io.github.pndhd1.sleeptimer.ActionExtend_TIMER"
+        private const val RequestCodeContent = 99
+        private const val RequestCodeStop = 100
+        private const val RequestCodeExtend = 101
 
         fun start(context: Context) {
             val intent = Intent(context, TimerNotificationService::class.java).apply {
-                action = ACTION_START
+                action = ActionStart
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -228,7 +228,7 @@ class TimerNotificationService : LifecycleService() {
 
         fun stop(context: Context) {
             val intent = Intent(context, TimerNotificationService::class.java).apply {
-                action = ACTION_STOP
+                action = ActionStop
             }
             context.startService(intent)
         }

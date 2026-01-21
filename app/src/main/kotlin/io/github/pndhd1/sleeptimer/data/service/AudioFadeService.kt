@@ -42,13 +42,13 @@ class AudioFadeService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        if (intent?.action == ACTION_START_FADE) {
-            val fadeDurationSeconds = intent.getLongExtra(EXTRA_FADE_DURATION_SECONDS, -1)
+        if (intent?.action == ActionStartFade) {
+            val fadeDurationSeconds = intent.getLongExtra(ExtraFadeDurationSeconds, -1)
             if (fadeDurationSeconds < 0L) {
                 stopSelf()
                 return START_NOT_STICKY
             }
-            val targetVolumePercent = intent.getIntExtra(EXTRA_TARGET_VOLUME_PERCENT, 0)
+            val targetVolumePercent = intent.getIntExtra(ExtraTargetVolumePercent, 0)
             startForegroundAndFade(fadeDurationSeconds, targetVolumePercent)
         }
         return START_NOT_STICKY
@@ -57,7 +57,7 @@ class AudioFadeService : LifecycleService() {
     private fun startForegroundAndFade(durationSeconds: Long, targetVolumePercent: Int) {
         ServiceCompat.startForeground(
             this,
-            NOTIFICATION_ID,
+            NotificationId,
             createNotification(),
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
@@ -99,7 +99,7 @@ class AudioFadeService : LifecycleService() {
                     lerp(originalVolume.toFloat(), targetVolume.toFloat(), progress).toInt()
 
                 am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
-                delay(FADE_STEP_INTERVAL_MS)
+                delay(FadeStepIntervalMs)
             }
 
             am.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
@@ -133,17 +133,17 @@ class AudioFadeService : LifecycleService() {
     }
 
     companion object {
-        private const val NOTIFICATION_ID = 2
-        private const val ACTION_START_FADE = "io.github.pndhd1.sleeptimer.ACTION_START_FADE"
-        private const val EXTRA_FADE_DURATION_SECONDS = "fade_duration_seconds"
-        private const val EXTRA_TARGET_VOLUME_PERCENT = "target_volume_percent"
-        private const val FADE_STEP_INTERVAL_MS = 100L
+        private const val NotificationId = 2
+        private const val ActionStartFade = "io.github.pndhd1.sleeptimer.ActionStartFade"
+        private const val ExtraFadeDurationSeconds = "fade_duration_seconds"
+        private const val ExtraTargetVolumePercent = "target_volume_percent"
+        private const val FadeStepIntervalMs = 100L
 
         fun start(context: Context, fadeDurationSeconds: Long, targetVolumePercent: Int = 0) {
             val intent = Intent(context, AudioFadeService::class.java).apply {
-                action = ACTION_START_FADE
-                putExtra(EXTRA_FADE_DURATION_SECONDS, fadeDurationSeconds)
-                putExtra(EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
+                action = ActionStartFade
+                putExtra(ExtraFadeDurationSeconds, fadeDurationSeconds)
+                putExtra(ExtraTargetVolumePercent, targetVolumePercent)
             }
             ContextCompat.startForegroundService(context, intent)
         }
@@ -160,9 +160,9 @@ class AudioFadeService : LifecycleService() {
             targetVolumePercent: Int,
         ): PendingIntent {
             val intent = Intent(context, AudioFadeService::class.java).apply {
-                action = ACTION_START_FADE
-                putExtra(EXTRA_FADE_DURATION_SECONDS, fadeDurationSeconds)
-                putExtra(EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
+                action = ActionStartFade
+                putExtra(ExtraFadeDurationSeconds, fadeDurationSeconds)
+                putExtra(ExtraTargetVolumePercent, targetVolumePercent)
             }
             val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -174,7 +174,7 @@ class AudioFadeService : LifecycleService() {
 
         fun createCancelPendingIntent(context: Context, requestCode: Int): PendingIntent {
             val intent = Intent(context, AudioFadeService::class.java).apply {
-                action = ACTION_START_FADE
+                action = ActionStartFade
             }
             val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

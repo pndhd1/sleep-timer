@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.*
 private val NotificationPermissionRequestedKey =
     booleanPreferencesKey("notification_permission_requested")
 
-private const val REQUEST_CODE_GO_HOME_NOTIFICATION = 2001
+private const val RequestCodeGoHomeNotification = 2001
 
 @Inject
 @SingleIn(AppScope::class)
@@ -92,7 +92,7 @@ class SystemRepositoryImpl(
 
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context,
-            REQUEST_CODE_GO_HOME_NOTIFICATION,
+            RequestCodeGoHomeNotification,
             GoHomeActivity.getIntent(context),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
