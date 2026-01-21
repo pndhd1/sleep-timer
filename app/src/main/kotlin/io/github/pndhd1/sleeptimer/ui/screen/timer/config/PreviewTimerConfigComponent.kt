@@ -8,9 +8,7 @@ class PreviewTimerConfigComponent(
     initialState: TimerConfigState,
 ) : TimerConfigComponent {
     override val state: StateFlow<TimerConfigState> = MutableStateFlow(initialState)
-    override fun onHoursChanged(hours: Long) = Unit
-    override fun onMinutesChanged(minutes: Long) = Unit
-    override fun onSecondsChanged(seconds: Long) = Unit
+    override fun onDurationChanged(duration: Duration) = Unit
     override fun onPresetSelected(duration: Duration) = Unit
     override fun onStartClick() = Unit
 }

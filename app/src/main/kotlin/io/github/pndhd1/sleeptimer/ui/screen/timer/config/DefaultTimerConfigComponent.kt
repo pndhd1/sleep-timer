@@ -4,9 +4,6 @@ import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.flow.*
 import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 class DefaultTimerConfigComponent(
@@ -24,28 +21,8 @@ class DefaultTimerConfigComponent(
     )
     override val state: StateFlow<TimerConfigState> = _state.asStateFlow()
 
-    override fun onHoursChanged(hours: Long) {
-        _state.update { state ->
-            val newDuration =
-                hours.coerceIn(0, 23).hours + state.minutes.minutes + state.seconds.seconds
-            state.copy(duration = newDuration)
-        }
-    }
-
-    override fun onMinutesChanged(minutes: Long) {
-        _state.update { state ->
-            val newDuration =
-                state.hours.hours + minutes.coerceIn(0, 59).minutes + state.seconds.seconds
-            state.copy(duration = newDuration)
-        }
-    }
-
-    override fun onSecondsChanged(seconds: Long) {
-        _state.update { state ->
-            val newDuration =
-                state.hours.hours + state.minutes.minutes + seconds.coerceIn(0, 59).seconds
-            state.copy(duration = newDuration)
-        }
+    override fun onDurationChanged(duration: Duration) {
+        _state.update { it.copy(duration = duration) }
     }
 
     override fun onPresetSelected(duration: Duration) {

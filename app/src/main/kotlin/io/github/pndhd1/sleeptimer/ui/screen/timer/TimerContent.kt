@@ -48,7 +48,6 @@ fun TimerContent(
                     WindowInsets.systemBarsForVisualComponents
                         .union(WindowInsets.appBottomNavigationBar)
                         .add(WindowInsets.adBannerIgnoringVisibility)
-                        .union(WindowInsets.ime)
                 ),
         ) {
             Crossfade(

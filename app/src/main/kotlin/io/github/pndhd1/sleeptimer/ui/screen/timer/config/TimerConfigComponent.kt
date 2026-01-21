@@ -8,9 +8,7 @@ interface TimerConfigComponent {
 
     val state: StateFlow<TimerConfigState>
 
-    fun onHoursChanged(hours: Long)
-    fun onMinutesChanged(minutes: Long)
-    fun onSecondsChanged(seconds: Long)
+    fun onDurationChanged(duration: Duration)
     fun onPresetSelected(duration: Duration)
     fun onStartClick()
 }
@@ -20,8 +18,5 @@ data class TimerConfigState(
     val duration: Duration,
     val presets: List<Duration>,
 ) {
-    val hours = duration.inWholeHours
-    val minutes = duration.inWholeMinutes % 60
-    val seconds = duration.inWholeSeconds % 60
     val hasTime: Boolean get() = duration >= Defaults.MinTimerDuration && duration <= Defaults.MaxTimerDuration
 }

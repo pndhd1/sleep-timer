@@ -13,7 +13,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -33,35 +31,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
-import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
-import io.github.pndhd1.sleeptimer.ui.widgets.LoadingLayout
-import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
-import io.github.pndhd1.sleeptimer.ui.widgets.PresetChip
+import io.github.pndhd1.sleeptimer.ui.widgets.*
 import io.github.pndhd1.sleeptimer.utils.Defaults
-import io.github.pndhd1.sleeptimer.utils.Formatter
 import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
 import io.github.pndhd1.sleeptimer.utils.ui.*
 import kotlinx.coroutines.delay
 import kotlin.math.round
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private inline val DefaultDurationSliderMin get() = 0.minutes
+private inline val DefaultDurationSliderMin get() = 5.seconds
 private inline val DefaultDurationSliderMax get() = 90.minutes
 private inline val DefaultDurationSliderStep get() = 1.minutes
 
-private inline val ExtendDurationSliderMin get() = 0.minutes
+private inline val ExtendDurationSliderMin get() = Duration.ZERO
 private inline val ExtendDurationSliderMax get() = 40.minutes
 private inline val ExtendDurationSliderStep get() = 1.minutes
 
-private inline val FadeStartBeforeSliderMin get() = 0.seconds
+private inline val FadeStartBeforeSliderMin get() = Duration.ZERO
 private inline val FadeStartBeforeSliderMax get() = 1.minutes
 private inline val FadeStartBeforeSliderStep get() = 1.seconds
 
-private inline val FadeDurationSliderMin get() = 0.seconds
+private inline val FadeDurationSliderMin get() = Duration.ZERO
 private inline val FadeDurationSliderMax get() = 1.minutes
 private inline val FadeDurationSliderStep get() = 1.seconds
 
@@ -742,208 +735,6 @@ private fun SettingsCardContent(
             content()
         }
     }
-}
-
-@Composable
-private fun DurationSlider(
-    duration: Duration,
-    onDurationChanged: (Duration) -> Unit,
-    minDuration: Duration,
-    maxDuration: Duration,
-    modifier: Modifier = Modifier,
-    step: Duration? = null,
-    dialogMaxDuration: Duration = Defaults.MaxTimerDuration,
-    dialogMinDuration: Duration = minDuration,
-) {
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-
-    val minSeconds = minDuration.inWholeSeconds.toFloat()
-    val maxSeconds = maxDuration.inWholeSeconds.toFloat()
-
-    var sliderValue by remember(duration) {
-        mutableFloatStateOf(duration.inWholeSeconds.toFloat())
-    }
-
-    // Show slider value during drag, otherwise show actual duration
-    val sliderSeconds = sliderValue.toInt()
-    val durationSeconds = duration.inWholeSeconds.toInt()
-    val displayDuration = if (sliderSeconds != durationSeconds) {
-        sliderSeconds.seconds
-    } else {
-        duration
-    }
-
-    val steps = step?.let {
-        val range = (maxSeconds - minSeconds).toInt()
-        val stepSeconds = it.inWholeSeconds.toInt()
-        if (stepSeconds > 0) (range / stepSeconds - 1).coerceAtLeast(0) else 0
-    } ?: 0
-
-    Column(modifier = modifier) {
-        OutlinedButton(
-            onClick = { showDialog = true },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        ) {
-            Text(
-                text = Formatter.formatTime(displayDuration),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Slider(
-            value = sliderValue.coerceIn(minSeconds, maxSeconds),
-            onValueChange = { sliderValue = round(it) },
-            onValueChangeFinished = { onDurationChanged(sliderValue.toInt().seconds) },
-            valueRange = minSeconds..maxSeconds,
-            steps = steps,
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = Formatter.formatTimeWithUnits(minDuration),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = Formatter.formatTimeWithUnits(maxDuration),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-
-    if (showDialog) {
-        DurationEditDialog(
-            currentDuration = duration,
-            maxDuration = dialogMaxDuration,
-            minDuration = dialogMinDuration,
-            onConfirm = { newDuration ->
-                onDurationChanged(newDuration)
-                showDialog = false
-            },
-            onDismiss = { showDialog = false },
-        )
-    }
-}
-
-@Composable
-private fun DurationEditDialog(
-    currentDuration: Duration,
-    onConfirm: (Duration) -> Unit,
-    onDismiss: () -> Unit,
-    title: String = stringResource(R.string.settings_edit_duration_title),
-    maxDuration: Duration = Defaults.MaxTimerDuration,
-    minDuration: Duration = Defaults.MinTimerDuration,
-) {
-    var hours by rememberSaveable { mutableStateOf(currentDuration.inWholeHours.toString()) }
-    var minutes by rememberSaveable { mutableStateOf((currentDuration.inWholeMinutes % 60).toString()) }
-    var seconds by rememberSaveable { mutableStateOf((currentDuration.inWholeSeconds % 60).toString()) }
-
-    val parsedHours = hours.toIntOrNull() ?: 0
-    val parsedMinutes = minutes.toIntOrNull() ?: 0
-    val parsedSeconds = seconds.toIntOrNull() ?: 0
-    val totalDuration = parsedHours.hours + parsedMinutes.minutes + parsedSeconds.seconds
-    val isTooShort = totalDuration < minDuration
-    val isTooLong = totalDuration > maxDuration
-    val isValid = !isTooShort && !isTooLong
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    OutlinedTextField(
-                        value = hours,
-                        onValueChange = { newValue ->
-                            hours = newValue.filter { it.isDigit() }.take(2)
-                        },
-                        label = { Text(stringResource(R.string.label_hours_short), maxLines = 1) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.width(72.dp),
-                    )
-
-                    Text(":", style = MaterialTheme.typography.headlineMedium)
-
-                    OutlinedTextField(
-                        value = minutes,
-                        onValueChange = { newValue ->
-                            minutes = newValue.filter { it.isDigit() }.take(2)
-                        },
-                        label = {
-                            Text(
-                                stringResource(R.string.label_minutes_short),
-                                maxLines = 1
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.width(72.dp),
-                    )
-
-                    Text(":", style = MaterialTheme.typography.headlineMedium)
-
-                    OutlinedTextField(
-                        value = seconds,
-                        onValueChange = { newValue ->
-                            seconds = newValue.filter { it.isDigit() }.take(2)
-                        },
-                        label = {
-                            Text(
-                                stringResource(R.string.label_seconds_short),
-                                maxLines = 1
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.width(72.dp),
-                    )
-                }
-
-                if (!isValid) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = when {
-                            isTooShort -> stringResource(
-                                R.string.settings_min_duration_error,
-                                Formatter.formatTime(minDuration),
-                            )
-
-                            else -> stringResource(
-                                R.string.settings_max_duration_error,
-                                Formatter.formatTime(maxDuration),
-                            )
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(totalDuration) },
-                enabled = isValid,
-            ) {
-                Text(stringResource(R.string.settings_apply))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.settings_cancel))
-            }
-        },
-    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
