@@ -79,7 +79,7 @@
 
     <!-- Settings: Presets -->
     <string name="settings_presets_title">Быстрые пресеты</string>
-    <string name="settings_presets_description">Кнопки для быстрой установки длительности таймера</string>
+    <string name="settings_presets_description">Кнопки для быстрой установки длительности в минутах (макс. %d)</string>
     <string name="settings_add_preset">Добавить пресет</string>
     <string name="settings_add_preset_title">Добавить пресет</string>
     <string name="settings_add_preset_description">Введите длительность в минутах</string>

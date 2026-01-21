@@ -38,6 +38,7 @@ sealed interface SettingsState {
         val defaultDuration: Duration,
         val extendDuration: Duration,
         val presets: List<Duration>,
+        val maxPresets: Int,
         val showNotification: Boolean,
         val hasNotificationPermission: Boolean,
         val fadeOut: FadeOutSettings,
@@ -45,5 +46,7 @@ sealed interface SettingsState {
         val hasFullScreenIntentPermission: Boolean,
         val isActionsChannelEnabled: Boolean,
         val stopMediaOnExpire: Boolean,
-    ) : SettingsState
+    ) : SettingsState {
+        val canAddPreset: Boolean get() = presets.size < maxPresets
+    }
 }

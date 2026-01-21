@@ -171,7 +171,7 @@ class TimerNotificationService : LifecycleService() {
             val text = if (remaining.isNegative()) {
                 ""
             } else {
-                Formatter.formatTime(Locale.getDefault(), remaining)
+                Formatter.formatTimeWithDots(Locale.getDefault(), remaining)
             }
             text to progressPercent
         } else {

@@ -4,12 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -137,12 +133,12 @@ fun DurationEditDialog(
                         text = when {
                             isTooShort -> stringResource(
                                 R.string.settings_min_duration_error,
-                                Formatter.formatTime(minDuration),
+                                Formatter.formatTimeWithDots(minDuration),
                             )
 
                             else -> stringResource(
                                 R.string.settings_max_duration_error,
-                                Formatter.formatTime(maxDuration),
+                                Formatter.formatTimeWithDots(maxDuration),
                             )
                         },
                         style = MaterialTheme.typography.bodySmall,

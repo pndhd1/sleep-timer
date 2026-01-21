@@ -18,7 +18,7 @@ fun PresetChip(
     modifier: Modifier = Modifier,
     showRemoveIcon: Boolean = false,
 ) {
-    val label = Formatter.formatTimeWithUnits(duration)
+    val label = Formatter.formatShortTimeWithUnits(duration)
 
     if (showRemoveIcon) {
         InputChip(

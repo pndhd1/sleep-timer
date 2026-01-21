@@ -49,7 +49,7 @@ fun ActiveTimerContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = Formatter.formatTime(remainingTime),
+            text = Formatter.formatTimeWithDots(remainingTime),
             style = MaterialTheme.typography.displayLarge,
         )
 

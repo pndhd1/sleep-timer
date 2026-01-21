@@ -9,7 +9,7 @@ import kotlin.time.Duration
 
 object Formatter {
 
-    fun formatTime(locale: Locale, value: Duration): String = "%02d:%02d:%02d".format(
+    fun formatTimeWithDots(locale: Locale, value: Duration): String = "%02d:%02d:%02d".format(
         locale = locale,
         value.inWholeHours,
         value.inWholeMinutes % 60,
@@ -17,10 +17,10 @@ object Formatter {
     )
 
     @Composable
-    fun formatTime(value: Duration): String {
+    fun formatTimeWithDots(value: Duration): String {
         val configuration = LocalConfiguration.current
         val locale = configuration.locales[0]
-        return formatTime(locale, value)
+        return formatTimeWithDots(locale, value)
     }
 
     @Composable
@@ -35,6 +35,26 @@ object Formatter {
                 if (isNotEmpty()) append(" ")
                 append(stringResource(R.string.preset_minutes, minutes.toInt()))
             }
+            if (seconds > 0) {
+                if (isNotEmpty()) append(" ")
+                append(stringResource(R.string.preset_seconds, seconds.toInt()))
+            }
+            if (isEmpty()) append(stringResource(R.string.preset_seconds, 0))
+        }
+    }
+
+    @Composable
+    fun formatShortTimeWithUnits(duration: Duration): String {
+        val totalMinutes = duration.inWholeMinutes
+        val seconds = duration.inWholeSeconds % 60
+
+        return buildString {
+            if (totalMinutes > 0) append(
+                stringResource(
+                    R.string.preset_minutes,
+                    totalMinutes.toInt()
+                )
+            )
             if (seconds > 0) {
                 if (isNotEmpty()) append(" ")
                 append(stringResource(R.string.preset_seconds, seconds.toInt()))

@@ -27,6 +27,8 @@ object Defaults {
     const val DefaultGoHomeOnExpire: Boolean = false
     const val DefaultStopMediaOnExpire: Boolean = true
 
+    const val MaxPresets: Int = 6
+
     inline val MinTimerDuration: Duration get() = 5.seconds
     val MaxTimerDuration: Duration = 23.hours + 59.minutes + 59.seconds
 }

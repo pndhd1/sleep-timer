@@ -79,7 +79,7 @@
 
     <!-- Settings: Presets -->
     <string name="settings_presets_title">Quick Presets</string>
-    <string name="settings_presets_description">Shortcuts for quickly setting timer duration</string>
+    <string name="settings_presets_description">Shortcuts for quickly setting timer duration in minutes (max %d)</string>
     <string name="settings_add_preset">Add preset</string>
     <string name="settings_add_preset_title">Add Preset</string>
     <string name="settings_add_preset_description">Enter duration in minutes</string>

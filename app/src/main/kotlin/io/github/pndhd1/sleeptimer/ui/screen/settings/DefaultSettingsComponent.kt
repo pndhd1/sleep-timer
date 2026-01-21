@@ -9,6 +9,7 @@ import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
+import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.componentScope
 import io.github.pndhd1.sleeptimer.utils.exceptions.FatalException
 import io.github.pndhd1.sleeptimer.utils.runCatchingSuspend
@@ -49,6 +50,7 @@ class DefaultSettingsComponent(
                 defaultDuration = settings.defaultDuration,
                 extendDuration = settings.extendDuration,
                 presets = settings.presets,
+                maxPresets = Defaults.MaxPresets,
                 showNotification = settings.showNotification,
                 hasNotificationPermission = systemRepository.canSendNotifications.value,
                 fadeOut = settings.fadeOut,
@@ -77,6 +79,7 @@ class DefaultSettingsComponent(
     override fun onPresetAdded(duration: Duration) {
         val currentState = _state.value as? SettingsState.Loaded ?: return
         if (duration in currentState.presets) return
+        if (currentState.presets.size >= Defaults.MaxPresets) return
 
         val newPresets = (currentState.presets + duration).sortedBy { it.inWholeSeconds }
         updateLoadedState { it.copy(presets = newPresets) }

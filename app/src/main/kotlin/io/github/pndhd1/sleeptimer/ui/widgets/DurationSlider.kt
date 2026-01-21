@@ -66,7 +66,7 @@ fun DurationSlider(
             modifier = Modifier.align(Alignment.CenterHorizontally),
         ) {
             Text(
-                text = Formatter.formatTime(displayDuration),
+                text = Formatter.formatTimeWithDots(displayDuration),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
