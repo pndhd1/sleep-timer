@@ -68,6 +68,7 @@ fun BottomNavContent(
         }
 
         CompositionLocalProvider(
+            LocalContentColor provides MaterialTheme.colorScheme.onBackground,
             LocalBottomNavigationBarInsets provides bottomNavInsets,
             LocalAdBannerInsets provides adBannerInsets,
             LocalAdBannerInsetsIgnoringVisibility provides WindowInsets(bottom = adSize.height.dp)
