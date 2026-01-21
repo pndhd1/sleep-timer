@@ -87,12 +87,10 @@ fun BottomNavContent(
                     stack = stack,
                     modifier = Modifier
                         .weight(1f)
-                        .let {
-                            if (isPortrait) it.consumeWindowInsets(
+                        .applyIf(!isPortrait) {
+                            Modifier.consumeWindowInsets(
                                 NavigationRailDefaults.windowInsets.only(WindowInsetsSides.Start)
-                            ) else {
-                                it
-                            }
+                            )
                         },
                 )
             }
