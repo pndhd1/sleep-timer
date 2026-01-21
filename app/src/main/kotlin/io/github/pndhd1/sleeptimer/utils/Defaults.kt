@@ -20,11 +20,11 @@ object Defaults {
     const val DefaultShowNotification: Boolean = true
 
     const val DefaultFadeOutEnabled: Boolean = true
-    inline val DefaultFadeStartBefore: Duration get() = 15.seconds
-    inline val DefaultFadeOutDuration: Duration get() = 15.seconds
+    inline val DefaultFadeStartBefore: Duration get() = 30.seconds
+    inline val DefaultFadeOutDuration: Duration get() = 30.seconds
     const val DefaultFadeTargetVolumePercent: Int = 0
 
-    const val DefaultGoHomeOnExpire: Boolean = true
+    const val DefaultGoHomeOnExpire: Boolean = false
     const val DefaultStopMediaOnExpire: Boolean = true
 
     inline val MinTimerDuration: Duration get() = 5.seconds

@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.util.Locale
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -192,11 +193,15 @@ class TimerNotificationService : LifecycleService() {
                 getString(R.string.notification_action_stop),
                 stopIntent
             )
-            .addAction(
-                0,
-                getString(R.string.notification_action_extend, extendMinutes),
-                extendIntent
-            )
+            .apply {
+                if (cachedExtendDuration > Duration.ZERO) {
+                    addAction(
+                        0,
+                        getString(R.string.notification_action_extend, extendMinutes),
+                        extendIntent
+                    )
+                }
+            }
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }

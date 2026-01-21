@@ -1,9 +1,7 @@
 package io.github.pndhd1.sleeptimer.data.repository
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.core.content.getSystemService
 import androidx.datastore.core.DataStore
@@ -92,16 +90,7 @@ class ActiveTimerRepositoryImpl(
     }
 
     private fun scheduleAlarm(targetTime: Instant) {
-        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
-            action = TimerAlarmReceiver.ACTION_TIMER_EXPIRED
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            ALARM_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
+        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, ALARM_REQUEST_CODE)
         val triggerAtMillis = targetTime.toEpochMilliseconds()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -122,15 +111,7 @@ class ActiveTimerRepositoryImpl(
     }
 
     private fun cancelAlarm() {
-        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
-            action = TimerAlarmReceiver.ACTION_TIMER_EXPIRED
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            ALARM_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent = TimerAlarmReceiver.getPendingIntent(context, ALARM_REQUEST_CODE)
         alarmManager?.cancel(pendingIntent)
     }
 
@@ -149,32 +130,30 @@ class ActiveTimerRepositoryImpl(
         val actualFadeDuration = minOf(fadeOutSettings.duration, timeFromFadeToEnd)
 
         if (startImmediately) {
-            triggerFadeBroadcast(actualFadeDuration, fadeOutSettings.targetVolumePercent)
+            startFadeService(actualFadeDuration, fadeOutSettings.targetVolumePercent)
         } else {
-            scheduleFadeAlarm(fadeStartTime, actualFadeDuration, fadeOutSettings.targetVolumePercent)
+            scheduleFadeAlarm(
+                fadeStartTime,
+                actualFadeDuration,
+                fadeOutSettings.targetVolumePercent
+            )
         }
     }
 
-    private fun triggerFadeBroadcast(fadeDuration: Duration, targetVolumePercent: Int) {
-        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
-            action = TimerAlarmReceiver.ACTION_FADE_START
-            putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
-            putExtra(TimerAlarmReceiver.EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
-        }
-        context.sendBroadcast(intent)
+    private fun startFadeService(fadeDuration: Duration, targetVolumePercent: Int) {
+        AudioFadeService.start(context, fadeDuration.inWholeSeconds, targetVolumePercent)
     }
 
-    private fun scheduleFadeAlarm(fadeStartTime: Instant, fadeDuration: Duration, targetVolumePercent: Int) {
-        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
-            action = TimerAlarmReceiver.ACTION_FADE_START
-            putExtra(TimerAlarmReceiver.EXTRA_FADE_DURATION_SECONDS, fadeDuration.inWholeSeconds)
-            putExtra(TimerAlarmReceiver.EXTRA_TARGET_VOLUME_PERCENT, targetVolumePercent)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
+    private fun scheduleFadeAlarm(
+        fadeStartTime: Instant,
+        fadeDuration: Duration,
+        targetVolumePercent: Int
+    ) {
+        val pendingIntent = AudioFadeService.createStartPendingIntent(
             context,
             FADE_ALARM_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            fadeDuration.inWholeSeconds,
+            targetVolumePercent
         )
 
         val triggerAtMillis = fadeStartTime.toEpochMilliseconds()
@@ -197,15 +176,8 @@ class ActiveTimerRepositoryImpl(
     }
 
     private fun cancelFadeAlarm() {
-        val intent = Intent(context, TimerAlarmReceiver::class.java).apply {
-            action = TimerAlarmReceiver.ACTION_FADE_START
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            FADE_ALARM_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            AudioFadeService.createCancelPendingIntent(context, FADE_ALARM_REQUEST_CODE)
         alarmManager?.cancel(pendingIntent)
     }
 }

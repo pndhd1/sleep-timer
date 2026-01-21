@@ -49,19 +49,19 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private inline val DefaultDurationSliderMin get() = 5.minutes
-private inline val DefaultDurationSliderMax get() = 120.minutes
+private inline val DefaultDurationSliderMin get() = 0.minutes
+private inline val DefaultDurationSliderMax get() = 90.minutes
 private inline val DefaultDurationSliderStep get() = 1.minutes
 
-private inline val ExtendDurationSliderMin get() = 1.minutes
-private inline val ExtendDurationSliderMax get() = 30.minutes
-private inline val ExtendDurationSliderStep get() = 30.seconds
+private inline val ExtendDurationSliderMin get() = 0.minutes
+private inline val ExtendDurationSliderMax get() = 40.minutes
+private inline val ExtendDurationSliderStep get() = 1.minutes
 
-private inline val FadeStartBeforeSliderMin get() = 15.seconds
-private inline val FadeStartBeforeSliderMax get() = 5.minutes
-private inline val FadeStartBeforeSliderStep get() = 15.seconds
+private inline val FadeStartBeforeSliderMin get() = 0.seconds
+private inline val FadeStartBeforeSliderMax get() = 1.minutes
+private inline val FadeStartBeforeSliderStep get() = 1.seconds
 
-private inline val FadeDurationSliderMin get() = 1.seconds
+private inline val FadeDurationSliderMin get() = 0.seconds
 private inline val FadeDurationSliderMax get() = 1.minutes
 private inline val FadeDurationSliderStep get() = 1.seconds
 
@@ -560,7 +560,6 @@ private fun FadeOutCard(
                         minDuration = FadeStartBeforeSliderMin,
                         maxDuration = FadeStartBeforeSliderMax,
                         step = FadeStartBeforeSliderStep,
-                        dialogMinDuration = FadeStartBeforeSliderMin,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -579,7 +578,6 @@ private fun FadeOutCard(
                         minDuration = FadeDurationSliderMin,
                         maxDuration = FadeDurationSliderMax,
                         step = FadeDurationSliderStep,
-                        dialogMinDuration = FadeDurationSliderMin,
                         dialogMaxDuration = FadeDurationSliderMax,
                     )
 
@@ -755,7 +753,7 @@ private fun DurationSlider(
     modifier: Modifier = Modifier,
     step: Duration? = null,
     dialogMaxDuration: Duration = Defaults.MaxTimerDuration,
-    dialogMinDuration: Duration = Defaults.MinTimerDuration,
+    dialogMinDuration: Duration = minDuration,
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
