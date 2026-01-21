@@ -60,7 +60,9 @@ fun DurationEditDialog(
                     OutlinedTextField(
                         value = hours,
                         onValueChange = { newValue ->
-                            hours = newValue.filter { it.isDigit() }.take(2)
+                            val filtered = newValue.filter { it.isDigit() }.take(2)
+                            val value = filtered.toIntOrNull() ?: 0
+                            hours = if (value > 23) "23" else filtered
                         },
                         label = { Text(stringResource(R.string.label_hours_short), maxLines = 1) },
                         keyboardOptions = KeyboardOptions(
@@ -79,7 +81,9 @@ fun DurationEditDialog(
                     OutlinedTextField(
                         value = minutes,
                         onValueChange = { newValue ->
-                            minutes = newValue.filter { it.isDigit() }.take(2)
+                            val filtered = newValue.filter { it.isDigit() }.take(2)
+                            val value = filtered.toIntOrNull() ?: 0
+                            minutes = if (value > 59) "59" else filtered
                         },
                         label = {
                             Text(
@@ -105,7 +109,9 @@ fun DurationEditDialog(
                     OutlinedTextField(
                         value = seconds,
                         onValueChange = { newValue ->
-                            seconds = newValue.filter { it.isDigit() }.take(2)
+                            val filtered = newValue.filter { it.isDigit() }.take(2)
+                            val value = filtered.toIntOrNull() ?: 0
+                            seconds = if (value > 59) "59" else filtered
                         },
                         label = {
                             Text(
