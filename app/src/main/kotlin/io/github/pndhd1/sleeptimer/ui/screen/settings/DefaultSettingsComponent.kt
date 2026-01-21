@@ -160,6 +160,7 @@ class DefaultSettingsComponent(
             it.copy(
                 hasFullScreenIntentPermission = systemRepository.canUseFullScreenIntent.value,
                 isActionsChannelEnabled = notificationChannelManager.isActionsChannelEnabled(),
+                goHomeOnExpire = systemRepository.canUseFullScreenIntent.value,
             )
         }
     }
