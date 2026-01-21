@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.domain.usecase
 
 import dev.zacsweers.metro.Inject
+import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
@@ -11,6 +12,7 @@ class CompleteTimerUseCase(
     private val systemRepository: SystemRepository,
     private val activeTimerRepository: ActiveTimerRepository,
     private val settingsRepository: SettingsRepository,
+    private val notificationChannelManager: NotificationChannelManager,
 ) {
 
     suspend operator fun invoke() {
@@ -19,7 +21,11 @@ class CompleteTimerUseCase(
             systemRepository.requestAudioFocusToStopMedia()
         }
         systemRepository.lockScreen()
-        if (settings.goHomeOnExpire) {
+        if (
+            settings.goHomeOnExpire &&
+            systemRepository.canUseFullScreenIntent.value &&
+            notificationChannelManager.isActionsChannelEnabled()
+        ) {
             systemRepository.goHomeAfterLock()
         }
         activeTimerRepository.clearTimer()

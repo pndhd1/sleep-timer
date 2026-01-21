@@ -14,6 +14,7 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -35,6 +36,8 @@ import kotlinx.coroutines.flow.*
 
 private val NotificationPermissionRequestedKey =
     booleanPreferencesKey("notification_permission_requested")
+
+private const val REQUEST_CODE_GO_HOME_NOTIFICATION = 2001
 
 @Inject
 @SingleIn(AppScope::class)
@@ -72,15 +75,25 @@ class SystemRepositoryImpl(
     }
 
     override fun goHomeAfterLock() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            goHomeViaFullScreenIntent()
+        } else {
+            goHomeViaStartActivity()
+        }
+    }
+
+    private fun goHomeViaStartActivity() {
+        context.startActivity(GoHomeActivity.getIntent(context))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun goHomeViaFullScreenIntent() {
         if (notificationManager == null || !canUseFullScreenIntent.value) return
 
-        val fullScreenIntent = Intent(context, GoHomeActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context,
-            0,
-            fullScreenIntent,
+            REQUEST_CODE_GO_HOME_NOTIFICATION,
+            GoHomeActivity.getIntent(context),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
