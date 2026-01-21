@@ -4,7 +4,6 @@ import dev.zacsweers.metro.Inject
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.first
-import kotlin.time.Duration
 
 @Inject
 class ExtendTimerUseCase(
@@ -12,10 +11,10 @@ class ExtendTimerUseCase(
     private val settingsRepository: SettingsRepository,
 ) {
 
-    suspend operator fun invoke(additionalDuration: Duration) {
+    suspend operator fun invoke() {
         val settings = settingsRepository.timerSettings.first()
         activeTimerRepository.extendTimer(
-            additionalDuration = additionalDuration,
+            additionalDuration = settings.extendDuration,
             fadeOutSettings = settings.fadeOut,
         )
     }

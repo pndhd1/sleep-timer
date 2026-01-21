@@ -116,14 +116,14 @@ class TimerNotificationService : LifecycleService() {
 
     private fun stopTimer() {
         lifecycleScope.launch {
-            stopTimerUseCase()
+            runCatching { stopTimerUseCase() }
             stopSelf()
         }
     }
 
     private fun extendTimer() {
         lifecycleScope.launch {
-            extendTimerUseCase(cachedExtendDuration)
+            runCatching { extendTimerUseCase() }
         }
     }
 

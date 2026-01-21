@@ -17,6 +17,7 @@ import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
+import io.github.pndhd1.sleeptimer.domain.usecase.ExtendTimerUseCase
 import io.github.pndhd1.sleeptimer.domain.usecase.StartTimerUseCase
 import io.github.pndhd1.sleeptimer.domain.usecase.StopTimerUseCase
 import io.github.pndhd1.sleeptimer.ui.screen.timer.TimerComponent.Child
@@ -41,6 +42,7 @@ class DefaultTimerComponent(
     private val settingsRepository: SettingsRepository,
     systemRepository: SystemRepository,
     activeTimerRepository: ActiveTimerRepository,
+    private val extendTimerUseCase: ExtendTimerUseCase,
     private val startTimerUseCase: StartTimerUseCase,
     private val stopTimerUseCase: StopTimerUseCase,
     private val permissionComponentFactory: DefaultPermissionComponent.Factory,
@@ -108,6 +110,8 @@ class DefaultTimerComponent(
             component = DefaultActiveTimerComponent(
                 componentContext = componentContext,
                 targetTime = config.targetTime,
+                extendDuration = config.extendDuration,
+                onExtend = ::onExtendTimer,
                 onStop = ::onStopTimer,
             ),
         )
@@ -129,7 +133,7 @@ class DefaultTimerComponent(
             SlotConfig.Permission(PermissionType.Notification)
 
         activeTimer != null && activeTimer.targetTime >= Clock.System.now() ->
-            activeTimer.toActiveTimerSlot()
+            activeTimer.toActiveTimerSlot(settings.extendDuration)
 
         else -> settings.toTimerConfigSlot()
     }
@@ -152,6 +156,12 @@ class DefaultTimerComponent(
                 onFailure = { false }
             )
             if (showNotification) runCatchingSuspend { TimerNotificationService.start(context) }
+        }
+    }
+
+    private fun onExtendTimer() {
+        scope.launch {
+            runCatchingSuspend { extendTimerUseCase() }.onFailure(::handleError)
         }
     }
 
@@ -187,7 +197,10 @@ private sealed interface SlotConfig {
     ) : SlotConfig
 
     @Serializable
-    data class Active(val targetTime: Instant) : SlotConfig
+    data class Active(
+        val targetTime: Instant,
+        val extendDuration: Duration,
+    ) : SlotConfig
 }
 
 private fun TimerSettings.toTimerConfigSlot() = SlotConfig.Config(
@@ -195,6 +208,7 @@ private fun TimerSettings.toTimerConfigSlot() = SlotConfig.Config(
     presets = presets,
 )
 
-private fun ActiveTimerData.toActiveTimerSlot() = SlotConfig.Active(
+private fun ActiveTimerData.toActiveTimerSlot(extendDuration: Duration) = SlotConfig.Active(
     targetTime = targetTime,
+    extendDuration = extendDuration,
 )

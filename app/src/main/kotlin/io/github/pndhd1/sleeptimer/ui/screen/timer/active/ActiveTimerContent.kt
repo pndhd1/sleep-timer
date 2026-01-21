@@ -3,6 +3,7 @@ package io.github.pndhd1.sleeptimer.ui.screen.timer.active
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,16 +54,32 @@ fun ActiveTimerContent(
             style = MaterialTheme.typography.displayLarge,
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        FilledTonalButton(
-            onClick = component::onStopClick,
-            modifier = Modifier.height(56.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                text = stringResource(R.string.button_stop),
-                style = MaterialTheme.typography.titleMedium,
-            )
+            if (state.extendDuration > Duration.ZERO) {
+                OutlinedButton(
+                    onClick = component::onExtendClick,
+                    modifier = Modifier.height(56.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.button_extend),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+            }
+
+            FilledTonalButton(
+                onClick = component::onStopClick,
+                modifier = Modifier.height(56.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.button_stop),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
         }
     }
 }

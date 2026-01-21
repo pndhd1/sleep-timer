@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -71,7 +72,9 @@ private fun PortraitLayout(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -81,17 +84,18 @@ private fun PortraitLayout(
             minDuration = TimerSliderMin,
             maxDuration = TimerSliderMax,
             step = TimerSliderStep,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(Modifier.height(24.dp))
+        if (state.presets.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
 
-        PresetButtons(
-            presets = state.presets,
-            onPresetSelected = onPresetSelected,
-        )
+            PresetButtons(
+                presets = state.presets,
+                onPresetSelected = onPresetSelected,
+                isPortrait = true,
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -111,42 +115,39 @@ private fun LandscapeLayout(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 16.dp),
-        contentAlignment = Alignment.Center,
+        horizontalArrangement = Arrangement.spacedBy(32.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f),
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.weight(1f),
-            ) {
-                DurationSlider(
-                    duration = state.duration,
-                    onDurationChanged = onDurationChanged,
-                    minDuration = TimerSliderMin,
-                    maxDuration = TimerSliderMax,
-                    step = TimerSliderStep,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            DurationSlider(
+                duration = state.duration,
+                onDurationChanged = onDurationChanged,
+                minDuration = TimerSliderMin,
+                maxDuration = TimerSliderMax,
+                step = TimerSliderStep,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-                PresetButtons(
-                    presets = state.presets,
-                    onPresetSelected = onPresetSelected,
-                )
-            }
-
-            StartButton(
-                enabled = state.hasTime,
-                loading = state.loading,
-                onClick = onStartClick,
+            if (state.presets.isNotEmpty()) PresetButtons(
+                presets = state.presets,
+                onPresetSelected = onPresetSelected,
+                isPortrait = false,
             )
         }
+
+        StartButton(
+            enabled = state.hasTime,
+            loading = state.loading,
+            onClick = onStartClick,
+        )
     }
 }
 
@@ -154,12 +155,14 @@ private fun LandscapeLayout(
 private fun PresetButtons(
     presets: List<Duration>,
     onPresetSelected: (Duration) -> Unit,
+    isPortrait: Boolean,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        maxItemsInEachRow = if (isPortrait) 3 else Int.MAX_VALUE,
     ) {
         presets.forEach { duration ->
             PresetChip(
@@ -188,19 +191,15 @@ private fun StartButton(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) { curLoading ->
-        Box(
-            modifier = Modifier.requiredHeight(56.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (curLoading) {
-                CircularProgressIndicator()
-                return@AnimatedContent
-            }
+        Box(contentAlignment = Alignment.Center) {
+            if (curLoading) CircularProgressIndicator()
 
             Button(
                 onClick = { if (!loading) onClick() },
                 enabled = enabled,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .height(56.dp)
+                    .alpha(if (curLoading) 0f else 1f),
             ) {
                 Text(
                     text = stringResource(R.string.button_start),

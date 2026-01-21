@@ -69,12 +69,12 @@ class AudioFadeService : LifecycleService() {
         startFadeJob(durationSeconds.seconds, targetVolumePercent)
     }
 
-    private fun startFadeJob(totalDuration: Duration, targetVolumePercent: Int) {
+    private fun startFadeJob(totalDuration: Duration, targetVolumePercent: Int) = runCatching {
         fadeJob?.cancel()
 
         val am = audioManager ?: run {
             stopSelf()
-            return
+            return@runCatching
         }
 
         val maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
@@ -84,27 +84,31 @@ class AudioFadeService : LifecycleService() {
         // If current volume is already at or below target, nothing to do
         if (originalVolume <= targetVolume) {
             stopSelf()
-            return
+            return@runCatching
         }
 
         fadeJob = lifecycleScope.launch {
-            val startMark = TimeSource.Monotonic.markNow()
+            runCatching {
+                val startMark = TimeSource.Monotonic.markNow()
 
-            while (isActive) {
-                val elapsed = startMark.elapsedNow()
-                if (elapsed >= totalDuration) break
+                while (isActive) {
+                    val elapsed = startMark.elapsedNow()
+                    if (elapsed >= totalDuration) break
 
-                val progress = (elapsed / totalDuration).coerceIn(0.0, 1.0).toFloat()
-                val currentVolume =
-                    lerp(originalVolume.toFloat(), targetVolume.toFloat(), progress).toInt()
+                    val progress = (elapsed / totalDuration).coerceIn(0.0, 1.0).toFloat()
+                    val currentVolume =
+                        lerp(originalVolume.toFloat(), targetVolume.toFloat(), progress).toInt()
 
-                am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
-                delay(FadeStepIntervalMs)
+                    am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+                    delay(FadeStepIntervalMs)
+                }
+
+                am.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
             }
-
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
             stopSelf()
         }
+    }.onFailure {
+        stopSelf()
     }
 
     override fun onDestroy() {

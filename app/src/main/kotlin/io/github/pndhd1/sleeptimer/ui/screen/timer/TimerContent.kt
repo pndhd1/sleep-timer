@@ -50,10 +50,7 @@ fun TimerContent(
                         .add(WindowInsets.adBannerIgnoringVisibility)
                 ),
         ) {
-            Crossfade(
-                targetState = slot?.child?.instance,
-                modifier = Modifier,
-            ) { child ->
+            Crossfade(targetState = slot?.child?.instance) { child ->
                 when (child) {
                     is TimerComponent.Child.Permission -> {
                         PermissionContent(
