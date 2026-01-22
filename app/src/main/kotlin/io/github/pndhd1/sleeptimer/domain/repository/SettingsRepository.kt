@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.domain.repository
 
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
@@ -18,4 +19,5 @@ interface SettingsRepository {
     suspend fun updateFadeTargetVolumePercent(percent: Int)
     suspend fun updateGoHomeOnExpire(enabled: Boolean)
     suspend fun updateStopMediaOnExpire(enabled: Boolean)
+    suspend fun updateFabAlignment(alignment: FabAlignment)
 }

@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screen.timer.config
 
 import com.arkivanov.decompose.ComponentContext
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import kotlinx.coroutines.flow.*
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -18,6 +19,7 @@ class DefaultTimerConfigComponent(
             duration = params.defaultDuration,
             defaultDuration = params.defaultDuration,
             presets = params.presets,
+            fabAlignment = params.fabAlignment,
             isCustomExpanded = false,
         )
     )
@@ -44,5 +46,6 @@ class DefaultTimerConfigComponent(
     data class Params(
         val defaultDuration: Duration,
         val presets: List<Duration>,
+        val fabAlignment: FabAlignment,
     )
 }

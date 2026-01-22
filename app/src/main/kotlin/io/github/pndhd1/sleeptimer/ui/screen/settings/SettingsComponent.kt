@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screen.settings
 
 import android.content.Intent
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
@@ -25,6 +26,7 @@ interface SettingsComponent {
     fun getFullScreenIntentSettingsIntent(): Intent?
     fun getNotificationChannelSettingsIntent(): Intent
     fun onStopMediaOnExpireChanged(enabled: Boolean)
+    fun onFabAlignmentChanged(alignment: FabAlignment)
     fun onAboutClick()
 }
 
@@ -45,5 +47,6 @@ sealed interface SettingsState {
         val hasFullScreenIntentPermission: Boolean,
         val isActionsChannelEnabled: Boolean,
         val stopMediaOnExpire: Boolean,
+        val fabAlignment: FabAlignment,
     ) : SettingsState
 }

@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.crashlytics
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.notification.NotificationChannelManager
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SystemRepository
@@ -56,6 +57,7 @@ class DefaultSettingsComponent(
                 hasFullScreenIntentPermission = systemRepository.canUseFullScreenIntent.value,
                 isActionsChannelEnabled = notificationChannelManager.isActionsChannelEnabled(),
                 stopMediaOnExpire = settings.stopMediaOnExpire,
+                fabAlignment = settings.fabAlignment,
             )
         }
     }
@@ -172,6 +174,13 @@ class DefaultSettingsComponent(
         updateLoadedState { it.copy(stopMediaOnExpire = enabled) }
         launchWithErrorHandling {
             settingsRepository.updateStopMediaOnExpire(enabled)
+        }
+    }
+
+    override fun onFabAlignmentChanged(alignment: FabAlignment) {
+        updateLoadedState { it.copy(fabAlignment = alignment) }
+        launchWithErrorHandling {
+            settingsRepository.updateFabAlignment(alignment)
         }
     }
 

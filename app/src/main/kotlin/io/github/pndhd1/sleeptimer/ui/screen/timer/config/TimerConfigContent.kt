@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -26,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.DurationSlider
 import io.github.pndhd1.sleeptimer.utils.Defaults
@@ -65,7 +65,7 @@ fun TimerConfigContent(
 
     val gridInsets = WindowInsets.systemBarsForVisualComponents
         .union(WindowInsets.appBottomNavigationBar)
-        .add(WindowInsets.adBannerIgnoringVisibility)
+        .add(WindowInsets.adBanner)
         .add(WindowInsets(left = 16.dp, top = 16.dp, right = 16.dp, bottom = 16.dp))
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -126,6 +126,31 @@ fun TimerConfigContent(
                     // Intercept clicks under banner
                 },
         )
+
+        FloatingActionButton(
+            onClick = {
+                component.onDurationChanged(state.defaultDuration)
+                component.onStartClick()
+            },
+            modifier = Modifier
+                .align(
+                    when (state.fabAlignment) {
+                        FabAlignment.Start -> Alignment.BottomStart
+                        FabAlignment.End -> Alignment.BottomEnd
+                    }
+                )
+                .windowInsetsPadding(
+                    WindowInsets.systemBarsForVisualComponents
+                        .union(WindowInsets.appBottomNavigationBar)
+                        .add(WindowInsets.adBanner)
+                )
+                .padding(16.dp),
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_timer),
+                contentDescription = stringResource(R.string.button_start),
+            )
+        }
     }
 
     if (state.isCustomExpanded && !isInTransition) {
@@ -387,6 +412,7 @@ private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigSta
             duration = 45.minutes,
             defaultDuration = 45.minutes,
             presets = Defaults.DefaultPresets,
+            fabAlignment = FabAlignment.End,
             isCustomExpanded = false,
         ),
         TimerConfigState(
@@ -394,6 +420,7 @@ private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigSta
             duration = 30.minutes,
             defaultDuration = 45.minutes,
             presets = Defaults.DefaultPresets,
+            fabAlignment = FabAlignment.Start,
             isCustomExpanded = true,
         ),
         TimerConfigState(
@@ -401,13 +428,13 @@ private class TimerConfigStateProvider : PreviewParameterProvider<TimerConfigSta
             duration = 15.minutes,
             defaultDuration = 45.minutes,
             presets = Defaults.DefaultPresets,
+            fabAlignment = FabAlignment.End,
             isCustomExpanded = true,
         ),
     )
 }
 
 @Preview(showBackground = true)
-@PreviewScreenSizes
 @Composable
 private fun TimerConfigContentPreview(
     @PreviewParameter(TimerConfigStateProvider::class) state: TimerConfigState,

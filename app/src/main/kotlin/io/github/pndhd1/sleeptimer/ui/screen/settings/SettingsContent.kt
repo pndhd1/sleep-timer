@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.*
@@ -325,6 +326,12 @@ private fun SettingsLayout(
                 )
             }
             item {
+                FabAlignmentCard(
+                    alignment = state.fabAlignment,
+                    onAlignmentChanged = component::onFabAlignmentChanged,
+                )
+            }
+            item {
                 AboutCard(onClick = component::onAboutClick)
             }
         }
@@ -452,6 +459,41 @@ private fun ExtendDurationCard(
             maxDuration = ExtendDurationSliderMax,
             step = ExtendDurationSliderStep,
         )
+    }
+}
+
+@Composable
+private fun FabAlignmentCard(
+    alignment: FabAlignment,
+    onAlignmentChanged: (FabAlignment) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsCard(
+        title = stringResource(R.string.settings_fab_alignment_title),
+        description = stringResource(R.string.settings_fab_alignment_description),
+        modifier = modifier,
+    ) {
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            FabAlignment.entries.forEachIndexed { index, fabAlignment ->
+                SegmentedButton(
+                    selected = alignment == fabAlignment,
+                    onClick = { onAlignmentChanged(fabAlignment) },
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = FabAlignment.entries.size,
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(
+                            when (fabAlignment) {
+                                FabAlignment.Start -> R.string.settings_fab_alignment_start
+                                FabAlignment.End -> R.string.settings_fab_alignment_end
+                            }
+                        ),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -882,6 +924,7 @@ private fun SettingsContentLoadedPreview() {
         hasFullScreenIntentPermission = true,
         isActionsChannelEnabled = true,
         stopMediaOnExpire = false,
+        fabAlignment = FabAlignment.End,
     )
     SleepTimerTheme {
         SettingsContent(

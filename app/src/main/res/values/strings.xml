@@ -74,10 +74,16 @@
     <string name="settings_open_app_settings">Open Settings</string>
 
     <!-- Settings: Duration -->
-    <string name="settings_default_duration_title">Default Timer Duration</string>
-    <string name="settings_default_duration_description">Duration used when starting a new timer</string>
+    <string name="settings_default_duration_title">Quick Start Duration</string>
+    <string name="settings_default_duration_description">Duration used for quick start button and card</string>
     <string name="settings_extend_duration_title">Extend Duration</string>
     <string name="settings_extend_duration_description">Duration added when extending an active timer</string>
+
+    <!-- Settings: FAB Alignment -->
+    <string name="settings_fab_alignment_title">Quick Start Button Position</string>
+    <string name="settings_fab_alignment_description">Position of the floating button for left-handed or right-handed use</string>
+    <string name="settings_fab_alignment_start">Left</string>
+    <string name="settings_fab_alignment_end">Right</string>
     <string name="settings_edit_duration_title">Set Duration</string>
     <string name="settings_duration_min">%d min</string>
     <string name="settings_duration_sec">%d sec</string>

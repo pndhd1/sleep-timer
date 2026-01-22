@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.ui.screen.timer.config
 
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
@@ -19,6 +20,7 @@ data class TimerConfigState(
     val duration: Duration,
     val defaultDuration: Duration,
     val presets: List<Duration>,
+    val fabAlignment: FabAlignment,
     val isCustomExpanded: Boolean = false,
 ) {
     val hasTime: Boolean get() = duration >= Defaults.MinTimerDuration && duration <= Defaults.MaxTimerDuration

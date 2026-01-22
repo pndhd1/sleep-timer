@@ -1,6 +1,7 @@
 package io.github.pndhd1.sleeptimer.ui.screen.settings
 
 import android.content.Intent
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
@@ -25,5 +26,6 @@ class PreviewSettingsComponent(
     override fun getFullScreenIntentSettingsIntent(): Intent? = null
     override fun getNotificationChannelSettingsIntent(): Intent = Intent()
     override fun onStopMediaOnExpireChanged(enabled: Boolean) = Unit
+    override fun onFabAlignmentChanged(alignment: FabAlignment) = Unit
     override fun onAboutClick() = Unit
 }

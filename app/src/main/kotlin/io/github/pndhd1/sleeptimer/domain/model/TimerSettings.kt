@@ -10,4 +10,5 @@ data class TimerSettings(
     val fadeOut: FadeOutSettings,
     val goHomeOnExpire: Boolean,
     val stopMediaOnExpire: Boolean,
+    val fabAlignment: FabAlignment,
 )

@@ -13,6 +13,7 @@ import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import io.github.pndhd1.sleeptimer.domain.model.ActiveTimerData
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.ActiveTimerRepository
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
@@ -101,6 +102,7 @@ class DefaultTimerComponent(
                 params = DefaultTimerConfigComponent.Params(
                     defaultDuration = config.defaultDuration,
                     presets = config.presets,
+                    fabAlignment = config.fabAlignment,
                 ),
                 onStartTimer = ::onStartTimer,
             ),
@@ -194,6 +196,7 @@ private sealed interface SlotConfig {
     data class Config(
         val defaultDuration: Duration,
         val presets: List<Duration>,
+        val fabAlignment: FabAlignment,
     ) : SlotConfig
 
     @Serializable
@@ -206,6 +209,7 @@ private sealed interface SlotConfig {
 private fun TimerSettings.toTimerConfigSlot() = SlotConfig.Config(
     defaultDuration = defaultDuration,
     presets = presets,
+    fabAlignment = fabAlignment,
 )
 
 private fun ActiveTimerData.toActiveTimerSlot(extendDuration: Duration) = SlotConfig.Active(

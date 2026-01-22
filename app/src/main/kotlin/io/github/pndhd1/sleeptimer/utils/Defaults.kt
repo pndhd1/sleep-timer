@@ -1,5 +1,6 @@
 package io.github.pndhd1.sleeptimer.utils
 
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -26,6 +27,7 @@ object Defaults {
 
     const val DefaultGoHomeOnExpire: Boolean = false
     const val DefaultStopMediaOnExpire: Boolean = true
+    val DefaultFabAlignment: FabAlignment = FabAlignment.End
 
     inline val MinTimerDuration: Duration get() = 5.seconds
     val MaxTimerDuration: Duration = 23.hours + 59.minutes + 59.seconds

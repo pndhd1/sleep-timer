@@ -74,10 +74,16 @@
     <string name="settings_open_app_settings">Открыть настройки</string>
 
     <!-- Settings: Duration -->
-    <string name="settings_default_duration_title">Длительность по умолчанию</string>
-    <string name="settings_default_duration_description">Длительность при запуске нового таймера</string>
+    <string name="settings_default_duration_title">Длительность быстрого старта</string>
+    <string name="settings_default_duration_description">Длительность для кнопки и карточки быстрого старта</string>
     <string name="settings_extend_duration_title">Время продления</string>
     <string name="settings_extend_duration_description">Время, добавляемое при продлении активного таймера</string>
+
+    <!-- Settings: FAB Alignment -->
+    <string name="settings_fab_alignment_title">Позиция кнопки быстрого старта</string>
+    <string name="settings_fab_alignment_description">Расположение плавающей кнопки для левшей или правшей</string>
+    <string name="settings_fab_alignment_start">Слева</string>
+    <string name="settings_fab_alignment_end">Справа</string>
     <string name="settings_edit_duration_title">Установить время</string>
     <string name="settings_duration_min">%d мин</string>
     <string name="settings_duration_sec">%d сек</string>

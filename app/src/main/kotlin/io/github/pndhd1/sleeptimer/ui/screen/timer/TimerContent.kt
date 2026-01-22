@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.ui.screen.timer.active.ActiveTimerContent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.active.PreviewActiveTimerComponent
 import io.github.pndhd1.sleeptimer.ui.screen.timer.config.PreviewTimerConfigComponent
@@ -86,6 +87,7 @@ private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child
                     presets = Defaults.DefaultPresets,
                     defaultDuration = 15.minutes,
                     isCustomExpanded = false,
+                    fabAlignment = FabAlignment.End,
                 )
             )
         ),

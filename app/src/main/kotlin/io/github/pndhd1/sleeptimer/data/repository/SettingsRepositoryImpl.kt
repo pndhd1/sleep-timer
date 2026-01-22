@@ -1,14 +1,12 @@
 package io.github.pndhd1.sleeptimer.data.repository
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.byteArrayPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.*
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import io.github.pndhd1.sleeptimer.domain.model.FabAlignment
 import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.domain.model.TimerSettings
 import io.github.pndhd1.sleeptimer.domain.repository.SettingsRepository
@@ -30,6 +28,7 @@ private val FadeOutDurationSecondsKey = intPreferencesKey("fade_out_duration_sec
 private val FadeTargetVolumePercentKey = intPreferencesKey("fade_target_volume_percent")
 private val GoHomeOnExpireKey = booleanPreferencesKey("go_home_on_expire")
 private val StopMediaOnExpireKey = booleanPreferencesKey("stop_media_on_expire")
+private val FabAlignmentKey = stringPreferencesKey("fab_alignment")
 
 @Inject
 @SingleIn(AppScope::class)
@@ -119,6 +118,14 @@ class SettingsRepositoryImpl(
             }
         }
     }
+
+    override suspend fun updateFabAlignment(alignment: FabAlignment) {
+        preferences.updateData { current ->
+            current.toMutablePreferences().apply {
+                this[FabAlignmentKey] = alignment.name
+            }
+        }
+    }
 }
 
 private fun Preferences.toDomain() = TimerSettings(
@@ -136,4 +143,6 @@ private fun Preferences.toDomain() = TimerSettings(
     ),
     goHomeOnExpire = get(GoHomeOnExpireKey) ?: Defaults.DefaultGoHomeOnExpire,
     stopMediaOnExpire = get(StopMediaOnExpireKey) ?: Defaults.DefaultStopMediaOnExpire,
+    fabAlignment = get(FabAlignmentKey)?.let { runCatching { FabAlignment.valueOf(it) }.getOrNull() }
+        ?: Defaults.DefaultFabAlignment,
 )
