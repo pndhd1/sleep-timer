@@ -22,7 +22,6 @@
     <!-- Buttons -->
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
-    <string name="button_extend">Extend</string>
     <string name="button_reset">Reset</string>
     <string name="button_close">Close</string>
 

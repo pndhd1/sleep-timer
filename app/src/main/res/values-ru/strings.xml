@@ -22,7 +22,6 @@
     <!-- Buttons -->
     <string name="button_start">Старт</string>
     <string name="button_stop">Стоп</string>
-    <string name="button_extend">Продлить</string>
     <string name="button_reset">Сброс</string>
     <string name="button_close">Закрыть</string>
 

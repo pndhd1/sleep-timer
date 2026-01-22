@@ -20,6 +20,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
+import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.time.Clock
@@ -42,43 +45,51 @@ fun ActiveTimerContent(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = Formatter.formatTimeWithDots(remainingTime),
-            style = MaterialTheme.typography.displayLarge,
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+    Box(modifier = modifier) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .windowInsetsPadding(
+                    WindowInsets.systemBarsForVisualComponents
+                        .union(WindowInsets.appBottomNavigationBar)
+                        .add(WindowInsets.adBannerIgnoringVisibility)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            if (state.extendDuration > Duration.ZERO) {
-                OutlinedButton(
-                    onClick = component::onExtendClick,
-                    modifier = Modifier.height(56.dp),
+            Text(
+                text = Formatter.formatTimeWithDots(remainingTime),
+                style = MaterialTheme.typography.displayLarge,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                val buttonModifier = Modifier.defaultMinSize(140.dp, 56.dp)
+
+                if (state.extendDuration > Duration.ZERO) {
+                    OutlinedButton(
+                        onClick = component::onExtendClick,
+                        modifier = buttonModifier,
+                    ) {
+                        Text(
+                            text = "+${Formatter.formatShortTimeWithUnits(state.extendDuration)}",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+
+                FilledTonalButton(
+                    onClick = component::onStopClick,
+                    modifier = buttonModifier,
                 ) {
                     Text(
-                        text = stringResource(R.string.button_extend),
+                        text = stringResource(R.string.button_stop),
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
-            }
-
-            FilledTonalButton(
-                onClick = component::onStopClick,
-                modifier = Modifier.height(56.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.button_stop),
-                    style = MaterialTheme.typography.titleMedium,
-                )
             }
         }
     }
