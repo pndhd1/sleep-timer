@@ -19,6 +19,10 @@ import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.OpenSettingsDialog
 import io.github.pndhd1.sleeptimer.utils.launchCatching
+import io.github.pndhd1.sleeptimer.utils.ui.SolidInsetsBackground
+import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
+import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
+import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 
 @Composable
 fun PermissionContent(
@@ -43,43 +47,57 @@ fun PermissionContent(
         PermissionType.Notification -> R.string.permission_notification_title to R.string.permission_notification_description
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(titleRes),
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(descriptionRes),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                val onError = { showSettingsDialog = true }
-                component.getRuntimePermission()?.let {
-                    permissionLauncher.launchCatching(it, onError)
-                }
-                component.getActivationIntent()?.let {
-                    intentLauncher.launchCatching(it, onError)
-                }
-            },
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .windowInsetsPadding(
+                    WindowInsets.systemBarsForVisualComponents
+                        .union(WindowInsets.appBottomNavigationBar)
+                        .add(WindowInsets.adBannerIgnoringVisibility)
+                )
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text(text = stringResource(R.string.permission_grant_button))
+            Text(
+                text = stringResource(titleRes),
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(descriptionRes),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    val onError = { showSettingsDialog = true }
+                    component.getRuntimePermission()?.let {
+                        permissionLauncher.launchCatching(it, onError)
+                    }
+                    component.getActivationIntent()?.let {
+                        intentLauncher.launchCatching(it, onError)
+                    }
+                },
+            ) {
+                Text(text = stringResource(R.string.permission_grant_button))
+            }
         }
+
+        SolidInsetsBackground(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .windowInsetsBottomHeight(WindowInsets.appBottomNavigationBar)
+                .fillMaxWidth()
+        )
     }
 
     if (showSettingsDialog) {

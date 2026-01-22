@@ -317,7 +317,7 @@ private fun CustomCardDialog(
 }
 
 @Composable
-fun TimerCard(
+private fun TimerCard(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
