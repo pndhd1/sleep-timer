@@ -770,6 +770,8 @@ private fun SettingsCardContent(
                 )
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             endContent?.invoke(this)
         }
 
