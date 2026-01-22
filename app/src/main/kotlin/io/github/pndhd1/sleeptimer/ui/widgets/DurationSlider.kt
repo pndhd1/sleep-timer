@@ -53,7 +53,6 @@ fun DurationSlider(
         0
     }
 
-
     // Round value to nearest step multiple
     fun roundToStep(value: Float): Float {
         if (stepSeconds <= 0) return value

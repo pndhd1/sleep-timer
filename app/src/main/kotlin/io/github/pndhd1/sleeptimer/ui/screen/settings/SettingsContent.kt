@@ -33,6 +33,7 @@ import io.github.pndhd1.sleeptimer.domain.model.FadeOutSettings
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.*
 import io.github.pndhd1.sleeptimer.utils.Defaults
+import io.github.pndhd1.sleeptimer.utils.Formatter
 import io.github.pndhd1.sleeptimer.utils.isPortrait
 import io.github.pndhd1.sleeptimer.utils.launchCatching
 import io.github.pndhd1.sleeptimer.utils.ui.*
@@ -332,7 +333,7 @@ private fun SettingsLayout(
             visible = listState.canScrollBackward,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .windowInsetsTopHeight(WindowInsets.statusBars)
+                .windowInsetsTopHeight(WindowInsets.systemBars)
                 .fillMaxWidth(),
         )
 
@@ -805,6 +806,39 @@ private fun PresetChips(
                 contentDescription = stringResource(R.string.settings_add_preset),
             )
         }
+    }
+}
+
+@Composable
+private fun PresetChip(
+    duration: Duration,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showRemoveIcon: Boolean = false,
+) {
+    val label = Formatter.formatShortTimeWithUnits(duration)
+
+    if (showRemoveIcon) {
+        InputChip(
+            selected = false,
+            onClick = onClick,
+            label = { Text(label) },
+            trailingIcon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.settings_remove_preset),
+                    modifier = Modifier.height(InputChipDefaults.IconSize),
+                )
+            },
+            modifier = modifier,
+        )
+    } else {
+        FilterChip(
+            selected = false,
+            onClick = onClick,
+            label = { Text(label) },
+            modifier = modifier,
+        )
     }
 }
 

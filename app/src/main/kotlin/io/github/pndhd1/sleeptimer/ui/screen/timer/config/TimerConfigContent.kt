@@ -13,6 +13,8 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -26,7 +28,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.DurationSlider
-import io.github.pndhd1.sleeptimer.ui.widgets.TimerCard
 import io.github.pndhd1.sleeptimer.utils.Defaults
 import io.github.pndhd1.sleeptimer.utils.Formatter
 import io.github.pndhd1.sleeptimer.utils.isPortrait
@@ -102,7 +103,7 @@ fun TimerConfigContent(
             visible = gridState.canScrollBackward,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .windowInsetsTopHeight(WindowInsets.statusBars)
+                .windowInsetsTopHeight(WindowInsets.systemBars)
                 .fillMaxWidth(),
         )
 
@@ -286,6 +287,93 @@ private fun CustomCardDialog(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TimerCard(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    duration: Duration? = null,
+    icon: Int? = null,
+    filled: Boolean = false,
+) {
+    val containerColor = if (filled) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerLow
+    }
+
+    val contentColor = if (filled) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    val accentColor = if (filled) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
+    Card(
+        onClick = onClick,
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(icon),
+                    contentDescription = null,
+                    tint = accentColor,
+                    modifier = Modifier.size(32.dp),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            if (duration != null) {
+                Text(
+                    text = Formatter.formatTimeWithUnits(duration),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = accentColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = contentColor,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

@@ -121,25 +121,27 @@ fun AboutContent(
             }
         }
 
-        // there is a little delay before canScrollForward is correctly set
-        // so we delay collecting it to avoid flickering
-        var bottomInsetVisible by remember {
-            mutableStateOf(true)
-        }
-        LaunchedEffect(listState) {
-            delay(200)
-            snapshotFlow { listState.canScrollForward }.collect {
-                bottomInsetVisible = it
+        if (LocalNavigationMode.current == NavigationMode.Buttons) {
+            // there is a little delay before canScrollForward is correctly set
+            // so we delay collecting it to avoid flickering
+            var bottomInsetVisible by remember {
+                mutableStateOf(true)
             }
-        }
+            LaunchedEffect(listState) {
+                delay(200)
+                snapshotFlow { listState.canScrollForward }.collect {
+                    bottomInsetVisible = it
+                }
+            }
 
-        InsetsBackground(
-            visible = bottomInsetVisible,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .windowInsetsBottomHeight(WindowInsets.navigationBars),
-        )
+            InsetsBackground(
+                visible = bottomInsetVisible,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .windowInsetsBottomHeight(WindowInsets.navigationBars),
+            )
+        }
         InsetsBackground(
             color = MaterialTheme.colorScheme.surfaceContainer,
             modifier = Modifier
