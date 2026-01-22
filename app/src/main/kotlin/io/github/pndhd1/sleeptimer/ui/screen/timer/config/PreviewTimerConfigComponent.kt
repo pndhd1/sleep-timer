@@ -11,4 +11,5 @@ class PreviewTimerConfigComponent(
     override fun onDurationChanged(duration: Duration) = Unit
     override fun onPresetSelected(duration: Duration) = Unit
     override fun onStartClick() = Unit
+    override fun onCustomExpandedChanged(expanded: Boolean) = Unit
 }

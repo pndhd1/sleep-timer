@@ -24,6 +24,14 @@
     <string name="button_stop">Стоп</string>
     <string name="button_extend">Продлить</string>
     <string name="button_reset">Сброс</string>
+    <string name="button_close">Закрыть</string>
+
+    <!-- Timer Cards -->
+    <string name="timer_quick_start">Быстрый старт</string>
+    <string name="timer_tap_to_start">Нажмите для запуска</string>
+    <string name="timer_custom">Другое</string>
+    <string name="timer_set_your_time">Укажите своё время</string>
+    <string name="timer_preset">Пресет</string>
 
     <!-- Dialogs -->
     <string name="dialog_ok">OK</string>
@@ -80,7 +88,7 @@
 
     <!-- Settings: Presets -->
     <string name="settings_presets_title">Быстрые пресеты</string>
-    <string name="settings_presets_description">Кнопки для быстрой установки длительности в минутах (макс. %d)</string>
+    <string name="settings_presets_description">Кнопки для быстрой установки длительности в минутах</string>
     <string name="settings_add_preset">Добавить пресет</string>
     <string name="settings_add_preset_title">Добавить пресет</string>
     <string name="settings_add_preset_description">Введите длительность в минутах</string>

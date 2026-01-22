@@ -2,11 +2,11 @@ package io.github.pndhd1.sleeptimer.ui.screen.timer
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -23,10 +23,6 @@ import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.ui.widgets.ErrorLayout
 import io.github.pndhd1.sleeptimer.ui.widgets.LoadingLayout
 import io.github.pndhd1.sleeptimer.utils.Defaults
-import io.github.pndhd1.sleeptimer.utils.ui.SolidInsetsBackground
-import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
-import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
-import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -41,53 +37,37 @@ fun TimerContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .windowInsetsPadding(
-                    WindowInsets.systemBarsForVisualComponents
-                        .union(WindowInsets.appBottomNavigationBar)
-                        .add(WindowInsets.adBannerIgnoringVisibility)
-                ),
-        ) {
-            Crossfade(targetState = slot?.child?.instance) { child ->
-                when (child) {
-                    is TimerComponent.Child.Permission -> {
-                        PermissionContent(
-                            component = child.component,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    is TimerComponent.Child.Config -> {
-                        TimerConfigContent(
-                            component = child.component,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    is TimerComponent.Child.Active -> {
-                        ActiveTimerContent(
-                            component = child.component,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    is TimerComponent.Child.Error -> ErrorLayout(modifier = Modifier.fillMaxSize())
-
-                    null -> Unit // Loading is handled outside the Crossfade
+        Crossfade(targetState = slot?.child?.instance) { child ->
+            when (child) {
+                is TimerComponent.Child.Permission -> {
+                    PermissionContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
-            }
 
-            if (slot?.child?.instance == null) LoadingLayout(modifier = Modifier.fillMaxSize())
+                is TimerComponent.Child.Config -> {
+                    TimerConfigContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                        isInTransition = child != slot?.child?.instance,
+                    )
+                }
+
+                is TimerComponent.Child.Active -> {
+                    ActiveTimerContent(
+                        component = child.component,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+
+                is TimerComponent.Child.Error -> ErrorLayout(modifier = Modifier.fillMaxSize())
+
+                null -> Unit // Loading is handled outside the Crossfade
+            }
         }
 
-        SolidInsetsBackground(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .windowInsetsBottomHeight(WindowInsets.appBottomNavigationBar)
-        )
+        if (slot?.child?.instance == null) LoadingLayout(modifier = Modifier.fillMaxSize())
     }
 }
 
@@ -104,6 +84,8 @@ private class TimerChildProvider : PreviewParameterProvider<TimerComponent.Child
                     loading = false,
                     duration = 30.minutes,
                     presets = Defaults.DefaultPresets,
+                    defaultDuration = 15.minutes,
+                    isCustomExpanded = false,
                 )
             )
         ),

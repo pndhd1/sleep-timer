@@ -15,8 +15,10 @@ class DefaultTimerConfigComponent(
     private val _state = MutableStateFlow(
         TimerConfigState(
             loading = false,
-            duration = params.duration,
+            duration = params.defaultDuration,
+            defaultDuration = params.defaultDuration,
             presets = params.presets,
+            isCustomExpanded = false,
         )
     )
     override val state: StateFlow<TimerConfigState> = _state.asStateFlow()
@@ -35,8 +37,12 @@ class DefaultTimerConfigComponent(
         if (currentState.hasTime) onStartTimer(targetTime, currentState.duration)
     }
 
+    override fun onCustomExpandedChanged(expanded: Boolean) {
+        _state.update { it.copy(isCustomExpanded = expanded) }
+    }
+
     data class Params(
-        val duration: Duration,
+        val defaultDuration: Duration,
         val presets: List<Duration>,
     )
 }

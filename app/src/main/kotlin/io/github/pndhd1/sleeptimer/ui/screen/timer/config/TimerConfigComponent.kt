@@ -11,12 +11,15 @@ interface TimerConfigComponent {
     fun onDurationChanged(duration: Duration)
     fun onPresetSelected(duration: Duration)
     fun onStartClick()
+    fun onCustomExpandedChanged(expanded: Boolean)
 }
 
 data class TimerConfigState(
     val loading: Boolean,
     val duration: Duration,
+    val defaultDuration: Duration,
     val presets: List<Duration>,
+    val isCustomExpanded: Boolean = false,
 ) {
     val hasTime: Boolean get() = duration >= Defaults.MinTimerDuration && duration <= Defaults.MaxTimerDuration
 }

@@ -286,8 +286,6 @@ private fun SettingsLayout(
             item {
                 PresetsCard(
                     presets = state.presets,
-                    maxPresets = state.maxPresets,
-                    canAddPreset = state.canAddPreset,
                     onPresetAdded = component::onPresetAdded,
                     onPresetRemoved = component::onPresetRemoved,
                 )
@@ -334,7 +332,7 @@ private fun SettingsLayout(
             visible = listState.canScrollBackward,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .windowInsetsTopHeight(WindowInsets.systemBarsForVisualComponents)
+                .windowInsetsTopHeight(WindowInsets.statusBars)
                 .fillMaxWidth(),
         )
 
@@ -343,10 +341,10 @@ private fun SettingsLayout(
                 .align(Alignment.BottomCenter)
                 .windowInsetsBottomHeight(
                     WindowInsets.appBottomNavigationBar
-                        .union(WindowInsets.systemBarsForVisualComponents)
+                        .union(WindowInsets.systemBars)
                         .let {
                             if (!isPortrait() && LocalNavigationMode.current == NavigationMode.Gestures) {
-                                it.exclude(WindowInsets.systemBarsForVisualComponents)
+                                it.exclude(WindowInsets.systemBars)
                             } else {
                                 it
                             }
@@ -459,8 +457,6 @@ private fun ExtendDurationCard(
 @Composable
 private fun PresetsCard(
     presets: List<Duration>,
-    maxPresets: Int,
-    canAddPreset: Boolean,
     onPresetAdded: (Duration) -> Unit,
     onPresetRemoved: (Duration) -> Unit,
     modifier: Modifier = Modifier,
@@ -469,14 +465,13 @@ private fun PresetsCard(
 
     SettingsCard(
         title = stringResource(R.string.settings_presets_title),
-        description = stringResource(R.string.settings_presets_description, maxPresets),
+        description = stringResource(R.string.settings_presets_description),
         modifier = modifier,
     ) {
         PresetChips(
             presets = presets,
             onPresetRemoved = onPresetRemoved,
             onAddClick = { showAddDialog = true },
-            canAddMore = canAddPreset,
         )
     }
 
@@ -748,7 +743,6 @@ private fun PresetChips(
     presets: List<Duration>,
     onPresetRemoved: (Duration) -> Unit,
     onAddClick: () -> Unit,
-    canAddMore: Boolean,
     modifier: Modifier = Modifier,
 ) {
     // Track items with visibility state for enter/exit animations
@@ -805,13 +799,11 @@ private fun PresetChips(
             }
         }
 
-        if (canAddMore) {
-            FilledTonalIconButton(onClick = onAddClick) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_add),
-                    contentDescription = stringResource(R.string.settings_add_preset),
-                )
-            }
+        FilledTonalIconButton(onClick = onAddClick) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_add),
+                contentDescription = stringResource(R.string.settings_add_preset),
+            )
         }
     }
 }
@@ -844,7 +836,6 @@ private fun SettingsContentLoadedPreview() {
         defaultDuration = 30.minutes,
         extendDuration = 5.minutes,
         presets = listOf(15.minutes, 30.minutes, 45.minutes, 60.minutes),
-        maxPresets = Defaults.MaxPresets,
         showNotification = true,
         hasNotificationPermission = true,
         fadeOut = FadeOutSettings(

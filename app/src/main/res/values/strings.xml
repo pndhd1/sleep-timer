@@ -24,6 +24,14 @@
     <string name="button_stop">Stop</string>
     <string name="button_extend">Extend</string>
     <string name="button_reset">Reset</string>
+    <string name="button_close">Close</string>
+
+    <!-- Timer Cards -->
+    <string name="timer_quick_start">Quick Start</string>
+    <string name="timer_tap_to_start">Tap to start</string>
+    <string name="timer_custom">Custom</string>
+    <string name="timer_set_your_time">Set your time</string>
+    <string name="timer_preset">Preset</string>
 
     <!-- Dialogs -->
     <string name="dialog_ok">OK</string>
@@ -80,7 +88,7 @@
 
     <!-- Settings: Presets -->
     <string name="settings_presets_title">Quick Presets</string>
-    <string name="settings_presets_description">Shortcuts for quickly setting timer duration in minutes (max %d)</string>
+    <string name="settings_presets_description">Shortcuts for quickly setting timer duration in minutes</string>
     <string name="settings_add_preset">Add preset</string>
     <string name="settings_add_preset_title">Add Preset</string>
     <string name="settings_add_preset_description">Enter duration in minutes</string>

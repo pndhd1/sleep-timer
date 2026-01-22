@@ -99,7 +99,7 @@ class DefaultTimerComponent(
             component = DefaultTimerConfigComponent(
                 componentContext = componentContext,
                 params = DefaultTimerConfigComponent.Params(
-                    duration = config.duration,
+                    defaultDuration = config.defaultDuration,
                     presets = config.presets,
                 ),
                 onStartTimer = ::onStartTimer,
@@ -192,7 +192,7 @@ private sealed interface SlotConfig {
 
     @Serializable
     data class Config(
-        val duration: Duration,
+        val defaultDuration: Duration,
         val presets: List<Duration>,
     ) : SlotConfig
 
@@ -204,7 +204,7 @@ private sealed interface SlotConfig {
 }
 
 private fun TimerSettings.toTimerConfigSlot() = SlotConfig.Config(
-    duration = defaultDuration,
+    defaultDuration = defaultDuration,
     presets = presets,
 )
 
