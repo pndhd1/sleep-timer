@@ -188,11 +188,6 @@ class TimerNotificationService : LifecycleService() {
             .setSilent(true)
             .setContentIntent(contentIntent)
             .setProgress(100, progress, false)
-            .addAction(
-                0,
-                getString(R.string.notification_action_stop),
-                stopIntent
-            )
             .apply {
                 if (cachedExtendDuration > Duration.ZERO) {
                     addAction(
@@ -202,6 +197,11 @@ class TimerNotificationService : LifecycleService() {
                     )
                 }
             }
+            .addAction(
+                0,
+                getString(R.string.notification_action_stop),
+                stopIntent
+            )
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }

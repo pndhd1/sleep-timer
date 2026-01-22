@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.pndhd1.sleeptimer.R
 import io.github.pndhd1.sleeptimer.ui.theme.SleepTimerTheme
 import io.github.pndhd1.sleeptimer.utils.Formatter
+import io.github.pndhd1.sleeptimer.utils.ui.SolidInsetsBackground
 import io.github.pndhd1.sleeptimer.utils.ui.adBannerIgnoringVisibility
 import io.github.pndhd1.sleeptimer.utils.ui.appBottomNavigationBar
 import io.github.pndhd1.sleeptimer.utils.ui.systemBarsForVisualComponents
@@ -47,7 +48,7 @@ fun ActiveTimerContent(
 
     Box(modifier = modifier) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(
                     WindowInsets.systemBarsForVisualComponents
@@ -92,6 +93,13 @@ fun ActiveTimerContent(
                 }
             }
         }
+
+        SolidInsetsBackground(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .windowInsetsBottomHeight(WindowInsets.appBottomNavigationBar)
+                .fillMaxWidth()
+        )
     }
 }
 

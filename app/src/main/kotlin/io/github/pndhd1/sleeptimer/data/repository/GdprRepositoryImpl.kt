@@ -6,6 +6,7 @@ import androidx.core.content.getSystemService
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -65,11 +66,9 @@ class GdprRepositoryImpl(
         }
 
     override suspend fun setUserConsent(consent: Boolean) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[GdprConsentDialogShownKey] = true
-                this[GdprUserConsentKey] = consent
-            }
+        preferences.edit {
+            it[GdprConsentDialogShownKey] = true
+            it[GdprUserConsentKey] = consent
         }
     }
 

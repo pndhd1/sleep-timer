@@ -40,91 +40,47 @@ class SettingsRepositoryImpl(
     override val timerSettings: Flow<TimerSettings> = preferences.data.map { it.toDomain() }
 
     override suspend fun updateTimerDefaultDuration(duration: Duration) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[DefaultDurationSecondsKey] = duration.inWholeSeconds.toInt()
-            }
-        }
+        preferences.edit { it[DefaultDurationSecondsKey] = duration.inWholeSeconds.toInt() }
     }
 
     override suspend fun updateTimerPresets(presets: List<Duration>) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[PresetSecondsKey] = presets.map { it.inWholeSeconds.toInt() }.toByteArray()
-            }
-        }
+        preferences.edit { it[PresetSecondsKey] = presets.map { it.inWholeSeconds.toInt() }.toByteArray() }
     }
 
     override suspend fun updateExtendDuration(duration: Duration) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[ExtendDurationSecondsKey] = duration.inWholeSeconds.toInt()
-            }
-        }
+        preferences.edit { it[ExtendDurationSecondsKey] = duration.inWholeSeconds.toInt() }
     }
 
     override suspend fun updateShowNotification(show: Boolean) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[ShowNotificationKey] = show
-            }
-        }
+        preferences.edit { it[ShowNotificationKey] = show }
     }
 
     override suspend fun updateFadeOutEnabled(enabled: Boolean) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[FadeOutEnabledKey] = enabled
-            }
-        }
+        preferences.edit { it[FadeOutEnabledKey] = enabled }
     }
 
     override suspend fun updateFadeStartBefore(duration: Duration) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[FadeStartBeforeSecondsKey] = duration.inWholeSeconds.toInt()
-            }
-        }
+        preferences.edit { it[FadeStartBeforeSecondsKey] = duration.inWholeSeconds.toInt() }
     }
 
     override suspend fun updateFadeOutDuration(duration: Duration) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[FadeOutDurationSecondsKey] = duration.inWholeSeconds.toInt()
-            }
-        }
+        preferences.edit { it[FadeOutDurationSecondsKey] = duration.inWholeSeconds.toInt() }
     }
 
     override suspend fun updateFadeTargetVolumePercent(percent: Int) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[FadeTargetVolumePercentKey] = percent.coerceIn(0, 100)
-            }
-        }
+        preferences.edit { it[FadeTargetVolumePercentKey] = percent.coerceIn(0, 100) }
     }
 
     override suspend fun updateGoHomeOnExpire(enabled: Boolean) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[GoHomeOnExpireKey] = enabled
-            }
-        }
+        preferences.edit { it[GoHomeOnExpireKey] = enabled }
     }
 
     override suspend fun updateStopMediaOnExpire(enabled: Boolean) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[StopMediaOnExpireKey] = enabled
-            }
-        }
+        preferences.edit { it[StopMediaOnExpireKey] = enabled }
     }
 
     override suspend fun updateFabAlignment(alignment: FabAlignment) {
-        preferences.updateData { current ->
-            current.toMutablePreferences().apply {
-                this[FabAlignmentKey] = alignment.name
-            }
-        }
+        preferences.edit { it[FabAlignmentKey] = alignment.name }
     }
 }
 

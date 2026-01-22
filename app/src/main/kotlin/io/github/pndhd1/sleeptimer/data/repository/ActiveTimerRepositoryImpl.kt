@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.core.content.getSystemService
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -47,11 +48,9 @@ class ActiveTimerRepositoryImpl(
         totalDuration: Duration,
         fadeOutSettings: FadeOutSettings,
     ) {
-        preferences.updateData { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[TargetTimeKey] = targetTime.epochSeconds
-                this[TotalDurationKey] = totalDuration.inWholeSeconds
-            }
+        preferences.edit {
+            it[TargetTimeKey] = targetTime.epochSeconds
+            it[TotalDurationKey] = totalDuration.inWholeSeconds
         }
         scheduleAlarm(targetTime)
         scheduleFadeAlarmIfEnabled(targetTime, fadeOutSettings)
@@ -67,11 +66,9 @@ class ActiveTimerRepositoryImpl(
         cancelAlarm()
         cancelFadeAlarm()
         AudioFadeService.stop(context)
-        preferences.updateData { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[TargetTimeKey] = newTargetTime.epochSeconds
-                this[TotalDurationKey] = newTotalDuration.inWholeSeconds
-            }
+        preferences.edit {
+            it[TargetTimeKey] = newTargetTime.epochSeconds
+            it[TotalDurationKey] = newTotalDuration.inWholeSeconds
         }
         scheduleAlarm(newTargetTime)
         scheduleFadeAlarmIfEnabled(newTargetTime, fadeOutSettings)
@@ -81,11 +78,9 @@ class ActiveTimerRepositoryImpl(
         cancelAlarm()
         cancelFadeAlarm()
         AudioFadeService.stop(context)
-        preferences.updateData { prefs ->
-            prefs.toMutablePreferences().apply {
-                this.remove(TargetTimeKey)
-                this.remove(TotalDurationKey)
-            }
+        preferences.edit {
+            it.remove(TargetTimeKey)
+            it.remove(TotalDurationKey)
         }
     }
 
