@@ -12,7 +12,6 @@ import io.github.pndhd1.sleeptimer.utils.YandexAdsState
 
 class SleepTimerApplication : Application() {
 
-    @Inject
     lateinit var appGraph: AppGraph
         private set
 

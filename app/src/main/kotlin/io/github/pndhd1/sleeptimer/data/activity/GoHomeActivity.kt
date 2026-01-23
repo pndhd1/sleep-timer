@@ -16,7 +16,7 @@ import io.github.pndhd1.sleeptimer.requireAppGraph
 class GoHomeActivity : ComponentActivity() {
 
     @Inject
-    lateinit var systemRepository: SystemRepository
+    private lateinit var systemRepository: SystemRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
